@@ -47,13 +47,13 @@
 function handleInput(dt) {
     if(input.isDown('DOWN') || input.isDown('s')) {
         if (!player.outOfBounds(player.x,(player.y+1.5*player.speed*dt)+player.bothitbox ) ){
-            player.y += 1.5*player.speed * dt;
+            player.moveDown(1.5*player.speed * dt);
         }
     }
 
     if(input.isDown('UP') || input.isDown('w')) {
         if (!player.outOfBounds(player.x, player.y-1.5*player.speed*dt)){
-            player.y -= 1.5*player.speed * dt;
+            player.moveUp(1.5*player.speed * dt);
         }
     }
 

@@ -18,6 +18,10 @@ class Player{
         this.run_right_sprite.src = 'img/player/run-right.png';
         this.run_left_sprite = new Image();
         this.run_left_sprite.src = 'img/player/run-left.png';
+        this.run_up_sprite = new Image();
+        this.run_up_sprite.src = 'img/player/run-up.png';
+        this.run_down_sprite = new Image();
+        this.run_down_sprite.src = 'img/player/run-down.png';
     }
 
     moveRight(distance){
@@ -27,6 +31,14 @@ class Player{
     moveLeft(distance){
         this.x-=distance;
         this.sprite.image = this.run_left_sprite;
+    }
+    moveUp(distance){
+        this.y-=distance;
+        this.sprite.image = this.run_up_sprite;
+    }
+    moveDown(distance){
+        this.y+=distance;
+        this.sprite.image = this.run_down_sprite;
     }
 
     canLeave(){
