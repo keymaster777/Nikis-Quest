@@ -59,13 +59,13 @@ function handleInput(dt) {
 
     if(input.isDown('LEFT') || input.isDown('a')) {
         if (!player.outOfBounds((player.x - 1.5*player.speed * dt)-player.rlhitbox, player.y)){
-            player.x -= 1.5*player.speed * dt;
+            player.moveLeft(1.5*player.speed * dt);
         }
     }
 
     if(input.isDown('RIGHT') || input.isDown('d')) {
         if (!player.outOfBounds((player.x + 1.5*player.speed * dt)+player.rlhitbox, player.y)){
-            player.x += 1.5*player.speed * dt;
+            player.moveRight(1.5*player.speed * dt);
         }
     }
 

@@ -13,16 +13,17 @@ document.body.appendChild(canvas);
 var playerLocation = document.getElementById("position");
 
 
-var player = new Player();
+
 var playerImage = new Image();
-playerImage.src = 'img/sprites/knight_sprite.png';
-var knight_sprite = sprite({
+playerImage.src = 'img/player/run-right.png';
+var player_sprite = sprite({
     context: ctx,
-    width: 64,
-    height: 24,
+    width: 256,
+    height: 32,
     image: playerImage,
-    numberOfFrames:4
+    numberOfFrames: 8
 });
+var player = new Player(player_sprite);
 
 startLoadingAllImages(start);
 function start(){
@@ -35,56 +36,6 @@ function randomIntFromInterval(min,max){
     return Math.floor(Math.random()*(max-min+1)+min);
 }
 
-function sprite (options) {
-				
-    var that = {},
-    frameIndex = 0,
-    tickCount = 0,
-    ticksPerFrame = 10,
-    numberOfFrames = options.numberOfFrames || 1;
-					
-    that.context = options.context;
-    that.width = options.width;
-    that.height = options.height;
-    that.image = options.image;
-
-    that.loop = options.loop;
-
-    that.update = function () {
-
-        tickCount += 1;
-			
-        if (tickCount > ticksPerFrame) {
-        
-        	tickCount = 0;
-        	
-            // Go to the next frame
-            if (frameIndex < numberOfFrames - 1) {	
-                // Go to the next frame
-                frameIndex += 1;
-            } else {
-                frameIndex = 0;
-            }
-        }
-    }; 
-
-    that.render = function () {
-
-        // Draw the animation
-        that.context.drawImage(
-           that.image,
-           frameIndex * that.width / numberOfFrames,
-           0,
-           that.width / numberOfFrames,
-           that.height,
-           player.x-.4*TS,
-           player.y-TS,
-           TS*.05*that.width / numberOfFrames,
-           TS*.05*that.height);
-    };
-
-    return that;
-}
 
 
 function printArray(arr, preamble = ""){
@@ -276,7 +227,7 @@ class Room{
         for( var i = 0; i<layer1.length; i++){
             layer1[i].draw();
         }
-        player.draw(true);
+        player.draw();
         for( var i = 0; i<layer2.length; i++){
             layer2[i].draw();
         }
