@@ -135,14 +135,19 @@ class Room{
             directionsLeft = directionsLeft.filter(direction => direction != DOWN);
             this.oneWayBlockedDoors.push(DOWN);
         }
-        console.log(Math.floor(20/(uniqueRooms)));
-        for(var i = 0; i<Math.floor(20/(uniqueRooms+1));i++){
+        for(var i = 0; i<Math.floor(4/this.distanceFromCenter());i++){
             var index = randomIntFromInterval(0,directionsLeft.length-1);
             this.buildOneDoor(directionsLeft[index]);
             directionsLeft = directionsLeft.filter(direction => direction != directionsLeft[index] );
         }
         this.directionsLeft = directionsLeft;
         this.doorArray = tileArray.filter(tile => tile instanceof DoorTile);
+    }
+    distanceFromCenter(){
+        let a = this.x;
+        let b = this.y;
+        if (a == 0 && b == 0){ return 1}; 
+        return (Math.sqrt( a*a + b*b ));
     }
     buildOneDoor(direction){
         var tileArray = this.tileArray;
