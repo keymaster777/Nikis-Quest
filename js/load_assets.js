@@ -18,6 +18,11 @@ wallURLS.push('img/sprites/wall_top_left.png');
 wallURLS.push('img/sprites/wall_top_mid.png');
 wallURLS.push('img/sprites/wall_corner_left.png');
 wallURLS.push('img/sprites/wall_corner_right.png');
+wallURLS.push('img/sprites/wall_hole_1.png');
+wallURLS.push('img/sprites/wall_banner_red.png');
+wallURLS.push('img/sprites/wall_hole_2.png');
+wallURLS.push('img/sprites/wall_banner_yellow.png');
+wallURLS.push('img/sprites/wall_goo.png');
 
 //src for floor images
 floorURLS.push('img/sprites/floor_1.png');

@@ -46,6 +46,68 @@ function printArray(arr, preamble = ""){
     console.log(preamble + "["+result+"]");
 }
 
+function randomWall(outer = false){
+    let random = Math.random();
+    if (!outer){
+        switch(true){
+            case random < .05:
+                return wallimgs[10];
+                break;
+            case random < .075:
+                return wallimgs[13];
+                break;
+            case random < .1:
+                return wallimgs[11];
+                break;
+            case random < .105:
+                return wallimgs[14];
+                break;
+            default:
+                return wallimgs[2];
+                break;
+        }
+    }else{
+        switch(true){
+            case random < .05:
+                return wallimgs[10];
+                break;
+            case random < .1:
+                return wallimgs[12];
+                break;
+            case random < .105:
+                return wallimgs[14];
+                break;
+            default:
+                return wallimgs[2];
+                break;
+        }
+    }
+}
+
+function randomFloor(){
+    let random = Math.random();
+    switch(true){
+        case random < .05:
+            return floorimgs[1];
+            break;
+        case random < .1:
+            return floorimgs[2];
+            break;
+        case random < .15:
+            return floorimgs[3];
+            break;
+        case random < .2:
+            return floorimgs[4];
+            break;
+        case random < .225:
+            return floorimgs[5];
+            break;
+        default:
+            return floorimgs[0];
+            break;
+    }
+}
+
 
 class Room{
     constructor(width,height,x,y, entryDoor = false){
@@ -99,7 +161,7 @@ class Room{
     buildFloor(){
         for(var x=0; x<this.width; x++){
             for(var y=0; y<=this.height; y++){
-                this.tileArray.push(new FloorTile(floorimgs[randomIntFromInterval(0, floorimgs.length-1)], 0 , x, y, TS));
+                this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
             }
         }
     }
@@ -148,7 +210,6 @@ class Room{
         let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile);
         for(var i = 0; i<floorArray.length;i++){
             var random = randomIntFromInterval(1,1000);
-            console.log(random);
             switch(true){
                 case random < 10:
                     //Chest
@@ -203,10 +264,10 @@ class Room{
                     tileArray[x] = new WallTile(wallimgs[7], 1 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
                 }
                 if(tileArray[x].y == 1){
-                    tileArray[x] = new WallTile(wallimgs[2], 0 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
+                    tileArray[x] = new WallTile(randomWall(), 0 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
                 }
                 if(tileArray[x].y == this.height){
-                    tileArray[x] = new WallTile(wallimgs[2], 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true }); //Bottom
+                    tileArray[x] = new WallTile(randomWall(true), 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true }); //Bottom
                 }
                 if(tileArray[x].y == this.height-1){
                     tileArray.push(new WallTile(wallimgs[7], 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: false })); //bottom Cap

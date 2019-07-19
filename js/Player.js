@@ -32,6 +32,9 @@ class Player{
         this.idle_up.src = 'img/player/idle-up.png'
         this.idle = new Image();
         this.idle = this.idle_down;
+        this.weapon = new Image();
+        this.weapon.src = 'img/sprites/weapon_golden_sword.png';
+
     }
 
     move(dt, direction = false){
