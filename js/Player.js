@@ -22,23 +22,51 @@ class Player{
         this.run_up_sprite.src = 'img/player/run-up.png';
         this.run_down_sprite = new Image();
         this.run_down_sprite.src = 'img/player/run-down.png';
+        this.idle_down = new Image();
+        this.idle_down.src = 'img/player/idle-down.png';
+        this.idle_right = new Image();
+        this.idle_right.src = 'img/player/idle-right.png';
+        this.idle_left = new Image();
+        this.idle_left.src = 'img/player/idle-left.png'
+        this.idle_up = new Image();
+        this.idle_up.src = 'img/player/idle-up.png'
+        this.idle = new Image();
+        this.idle = this.idle_down;
     }
 
-    moveRight(distance){
-        this.x+=distance;
-        this.sprite.image = this.run_right_sprite;
+    move(dt, direction = false){
+        let distance = this.speed*1.5*dt
+        this.sprite.width = 256;
+        this.sprite.numberOfFrames = 8;
+        switch(direction){
+            case DOWN:
+                this.y+=distance;
+                this.sprite.image = this.run_down_sprite;
+                this.idle = this.idle_down;
+                break;
+            case UP:
+                this.y-=distance;
+                this.sprite.image = this.run_up_sprite;
+                this.idle = this.idle_up;
+                break;
+            case LEFT:
+                this.x-=distance;
+                this.sprite.image = this.run_left_sprite;
+                this.idle = this.idle_left;
+                break;
+            case RIGHT:
+                this.x+=distance;
+                this.sprite.image = this.run_right_sprite;
+                this.idle = this.idle_right;
+                break;
+        }
     }
-    moveLeft(distance){
-        this.x-=distance;
-        this.sprite.image = this.run_left_sprite;
-    }
-    moveUp(distance){
-        this.y-=distance;
-        this.sprite.image = this.run_up_sprite;
-    }
-    moveDown(distance){
-        this.y+=distance;
-        this.sprite.image = this.run_down_sprite;
+
+    spriteIdle(){
+        this.sprite.width = 32;
+        this.sprite.numberOfFrames = 1;
+        this.sprite.image = this.idle;
+        this.sprite.setFrame();
     }
 
     canLeave(){
@@ -50,6 +78,9 @@ class Player{
         debug = debug || false;
         this.sprite.update();
         this.sprite.render();
+        if(!isInput){
+            this.spriteIdle();
+        }
         if (debug){
             ctx.fillStyle = "red";
             ctx.fillRect(this.x,this.y,10,10); // fill in the pixel at (10,10)
@@ -87,15 +118,18 @@ function sprite (options) {
     var that = {},
     frameIndex = 0,
     tickCount = 0,
-    ticksPerFrame = 8,
-    numberOfFrames = options.numberOfFrames || 1;
-					
+    ticksPerFrame = 8;
+    that.numberOfFrames = options.numberOfFrames || 1;
     that.context = options.context;
     that.width = options.width;
     that.height = options.height;
     that.image = options.image;
 
     that.loop = options.loop;
+
+    that.setFrame = function(){
+        frameIndex = 0;
+    }
 
     that.update = function () {
 
@@ -106,7 +140,7 @@ function sprite (options) {
         	tickCount = 0;
         	
             // Go to the next frame
-            if (frameIndex < numberOfFrames - 1) {	
+            if (frameIndex < that.numberOfFrames - 1) {	
                 // Go to the next frame
                 frameIndex += 1;
             } else {
@@ -120,13 +154,13 @@ function sprite (options) {
         // Draw the animation
         that.context.drawImage(
            that.image,
-           frameIndex * that.width / numberOfFrames,
+           frameIndex * that.width / that.numberOfFrames,
            0,
-           that.width / numberOfFrames,
+           that.width / that.numberOfFrames,
            that.height,
            player.x-.6*TS,
            player.y-.9*TS,
-           TS*.04*that.width / numberOfFrames,
+           TS*.04*that.width / that.numberOfFrames,
            TS*.04*that.height);
     };
 

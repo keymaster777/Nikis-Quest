@@ -1,6 +1,7 @@
+var isInput = false;
+
 (function() {
     var pressedKeys = {};
-
     function setKey(event, status) {
         var code = event.keyCode;
         var key;
@@ -45,28 +46,41 @@
 
 
 function handleInput(dt) {
+    isInput=false;
     if(input.isDown('DOWN') || input.isDown('s')) {
         if (!player.outOfBounds(player.x,(player.y+1.5*player.speed*dt)+player.bothitbox ) ){
-            player.moveDown(1.5*player.speed * dt);
+            player.move(dt, DOWN);
+        }else{
+            player.move(0, DOWN);
         }
+        isInput = true;
     }
 
     if(input.isDown('UP') || input.isDown('w')) {
         if (!player.outOfBounds(player.x, player.y-1.5*player.speed*dt)){
-            player.moveUp(1.5*player.speed * dt);
+            player.move(dt, UP);
+        }else{
+            player.move(0, UP);
         }
+        isInput = true;
     }
 
     if(input.isDown('LEFT') || input.isDown('a')) {
         if (!player.outOfBounds((player.x - 1.5*player.speed * dt)-player.rlhitbox, player.y)){
-            player.moveLeft(1.5*player.speed * dt);
+            player.move(dt, LEFT);
+        }else{
+            player.move(0, LEFT);
         }
+        isInput = true;
     }
 
     if(input.isDown('RIGHT') || input.isDown('d')) {
         if (!player.outOfBounds((player.x + 1.5*player.speed * dt)+player.rlhitbox, player.y)){
-            player.moveRight(1.5*player.speed * dt);
+            player.move(dt, RIGHT);
+        }else{
+            player.move(0, RIGHT);
         }
+        isInput = true;
     }
 
     if(input.isDown('SPACE')) {
