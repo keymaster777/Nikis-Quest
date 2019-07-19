@@ -30,6 +30,21 @@ class Tile{
     }
 }
 
+class Item extends Tile{
+    constructor(tileimg, layer, x, y, TS, obstructing = false){
+        super(tileimg, layer, x, y, TS);
+        this.obstructing = obstructing;
+    }
+
+    inArea(x,y){
+        if(this.obstructing && x>=this.x*TS && x<this.x*TS+TS &&  y>=this.y*TS && y<this.y*TS+TS ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+
 class FloorTile extends Tile{
     constructor(tileimg, layer, x, y, TS){
         super(tileimg, layer, x, y, TS);
@@ -44,7 +59,7 @@ class DoorTile extends Tile{
 class WallTile extends Tile{
     constructor(tileimg, layer, x, y, TS, options){
         super(tileimg, layer, x, y, TS);
-        this.hitbox = options.hitbox || false;
+        this.obstructing = options.obstructing || false;
         this.hitboxLeft = options.hitboxLeft || false;
         this.hitboxRight = options.hitboxRight || false;
     }

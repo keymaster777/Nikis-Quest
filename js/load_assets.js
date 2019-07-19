@@ -2,8 +2,10 @@ var imagesOK=0;
 var totalURLS=0;
 var floorURLS=[];
 var wallURLS=[];
+var itemURLS=[];
 var floorimgs=[];
 var wallimgs=[];
+var itemimgs=[];
 
 //src for wall images
 wallURLS.push('img/sprites/wall_side_mid_left.png');
@@ -25,10 +27,15 @@ floorURLS.push('img/sprites/floor_4.png');
 floorURLS.push('img/sprites/floor_5.png');
 floorURLS.push('img/sprites/floor_7.png');
 
+//src for item images
+itemURLS.push('img/2D Pixel Dungeon Asset Pack/items and trap_animation/box_2/box_2_1.png');
+itemURLS.push('img/2D Pixel Dungeon Asset Pack/items and trap_animation/flasks/flasks_1_1.png');
+
 
 function startLoadingAllImages(callback){
     loadImgArray(floorURLS, floorimgs, callback);
     loadImgArray(wallURLS, wallimgs, callback);
+    loadImgArray(itemURLS, itemimgs, callback);
 }
 //neatly packages an array of images using an array of urls, callback checks if all image arrays are loaded
 function loadImgArray(urls, destination, callback){

@@ -91,9 +91,9 @@ class Player{
         this.y=y;
     }
     outOfBounds(x,y){
-        var walls=activeRoom.tileArray.filter(tile => tile instanceof WallTile);
-        for(var i = 0;i<walls.length;i++){
-            if( walls[i].inArea(x,y) && walls[i].hitbox){
+        var obstructing=activeRoom.tileArray.filter(tile => tile instanceof WallTile || tile instanceof Item);
+        for(var i = 0;i<obstructing.length;i++){
+            if( obstructing[i].inArea(x,y) && obstructing[i].obstructing){
                 return true;
             }
         }
