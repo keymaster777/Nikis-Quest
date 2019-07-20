@@ -85,19 +85,17 @@ class DoorTile extends Tile{
     preDraw(room){
         console.log("prebuild door")
         let indexOfOld;
+        indexOfOld = findTile(room.tileArray, this.x, this.y-1, {constructorName: "WallTile"});
         switch(this.direction){
             case DOWN:
             case UP:
-                indexOfOld = findTile(room.tileArray, this.x, this.y-1, {constructorName: "WallTile"});
                 room.tileArray[indexOfOld] = new WallTile(wallimgs[15], 2 , this.x, this.y-1, TS, { obstructing: false}); 
                 break;
             case LEFT:
-                indexOfOld = findTile(room.tileArray, this.x, this.y-1 ,{constructorName: "WallTile"});
                 room.tileArray[indexOfOld] = new WallTile(wallimgs[17], 1, this.x, this.y-1, TS, { obstructing: true, hitboxLeft:true});
                 room.tileArray.push(new WallTile(wallimgs[19], 2, this.x, this.y, TS, { obstructing: false}));
                 break;
             case RIGHT:
-                indexOfOld = findTile(room.tileArray, this.x, this.y-1,{constructorName: "WallTile"});
                 room.tileArray[indexOfOld] = new WallTile(wallimgs[16], 1, this.x, this.y-1, TS, { obstructing: true, hitboxRight:true});
                 room.tileArray.push(new WallTile(wallimgs[18], 2, this.x, this.y, TS, { obstructing: false})); 
                 break;

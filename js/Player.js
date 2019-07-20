@@ -79,6 +79,8 @@ class Player{
     draw(debug){
         if(debug){this.speed = 3*TS;}
         debug = debug || false;
+        this.sprite.x = player.x-.65*TS;
+        this.sprite.y = player.y-1.1*TS;
         this.sprite.update();
         this.sprite.render();
         if(!isInput){
@@ -133,7 +135,9 @@ function sprite (options) {
     that.width = options.width;
     that.height = options.height;
     that.image = options.image;
-
+    that.sizescale = options.sizescale || 1;
+    that.x = options.x || TS;
+    that.y = options.y || TS;
     that.loop = options.loop;
 
     that.setFrame = function(){
@@ -167,10 +171,10 @@ function sprite (options) {
            0,
            that.width / that.numberOfFrames,
            that.height,
-           player.x-.65*TS,
-           player.y-1.1*TS,
-           TS*.04*that.width / that.numberOfFrames,
-           TS*.04*that.height);
+           that.x,
+           that.y,
+           TS*that.sizescale*that.width / that.numberOfFrames,
+           TS*that.sizescale*that.height);
     };
 
     return that;

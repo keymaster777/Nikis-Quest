@@ -21,7 +21,8 @@ var player_sprite = sprite({
     width: 256,
     height: 32,
     image: playerImage,
-    numberOfFrames: 8
+    numberOfFrames: 8,
+    sizescale: .04,
 });
 var player = new Player(player_sprite);
 
