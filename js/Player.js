@@ -5,7 +5,7 @@ class Player{
         this.x=2*TS;
         this.y=3*TS;
         this.layer=1;
-        this.rlhitbox=.2*TS;
+        this.rlhitbox=.4*TS;
         this.bothitbox=.15*TS;
         this.speed=TS*1.5;
         this.setupSprite();
@@ -95,12 +95,18 @@ class Player{
     }
     outOfBounds(x,y){
         var obstructing=activeRoom.tileArray.filter(tile => tile instanceof WallTile || tile instanceof Item);
+        let list = [];
+        for (var i = x -this.rlhitbox; i <= x+this.rlhitbox; i++) {
+            list.push(i);
+        }
         for(var i = 0;i<obstructing.length;i++){
-            if( obstructing[i].inArea(x,y) && obstructing[i].obstructing){
-                return true;
+            for(var i2 = 0; i2<list.length;i2++){
+                if( obstructing[i].inArea(list[i2],y) && obstructing[i].obstructing){
+                    return true;
+                }
             }
         }
-        if((y>(activeRoom.height+1)*TS)||(x>(activeRoom.width)*TS)||x<0){
+        if(( y<TS || y>(activeRoom.height+1)*TS)||(x>(activeRoom.width)*TS)||x<0){
             return true;
         }
     }
@@ -161,8 +167,8 @@ function sprite (options) {
            0,
            that.width / that.numberOfFrames,
            that.height,
-           player.x-.6*TS,
-           player.y-.9*TS,
+           player.x-.65*TS,
+           player.y-1.1*TS,
            TS*.04*that.width / that.numberOfFrames,
            TS*.04*that.height);
     };

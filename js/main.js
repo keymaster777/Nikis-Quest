@@ -128,6 +128,7 @@ class Room{
         this.buildWalls();
         this.buildItems();
         this.positionPlayer();
+        this.preDraw();
         this.leftFrom;
     }
 
@@ -301,11 +302,19 @@ class Room{
 
     }
     
+    preDraw(){
+        for( var i = 0; i<this.tileArray.length; i++){
+            this.tileArray[i].preDraw(this);
+        }
+    }
+    
     drawFloor = function(){
         ctx.translate(activeRoom.lpad, 0);
         var layer0 = this.tileArray.filter(tile => tile.layer == 0);
         var layer1 = this.tileArray.filter(tile => tile.layer == 1);
         var layer2 = this.tileArray.filter(tile => tile.layer == 2);
+
+
         for( var i = 0; i<layer0.length; i++){
             layer0[i].draw();
         }
@@ -392,7 +401,7 @@ function main() {
     handleInput(dt);
     activeRoom.drawFloor();
     lastTime = now;
-    playerLocation.textContent=Math.round(player.x) + ", " + Math.round(player.y);
+    playerLocation.textContent=Math.floor(player.x) + ", " + Math.floor(player.y);
 
     requestAnimationFrame(main);
 };

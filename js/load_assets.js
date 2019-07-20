@@ -24,6 +24,10 @@ wallURLS.push('img/sprites/wall_hole_2.png');
 wallURLS.push('img/sprites/wall_banner_yellow.png');
 wallURLS.push('img/sprites/wall_goo.png');
 wallURLS.push('img/sprites/wall_arch.png');
+wallURLS.push('img/sprites/wall_side_front_left.png');
+wallURLS.push('img/sprites/wall_side_front_right.png');
+wallURLS.push('img/sprites/wall_side_top_left.png');
+wallURLS.push('img/sprites/wall_side_top_right.png');
 
 
 //src for floor images

@@ -66,7 +66,7 @@ function handleInput(dt) {
     }
 
     if(input.isDown('LEFT') || input.isDown('a')) {
-        if (!player.outOfBounds((player.x - 1.5*player.speed * dt)-player.rlhitbox, player.y)){
+        if (!player.outOfBounds((player.x - 1.5*player.speed * dt), player.y)){
             player.move(dt, LEFT);
         }else{
             player.move(0, LEFT);
@@ -75,7 +75,7 @@ function handleInput(dt) {
     }
 
     if(input.isDown('RIGHT') || input.isDown('d')) {
-        if (!player.outOfBounds((player.x + 1.5*player.speed * dt)+player.rlhitbox, player.y)){
+        if (!player.outOfBounds((player.x + 1.5*player.speed * dt), player.y)){
             player.move(dt, RIGHT);
         }else{
             player.move(0, RIGHT);

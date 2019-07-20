@@ -8,6 +8,10 @@ class Tile{
         this.tileimg = tileimg;
     }
 
+    preDraw(room){
+        return;
+    }
+
     draw(){
         ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
     }
@@ -50,12 +54,6 @@ class FloorTile extends Tile{
         super(tileimg, layer, x, y, TS);
     }
 }
-class DoorTile extends Tile{
-    constructor(tileimg, layer, x, y, TS, direction){
-        super(tileimg, layer, x, y, TS);
-        this.direction = direction;
-    }
-}
 class WallTile extends Tile{
     constructor(tileimg, layer, x, y, TS, options){
         super(tileimg, layer, x, y, TS);
@@ -64,16 +62,55 @@ class WallTile extends Tile{
         this.hitboxRight = options.hitboxRight || false;
     }
     inArea(x,y){
-        if(this.hitboxRight && x>=this.x*TS+.5*TS && x<this.x*TS+TS &&  y>=this.y*TS && y<this.y*TS+TS ){
+        if(this.hitboxRight && x>=this.x*TS+.75*TS && x<this.x*TS+TS && y>=this.y*TS && y<=this.y*TS+TS ){
             return true
         }
-        if(this.hitboxLeft && x>=this.x*.5*TS && x<this.x*TS+.5*TS &&  y>=this.y*TS && y<this.y*TS+TS ){
+        if(this.hitboxLeft && x>=this.x*.25*TS && x<this.x*TS+.25*TS && y>=this.y*TS && y<=this.y*TS+TS ){
             return true
         }
-        if(!this.hitboxLeft && !this.hitboxRight && x>=this.x*TS && x<this.x*TS+TS &&  y>=this.y*TS && y<this.y*TS+TS ){
+        if(!this.hitboxLeft && !this.hitboxRight && x>=this.x*TS && x<this.x*TS+TS && y>=this.y*TS && y<this.y*TS+TS ){
             return true;
         }else{
             return false;
+        }
+    }
+}
+
+class DoorTile extends Tile{
+    constructor(tileimg, layer, x, y, TS, direction){
+        super(tileimg, layer, x, y, TS);
+        this.direction = direction;
+    }
+
+    preDraw(room){
+        console.log("prebuild door")
+        let indexOfOld;
+        switch(this.direction){
+            case DOWN:
+            case UP:
+                indexOfOld = findTile(room.tileArray, this.x, this.y-1, {constructorName: "WallTile"});
+                room.tileArray[indexOfOld] = new WallTile(wallimgs[15], 2 , this.x, this.y-1, TS, { obstructing: false}); 
+                break;
+            case LEFT:
+                indexOfOld = findTile(room.tileArray, this.x, this.y-1 ,{constructorName: "WallTile"});
+                room.tileArray[indexOfOld] = new WallTile(wallimgs[17], 1, this.x, this.y-1, TS, { obstructing: true, hitboxLeft:true});
+                room.tileArray.push(new WallTile(wallimgs[19], 2, this.x, this.y, TS, { obstructing: false}));
+                break;
+            case RIGHT:
+                indexOfOld = findTile(room.tileArray, this.x, this.y-1,{constructorName: "WallTile"});
+                room.tileArray[indexOfOld] = new WallTile(wallimgs[16], 1, this.x, this.y-1, TS, { obstructing: true, hitboxRight:true});
+                room.tileArray.push(new WallTile(wallimgs[18], 2, this.x, this.y, TS, { obstructing: false})); 
+                break;
+        }
+
+    }
+}
+
+function findTile(array, x , y, options){
+    this.constructorName = options.constructorName || "Tile";
+    for(var i = array.length-1; i>0;i--){
+        if(array[i].x == x && array[i].y == y && array[i].constructor.name == constructorName){
+            return i;
         }
     }
 }
