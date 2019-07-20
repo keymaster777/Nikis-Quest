@@ -25,8 +25,8 @@ class Tile{
             return false;
         }
     }
-    sameCoord(Tile){
-        return Tile.x == this.x && Tile.y == this.y;
+    sameCoord(Tile, xshift = 0, yshift = 0){
+        return Tile.x + xshift == this.x && Tile.y + yshift == this.y;
     }
 }
 

@@ -23,6 +23,8 @@ wallURLS.push('img/sprites/wall_banner_red.png');
 wallURLS.push('img/sprites/wall_hole_2.png');
 wallURLS.push('img/sprites/wall_banner_yellow.png');
 wallURLS.push('img/sprites/wall_goo.png');
+wallURLS.push('img/sprites/wall_arch.png');
+
 
 //src for floor images
 floorURLS.push('img/sprites/floor_1.png');
