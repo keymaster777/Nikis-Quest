@@ -24,6 +24,19 @@ var player_sprite = sprite({
     numberOfFrames: 8,
     sizescale: .04,
 });
+
+var torchImage = new Image();
+torchImage.src = 'img/sprites/torch.png';
+var torch_sprite = sprite({
+    context: ctx,
+    width: 64,
+    height: 16,
+    image: torchImage,
+    numberOfFrames: 4,
+    sizescale: .05,
+    x:3*TS,
+    y:TS
+});
 var player = new Player(player_sprite);
 
 startLoadingAllImages(start);
@@ -109,7 +122,6 @@ function randomFloor(){
     }
 }
 
-
 class Room{
     constructor(width,height,x,y, entryDoor = false){
         this.x = x;
@@ -125,11 +137,11 @@ class Room{
         this.doorTile;
         this.doorArray;
         this.buildFloor();
-        this.buildDoors(this.directionsLeft);
         this.buildWalls();
-        this.buildItems();
+        this.buildDoors(this.directionsLeft);
         this.positionPlayer();
         this.preDraw();
+        this.buildItems();
         this.leftFrom;
     }
 
@@ -167,6 +179,55 @@ class Room{
             }
         }
     }
+
+    buildWalls(){
+        var tileArray = this.tileArray;
+        var numOfFloorTiles = tileArray.length;
+        for (var x=0; x<numOfFloorTiles; x++){
+
+            if (!this.specialWall(tileArray[x], tileArray, x)){
+
+                if(tileArray[x].x == 0){
+                    tileArray.push(new WallTile(wallimgs[1], 1, tileArray[x].x, tileArray[x].y, TS, { obstructing: true, hitboxLeft:true })); 
+                }
+                if(tileArray[x].x == this.width-1){
+                    tileArray.push(new WallTile(wallimgs[0], 1, tileArray[x].x, tileArray[x].y, TS, { obstructing: true, hitboxRight:true })); 
+                }
+                if(tileArray[x].y == 0){
+                    tileArray[x] = new WallTile(wallimgs[7], 1 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
+                }
+                if(tileArray[x].y == 1){
+                    tileArray[x] = new WallTile(randomWall(), 0 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
+                }
+                if(tileArray[x].y == this.height){
+                    tileArray[x] = new WallTile(randomWall(true), 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true }); //Bottom
+                }
+                if(tileArray[x].y == this.height-1){
+                    tileArray.push(new WallTile(wallimgs[7], 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: false })); //bottom Cap
+                }
+            }
+        }
+    }
+
+    specialWall(tile, tileArray, position){
+        if (tile.x == 0 && tile.y == 0){ 
+            tileArray[position] = new WallTile(wallimgs[6], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true});
+            return true;
+        }
+       
+        if (tile.x == this.width-1 && tile.y == 0){ 
+            tileArray[position] = new WallTile(wallimgs[5], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true });
+            return true;
+        }
+        if (tile.x == this.width-1 && tile.y == this.height-1){ 
+            tileArray.push(new WallTile(wallimgs[4], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true, hitboxRight:true }));
+            return true;
+        }
+        if (tile.x == 0 && tile.y == this.height-1){ 
+            tileArray.push(new WallTile(wallimgs[3], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true, hitboxLeft:true }));
+            return true;
+        }
+    }
     buildDoors(directionsLeft){
         var tileArray = this.tileArray;
         //Adds guaranteed door at entrance side of new room from exit side of old room
@@ -198,18 +259,9 @@ class Room{
         }
         this.directionsLeft = directionsLeft;
         this.doorArray = tileArray.filter(tile => tile instanceof DoorTile);
-
-        //Removes floor pieces overlapping doors
-        for(var d = 0; d<this.doorArray.length;d++){
-            for(var t = 0; t<this.tileArray.length; t++){
-                if(this.doorArray[d].sameCoord(tileArray[t]) && tileArray[t] instanceof FloorTile){
-                    this.tileArray.splice(t,1);
-                }
-            }
-        }
     }
     buildItems(){
-        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile);
+        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile && tile.enabled == true);
         for(var i = 0; i<floorArray.length;i++){
             var random = randomIntFromInterval(1,1000);
             switch(true){
@@ -250,62 +302,10 @@ class Room{
             }
         }
     }
-    buildWalls(){
-        var tileArray = this.tileArray;
-        var numOfFloorTiles = tileArray.length;
-        for (var x=0; x<numOfFloorTiles; x++){
-            if (!this.specialWall(tileArray[x], tileArray, x, this.doorStart)){
-
-                if(tileArray[x].x == 0){
-                    tileArray.push(new WallTile(wallimgs[1], 1, tileArray[x].x, tileArray[x].y, TS, { obstructing: true, hitboxLeft:true })); 
-                }
-                if(tileArray[x].x == this.width-1){
-                    tileArray.push(new WallTile(wallimgs[0], 1, tileArray[x].x, tileArray[x].y, TS, { obstructing: true, hitboxRight:true })); 
-                }
-                if(tileArray[x].y == 0){
-                    tileArray[x] = new WallTile(wallimgs[7], 1 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
-                }
-                if(tileArray[x].y == 1){
-                    tileArray[x] = new WallTile(randomWall(), 0 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true });
-                }
-                if(tileArray[x].y == this.height){
-                    tileArray[x] = new WallTile(randomWall(true), 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: true }); //Bottom
-                }
-                if(tileArray[x].y == this.height-1){
-                    tileArray.push(new WallTile(wallimgs[7], 2 , tileArray[x].x, tileArray[x].y, TS, { obstructing: false })); //bottom Cap
-                }
-            }
-        }
-    }
-    specialWall(tile, tileArray, position){
-        var doorArray = this.doorArray;
-        if (tile.x == 0 && tile.y == 0){ 
-            tileArray[position] = new WallTile(wallimgs[6], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true});
-            return true;
-        }
-        if (tile.x == this.width-1 && tile.y == 0){ 
-            tileArray[position] = new WallTile(wallimgs[5], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true });
-            return true;
-        }
-        if (tile.x == this.width-1 && tile.y == this.height-1){ 
-            tileArray.push(new WallTile(wallimgs[4], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true, hitboxRight:true }));
-            return true;
-        }
-        if (tile.x == 0 && tile.y == this.height-1){ 
-            tileArray.push(new WallTile(wallimgs[3], 2 , tileArray[position].x, tileArray[position].y, TS, { obstructing: true, hitboxLeft:true }));
-            return true;
-        }
-        for(var i = 0; i<doorArray.length;i++){
-            if(tile.sameCoord(doorArray[i])){
-                return true;
-            }
-        }
-
-    }
     
     preDraw(){
-        for( var i = 0; i<this.tileArray.length; i++){
-            this.tileArray[i].preDraw(this);
+        for( var i = 0; i<this.doorArray.length; i++){
+            this.doorArray[i].preDraw(this);
         }
     }
     
@@ -403,8 +403,11 @@ function main() {
     activeRoom.drawFloor();
     lastTime = now;
     playerLocation.textContent=Math.floor(player.x) + ", " + Math.floor(player.y);
-
+    //torch_sprite.update();
+    //torch_sprite.render();
     requestAnimationFrame(main);
 };
+
+
 
 
