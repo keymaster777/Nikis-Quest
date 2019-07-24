@@ -30,7 +30,9 @@ wallURLS.push('img/sprites/wall_side_top_left.png');                //18
 wallURLS.push('img/sprites/wall_side_top_right.png');               //19
 wallURLS.push('img/sprites/wall_left.png');                         //20
 wallURLS.push('img/sprites/wall_right.png');                        //21
-
+wallURLS.push('img/sprites/wall_column_top.png');                   //22
+wallURLS.push('img/sprites/wall_column_mid.png');                   //23
+wallURLS.push('img/sprites/wall_column_base.png');                  //24
 
 //src for floor images
 floorURLS.push('img/sprites/floor_1.png');

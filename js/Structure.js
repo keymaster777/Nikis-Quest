@@ -114,5 +114,41 @@ class Wall extends Structure{
         this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
     }
 }
+class WallColumn extends Structure{
+    constructor(x, y, room){
+        super(x,y,room);
+        this.build();
+    }
 
+    build(){
+        this.selfArray.push(new WallTile2(wallimgs[22], 3, this.x, this.y, {obstructing:true}));
+        this.selfArray.push(new WallTile2(wallimgs[23], 2, this.x, this.y+1, {obstructing:true}));
+        this.selfArray.push(new FloorTile(wallimgs[24], 0, this.x, this.y+2));
+        this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
+    }
+}
+class TorchWall extends Structure{
+    constructor(x, y, room){
+        super(x,y,room);
+        this.build();
+        this.torchImage = new Image();
+        this.torchImage.src = 'img/sprites/torch.png';
+        this.room = room;
+        this.sprite = sprite({
+            context: ctx,
+            width: 64,
+            height: 16,
+            image: this.torchImage,
+            numberOfFrames: 4,
+            sizescale: .05,
+            x:x*TS,
+            y:y+1*TS
+        });
+    }
 
+    build(){
+        this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {}));
+        this.selfArray.push(new WallTile2(wallimgs[2], 1 , this.x, this.y+1, {obstructing:true}));
+        this.room.sprites.push(this);
+    }
+}
