@@ -96,14 +96,14 @@ class Player{
         this.y=y;
     }
     outOfBounds(x,y){
-        var obstructing=activeRoom.tileArray.filter(tile => tile instanceof WallTile || tile instanceof Item);
+        let obstructing = activeRoom.tileArray.filter(tile => tile instanceof WallTile2 && tile.obstructing == true);
         let list = [];
-        for (var i = x -this.rlhitbox; i <= x+this.rlhitbox; i++) {
-            list.push(i);
+        for (var it = x -this.rlhitbox; it <= x+this.rlhitbox; it++) {
+            list.push(it);
         }
         for(var i = 0;i<obstructing.length;i++){
             for(var i2 = 0; i2<list.length;i2++){
-                if( obstructing[i].inArea(list[i2],y) && obstructing[i].obstructing){
+                if( obstructing[i].inArea(list[i2], y)){
                     return true;
                 }
             }
@@ -114,8 +114,7 @@ class Player{
     }
 
     atDoor(){
-        var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile);
-
+        var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile2);
         for(var i = 0;i<doors.length;i++){
             if( doors[i].inArea(this.x,this.y)){
                 return true;

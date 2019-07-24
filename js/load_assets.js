@@ -8,26 +8,28 @@ var wallimgs=[];
 var itemimgs=[];
 
 //src for wall images
-wallURLS.push('img/sprites/wall_side_mid_left.png');
-wallURLS.push('img/sprites/wall_side_mid_right.png');
-wallURLS.push('img/sprites/wall_mid.png');
-wallURLS.push('img/sprites/wall_inner_corner_l_top_left.png');
-wallURLS.push('img/sprites/wall_inner_corner_l_top_rigth.png');
-wallURLS.push('img/sprites/wall_top_right.png');
-wallURLS.push('img/sprites/wall_top_left.png');
-wallURLS.push('img/sprites/wall_top_mid.png');
-wallURLS.push('img/sprites/wall_corner_left.png');
-wallURLS.push('img/sprites/wall_corner_right.png');
-wallURLS.push('img/sprites/wall_hole_1.png');
-wallURLS.push('img/sprites/wall_banner_red.png');
-wallURLS.push('img/sprites/wall_hole_2.png');
-wallURLS.push('img/sprites/wall_banner_yellow.png');
-wallURLS.push('img/sprites/wall_goo.png');
-wallURLS.push('img/sprites/wall_arch.png');
-wallURLS.push('img/sprites/wall_side_front_left.png');
-wallURLS.push('img/sprites/wall_side_front_right.png');
-wallURLS.push('img/sprites/wall_side_top_left.png');
-wallURLS.push('img/sprites/wall_side_top_right.png');
+wallURLS.push('img/sprites/wall_side_mid_left.png');                //0
+wallURLS.push('img/sprites/wall_side_mid_right.png');               //1
+wallURLS.push('img/sprites/wall_mid.png');                          //2
+wallURLS.push('img/sprites/wall_inner_corner_l_top_left.png');      //3
+wallURLS.push('img/sprites/wall_inner_corner_l_top_rigth.png');     //4
+wallURLS.push('img/sprites/wall_top_right.png');                    //5
+wallURLS.push('img/sprites/wall_top_left.png');                     //6
+wallURLS.push('img/sprites/wall_top_mid.png');                      //7
+wallURLS.push('img/sprites/wall_corner_left.png');                  //8
+wallURLS.push('img/sprites/wall_corner_right.png');                 //9
+wallURLS.push('img/sprites/wall_hole_1.png');                       //10
+wallURLS.push('img/sprites/wall_banner_red.png');                   //11
+wallURLS.push('img/sprites/wall_hole_2.png');                       //12
+wallURLS.push('img/sprites/wall_banner_yellow.png');                //13
+wallURLS.push('img/sprites/wall_goo.png');                          //14
+wallURLS.push('img/sprites/wall_arch.png');                         //15
+wallURLS.push('img/sprites/wall_side_front_left.png');              //16
+wallURLS.push('img/sprites/wall_side_front_right.png');             //17
+wallURLS.push('img/sprites/wall_side_top_left.png');                //18
+wallURLS.push('img/sprites/wall_side_top_right.png');               //19
+wallURLS.push('img/sprites/wall_left.png');                         //20
+wallURLS.push('img/sprites/wall_right.png');                        //21
 
 
 //src for floor images
