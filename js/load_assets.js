@@ -33,6 +33,9 @@ wallURLS.push('img/sprites/wall_right.png');                        //21
 wallURLS.push('img/sprites/wall_column_top.png');                   //22
 wallURLS.push('img/sprites/wall_column_mid.png');                   //23
 wallURLS.push('img/sprites/wall_column_base.png');                  //24
+wallURLS.push('img/sprites/column_base.png');                       //25
+wallURLS.push('img/sprites/column_mid.png');                        //26
+wallURLS.push('img/sprites/column_top.png');                        //27
 
 //src for floor images
 floorURLS.push('img/sprites/floor_1.png');

@@ -82,6 +82,7 @@ class Corner extends Structure{
                 break;
         }
         this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
+        this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
     }
 }
 
@@ -95,60 +96,114 @@ class Wall extends Structure{
     build(){
         switch(this.direction){
             case DOWN:
-                this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y-1, {}));
-                this.selfArray.push(new WallTile2(randomWall({outer: true}), 2 , this.x, this.y, {obstructing:true}));
+                this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y-1));
+                this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y-1, {},true));
+                this.selfArray.push(new WallTile2(randomWall({outer: true}), 2 , this.x, this.y, {obstructing:true},true));
                 break;
             case UP:
-                this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {}));
-                this.selfArray.push(new WallTile2(randomWall(), 2 , this.x, this.y+1, {obstructing:true}));
+                this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {},true));
+                this.selfArray.push(new WallTile2(randomWall(), 2 , this.x, this.y+1, {obstructing:true},true));
                 break;
             case LEFT:
-                this.selfArray.push(new WallTile2(wallimgs[1], 3 , this.x, this.y, {obstructing:true, hitboxLeft:true}));
+                this.selfArray.push(new WallTile2(wallimgs[1], 3 , this.x, this.y, {obstructing:true, hitboxLeft:true},true));
                 this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
                 break;
             case RIGHT:
-                this.selfArray.push(new WallTile2(wallimgs[0], 3 , this.x, this.y, {obstructing:true, hitboxRight:true}));
+                this.selfArray.push(new WallTile2(wallimgs[0], 3 , this.x, this.y, {obstructing:true, hitboxRight:true},true));
                 this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
                 break;
         }
         this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
+        this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
     }
 }
 class WallColumn extends Structure{
-    constructor(x, y, room){
+    constructor(x, y, room, direction){
         super(x,y,room);
+        this.direction = direction;
         this.build();
     }
 
     build(){
-        this.selfArray.push(new WallTile2(wallimgs[22], 3, this.x, this.y, {obstructing:true}));
-        this.selfArray.push(new WallTile2(wallimgs[23], 2, this.x, this.y+1, {obstructing:true}));
-        this.selfArray.push(new FloorTile(wallimgs[24], 0, this.x, this.y+2));
+        switch (this.direction){
+            case UP:
+                this.selfArray.push(new WallTile2(wallimgs[22], 3, this.x, this.y, {obstructing:true}));
+                this.selfArray.push(new WallTile2(wallimgs[23], 2, this.x, this.y+1, {obstructing:true}));
+                this.selfArray.push(new WallTile2(wallimgs[24], 0, this.x, this.y+2, {obstructing:true, column:true}));
+            break;
+            case DOWN:
+                this.selfArray.push(new FloorTile(randomFloor(), 0, this.x, this.y-1));
+                this.selfArray.push(new WallTile2(wallimgs[22], 3, this.x, this.y-1, {}));
+                this.selfArray.push(new WallTile2(wallimgs[23], 2, this.x, this.y, {obstructing:true}));
+                break;
+        }
+
         this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
     }
 }
 class TorchWall extends Structure{
-    constructor(x, y, room){
+    constructor(x, y, room, direction){
         super(x,y,room);
-        this.build();
         this.torchImage = new Image();
-        this.torchImage.src = 'img/sprites/torch.png';
         this.room = room;
+        this.direction = direction;
         this.sprite = sprite({
             context: ctx,
             width: 64,
             height: 16,
             image: this.torchImage,
             numberOfFrames: 4,
-            sizescale: .05,
-            x:x*TS,
-            y:y+1*TS
+            sizescale: .065,
+            defaultSize:true
         });
+        this.build();
     }
 
     build(){
-        this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {}));
-        this.selfArray.push(new WallTile2(wallimgs[2], 1 , this.x, this.y+1, {obstructing:true}));
-        this.room.sprites.push(this);
+        switch(this.direction){
+            case UP:
+                this.torchImage.src = 'img/sprites/torch.png';
+                this.sprite.x = this.x*TS;
+                this.sprite.y = (this.y+1)*TS;
+                this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {}));
+                this.selfArray.push(new WallTile2(wallimgs[2], 1 , this.x, this.y+1, {obstructing:true}));
+                this.room.sprites.push(this);
+                break;
+            case LEFT:
+                this.torchImage.src = 'img/sprites/torch-side-left.png';
+                this.sprite.x = this.x*TS;
+                this.sprite.y = this.y*TS;
+                this.selfArray.push(new WallTile2(wallimgs[1], 3 , this.x, this.y, {obstructing:true, hitboxLeft:true}));
+                this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
+                this.room.sprites.push(this);
+                break;
+            case RIGHT:
+                this.torchImage.src = 'img/sprites/torch-side-right.png';
+                this.sprite.x = this.x*TS;
+                this.sprite.y = this.y*TS;
+                this.selfArray.push(new WallTile2(wallimgs[0], 3 , this.x, this.y, {obstructing:true, hitboxRight:true}));
+                this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
+                this.room.sprites.push(this);
+                break;
+        }
+        this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
+        this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
+    }
+}
+
+class FloorColumn extends Structure{
+    constructor(x, y, room){
+        super(x,y,room);
+        this.build();
+    }
+
+    build(){
+        this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
+        this.selfArray.push(new WallTile2(wallimgs[25], 2, this.x, this.y, {obstructing:true, column: true}));
+        this.selfArray.push(new WallTile2(wallimgs[26], '*', this.x, this.y-1, {}));
+        this.selfArray.push(new WallTile2(wallimgs[27], 3, this.x, this.y-2, {}));
+
+        this.occupyingSpaces = [this.x,this.y];
+        this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
     }
 }

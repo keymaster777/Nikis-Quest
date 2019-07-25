@@ -135,6 +135,7 @@ function sprite (options) {
     that.height = options.height;
     that.image = options.image;
     that.sizescale = options.sizescale || 1;
+    that.defaultSize = options.defaultSize || false;
     that.x = options.x || TS;
     that.y = options.y || TS;
     that.loop = options.loop;
@@ -164,6 +165,19 @@ function sprite (options) {
     that.render = function () {
 
         // Draw the animation
+        if(that.defaultSize == true){
+            that.context.drawImage(
+                that.image,
+                frameIndex * that.width / that.numberOfFrames,
+                0,
+                that.width / that.numberOfFrames,
+                that.height,
+                that.x,
+                that.y,
+                TS,
+                TS);
+            
+        }else{
         that.context.drawImage(
            that.image,
            frameIndex * that.width / that.numberOfFrames,
@@ -174,6 +188,7 @@ function sprite (options) {
            that.y,
            TS*that.sizescale*that.width / that.numberOfFrames,
            TS*that.sizescale*that.height);
+        }
     };
 
     return that;

@@ -146,6 +146,7 @@ class Room{
         this.sprites = [];
         this.buildDoors();
         this.buildWalls();
+        this.buildFloor();
         this.positionPlayer();
         this.leftFrom;
     }
@@ -154,7 +155,7 @@ class Room{
     /*            Helper Methods           */
     /* =================================== */
     isOccupiedTile(x,y){
-        for(var i =0;i<this.occupiedSpaces.length-1;i++){
+        for(var i =0;i<this.occupiedSpaces.length;i++){
             if(this.occupiedSpaces[i][0]==x && this.occupiedSpaces[i][1]==y){
                 return true;
             }
@@ -199,23 +200,61 @@ class Room{
         if (a == 0 && b == 0){ return 1}; 
         return (Math.sqrt( a*a + b*b ));
     }
-    randomWallConstruct(x,y){
+    randomWallConstruct(x,y,direction){
         let random = Math.random();
-        switch(true){
-            case random < .5:
-                this.wallConstructs[0] = new WallColumn(x,y, this);
-                this.tileArray = this.tileArray.concat(this.wallConstructs[0].selfArray);
-                this.occupiedSpaces = this.occupiedSpaces.concat(this.wallConstructs[0].occupyingSpaces);
-            break;
-            case random >= .5:
-                console.log("torch");
-                let torch = new TorchWall(x,y, this);
-                this.tileArray = this.tileArray.concat(torch.selfArray);
-                this.occupiedSpaces = this.occupiedSpaces.concat(torch.occupyingSpaces);
-            break;
+        if(direction == UP){
+            switch(true){
+                case random < .5:
+                    this.wallConstructs[0] = new WallColumn(x,y, this, UP);
+                    this.tileArray = this.tileArray.concat(this.wallConstructs[0].selfArray);
+                    this.occupiedSpaces = this.occupiedSpaces.concat(this.wallConstructs[0].occupyingSpaces);
+                break;
+                case random >= .5:
+                    let torch = new TorchWall(x,y, this, UP);
+                    this.tileArray = this.tileArray.concat(torch.selfArray);
+                    this.occupiedSpaces = this.occupiedSpaces.concat(torch.occupyingSpaces);
+                break;
+            }
+        }
+        if(direction == LEFT){
+            switch(true){
+                case random < 1:
+                    let torch = new TorchWall(x,y, this, LEFT);
+                    this.tileArray = this.tileArray.concat(torch.selfArray);
+                    this.occupiedSpaces = this.occupiedSpaces.concat(torch.occupyingSpaces);
+                break;
+            }
+        }
+        if(direction == RIGHT){
+            switch(true){
+                case random < 1:
+                    let torch = new TorchWall(x,y, this, RIGHT);
+                    this.tileArray = this.tileArray.concat(torch.selfArray);
+                    this.occupiedSpaces = this.occupiedSpaces.concat(torch.occupyingSpaces);
+                break;
+            }
+        }
+        if(direction == DOWN){
+            switch(true){
+                case random < 1:
+                    this.wallConstructs[0] = new WallColumn(x,y, this, DOWN);
+                    this.tileArray = this.tileArray.concat(this.wallConstructs[0].selfArray);
+                    this.occupiedSpaces = this.occupiedSpaces.concat(this.wallConstructs[0].occupyingSpaces);
+                break;
+            }
         }
 
     }
+    randomFloorConstruct(x,y){
+        let random = Math.random();
+        switch(true){
+            case random < 1:
+                let floorConstruct = new FloorColumn(x,y,this);
+                this.tileArray = this.tileArray.concat(floorConstruct.selfArray);
+                break;
+        }
+    }
+
 
     /* =================================== */
     /*            Build Methods            */
@@ -223,7 +262,14 @@ class Room{
     buildFloor(){
         for(var x=0; x<this.width; x++){
             for(var y=0; y<=this.height; y++){
-                this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
+                if(!this.isOccupiedTile(x,y)){
+                    let random = Math.random();
+                    if (random < .05){
+                        this.randomFloorConstruct(x,y);
+                    }else{
+                        this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
+                    }
+                }
             }
         }
     }
@@ -237,34 +283,51 @@ class Room{
         //Adds corners to main tile array
         for(var i = 0; i<this.corners.length; i++){
             this.tileArray = this.tileArray.concat(this.corners[i].selfArray);
-            this.occupiedSpaces = this.occupiedSpaces.concat(this.corners[i].occupyingSpaces);
         }
 
         //Adds walls along top and bottom
         for(var w = 0; w < this.width; w++){
-            let random = Math.random();
+            
             if(!this.isOccupiedTile(w,0)){
-                if (random < .05){
-                    this.randomWallConstruct(w,0);
+                let random = Math.random();
+                if (random < .1){
+                    this.randomWallConstruct(w,0,UP);
                 }else{
                     this.walls.push(new Wall(w, 0, this, UP)); 
                     this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);
                 }
             }
             if(!this.isOccupiedTile(w,this.height)){
-                this.walls.push(new Wall(w, this.height, this, DOWN)); 
-                this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);
+                let random = Math.random();
+                if (random < .1){
+                    this.randomWallConstruct(w,this.height,DOWN);
+                }else{
+                    this.walls.push(new Wall(w, this.height, this, DOWN)); 
+                    this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);
+                }
             }
         }
 
         //Adds walls along left and right
         for(var h = 0; h < this.height; h++){
             if(!this.isOccupiedTile(0,h)){
-                this.walls.push(new Wall(0, h, this, LEFT)); 
-                this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);            }
+                let random = Math.random();
+                if (random < .15){
+                    this.randomWallConstruct(0,h,LEFT);
+                }else{
+                    this.walls.push(new Wall(0, h, this, LEFT)); 
+                    this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);
+                }
+            }
             if(!this.isOccupiedTile(this.width-1,h)){
-                this.walls.push(new Wall(this.width-1, h, this, RIGHT)); 
-                this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray);            }
+                let random = Math.random();
+                if (random < .15){
+                    this.randomWallConstruct(this.width-1,h,RIGHT);
+                }else{
+                    this.walls.push(new Wall(this.width-1, h, this, RIGHT)); 
+                    this.tileArray = this.tileArray.concat(this.walls[this.walls.length-1].selfArray); 
+                }
+            }
         }
     }
 
@@ -338,11 +401,19 @@ class Room{
     
     drawRoom = function(){
         ctx.translate(activeRoom.lpad, 0);
+        var layerVaries = this.tileArray.filter(tile => tile.layer == '*');
         var layer0 = this.tileArray.filter(tile => tile.layer == 0);
         var layer1 = this.tileArray.filter(tile => tile.layer == 1);
         var layer2 = this.tileArray.filter(tile => tile.layer == 2);
         var layer3 = this.tileArray.filter(tile => tile.layer == 3);
 
+        for( var i = 0; i<layerVaries.length; i++){
+            if(player.y<layerVaries[i].y*TS+TS){
+                layer3.push(layerVaries[i]);
+            }else{
+                layer2.push(layerVaries[i]);
+            }
+        }
 
         for( var i = 0; i<layer0.length; i++){
             layer0[i].draw();
@@ -423,7 +494,7 @@ class Room{
 }
 
 var activeRoom = new Room(randomIntFromInterval(5,8),randomIntFromInterval(3,6), 0, 0);
-
+//var activeRoom = new Room(4,3, 0, 0);
 
 
 
