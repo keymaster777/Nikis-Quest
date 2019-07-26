@@ -98,7 +98,7 @@ class Wall extends Structure{
             case DOWN:
                 this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y-1));
                 this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y-1, {},true));
-                this.selfArray.push(new WallTile2(randomWall({outer: true}), 2 , this.x, this.y, {obstructing:true},true));
+                this.selfArray.push(new WallTile2(randomWall({outer: true}), 3 , this.x, this.y, {obstructing:true},true));
                 break;
             case UP:
                 this.selfArray.push(new WallTile2(wallimgs[7], 3 , this.x, this.y, {},true));
@@ -198,12 +198,66 @@ class FloorColumn extends Structure{
     }
 
     build(){
+        if(isOccupiedTile(this.x,this.y-1,this.room)){
+            this.room.tileArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y, TS));
+            return;
+        }
+        this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y-1));
         this.selfArray.push(new FloorTile(randomFloor(), 0 , this.x, this.y));
         this.selfArray.push(new WallTile2(wallimgs[25], 2, this.x, this.y, {obstructing:true, column: true}));
         this.selfArray.push(new WallTile2(wallimgs[26], '*', this.x, this.y-1, {}));
         this.selfArray.push(new WallTile2(wallimgs[27], 3, this.x, this.y-2, {}));
 
-        this.occupyingSpaces = [this.x,this.y];
+        this.occupyingSpaces = [[this.x,this.y],[this.x,this.y-1]];
         this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
+        this.room.tileArray = this.room.tileArray.concat(this.selfArray);
     }
+}
+
+class Pit extends Structure{
+    constructor(x, y, room){
+        super(x,y, room);
+        this.build();
+    }
+
+    build(){
+        this.selfArray.push(new PitTile( 0, this.x, this.y, this.room));
+        let validSpots = this.getValidSpots();
+        for(var validSpot of validSpots){
+            let random = Math.random();
+            if(random > .35){
+            this.selfArray.push(new PitTile( 0, validSpot[0], validSpot[1], this.room));
+            }
+        }
+
+        this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
+        this.room.occupiedSpaces = this.room.occupiedSpaces.concat(this.occupyingSpaces);
+        this.room.tileArray = this.room.tileArray.concat(this.selfArray);
+    }
+
+    getValidSpots(){
+        let valid = [];
+        if(!isOccupiedTile(this.x-1,this.y,this.room)){
+            valid.push([this.x-1,this.y]);
+        }
+        if(!isOccupiedTile(this.x,this.y-1,this.room)){
+            valid.push([this.x,this.y-1]);
+        }
+        if(!isOccupiedTile(this.x+1,this.y,this.room)){
+            valid.push([this.x+1,this.y]);
+        }
+        if(!isOccupiedTile(this.x,this.y+1,this.room)){
+            valid.push([this.x,this.y+1]);
+        }
+        return valid;
+    }
+}
+
+function isOccupiedTile(x,y, room){
+    for(var i =0;i<room.occupiedSpaces.length;i++){
+        if(room.occupiedSpaces[i][0]==x && room.occupiedSpaces[i][1]==y){
+            return true;
+        }
+    }
+    return false;
 }

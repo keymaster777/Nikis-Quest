@@ -248,9 +248,12 @@ class Room{
     randomFloorConstruct(x,y){
         let random = Math.random();
         switch(true){
-            case random < 1:
+            case random < .5:
                 let floorConstruct = new FloorColumn(x,y,this);
-                this.tileArray = this.tileArray.concat(floorConstruct.selfArray);
+                //this.tileArray = this.tileArray.concat(floorConstruct.selfArray);
+                break;
+            case random >= .5:
+                let pitConstruct = new Pit(x,y,this);
                 break;
         }
     }
@@ -260,15 +263,21 @@ class Room{
     /*            Build Methods            */
     /* =================================== */
     buildFloor(){
+
         for(var x=0; x<this.width; x++){
             for(var y=0; y<=this.height; y++){
                 if(!this.isOccupiedTile(x,y)){
                     let random = Math.random();
-                    if (random < .05){
+                    if (random < .1){
                         this.randomFloorConstruct(x,y);
-                    }else{
-                        this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
                     }
+                }
+            }
+        }
+        for(var x=0; x<this.width; x++){
+            for(var y=0; y<=this.height; y++){
+                if(!this.isOccupiedTile(x,y)){
+                    this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
                 }
             }
         }

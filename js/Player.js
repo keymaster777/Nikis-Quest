@@ -80,7 +80,7 @@ class Player{
         if(debug){this.speed = 3*TS;}
         debug = debug || false;
         this.sprite.x = player.x-.65*TS;
-        this.sprite.y = player.y-1.1*TS;
+        this.sprite.y = player.y-1*TS;
         this.sprite.update();
         this.sprite.render();
         if(!isInput){
@@ -96,7 +96,7 @@ class Player{
         this.y=y;
     }
     outOfBounds(x,y){
-        let obstructing = activeRoom.tileArray.filter(tile => tile instanceof WallTile2 && tile.obstructing == true);
+        let obstructing = activeRoom.tileArray.filter(tile => tile.obstructing == true);
         let list = [];
         for (var it = x -this.rlhitbox; it <= x+this.rlhitbox; it++) {
             list.push(it);

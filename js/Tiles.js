@@ -102,3 +102,32 @@ class WallTile2 extends Tile{
         }
     }
 }
+
+class PitTile extends Tile{
+    constructor(layer,x,y, room){
+        super(x,y);
+        this.room = room;
+        this.tileimg = new Image();
+        this.tileimg.src = 'img/sprites/edge.png';
+        this.y = y;
+        this.x = x;
+        this.layer = layer;
+        this.obstructing = true;
+    }
+
+    draw(){
+        for(var i = 0; i < this.room.tileArray.length; i++){
+            if(this.x == this.room.tileArray[i].x && this.y-1 == this.room.tileArray[i].y){
+                if(this.room.tileArray[i] instanceof PitTile){
+                    //Dont draw anything
+                }else{
+                    ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
+                }
+            }
+        }
+    }
+    inArea(x,y){
+        return x>=this.x*TS+(TS*.25) && x<this.x*TS+(TS*.75) && y>=this.y*TS && y<this.y*TS+TS ? true : false;
+    }
+    
+}
