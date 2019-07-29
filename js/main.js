@@ -147,6 +147,7 @@ class Room{
         this.buildDoors();
         this.buildWalls();
         this.buildFloor();
+        this.buildItems();
         this.positionPlayer();
         this.leftFrom;
     }

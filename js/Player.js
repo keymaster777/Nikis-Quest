@@ -9,6 +9,8 @@ class Player{
         this.bothitbox=.15*TS;
         this.speed=TS*1.5;
         this.setupSprite();
+        this.dashedLast = Date.now();
+        this.direction;
 
     }
 
@@ -43,25 +45,53 @@ class Player{
         this.sprite.numberOfFrames = 8;
         switch(direction){
             case DOWN:
+                this.direction = DOWN;
                 this.y+=distance;
                 this.sprite.image = this.run_down_sprite;
                 this.idle = this.idle_down;
                 break;
             case UP:
+                this.direction = UP;
                 this.y-=distance;
                 this.sprite.image = this.run_up_sprite;
                 this.idle = this.idle_up;
                 break;
             case LEFT:
+                this.direction = LEFT;
                 this.x-=distance;
                 this.sprite.image = this.run_left_sprite;
                 this.idle = this.idle_left;
                 break;
             case RIGHT:
+                this.direction = RIGHT;
                 this.x+=distance;
                 this.sprite.image = this.run_right_sprite;
                 this.idle = this.idle_right;
                 break;
+        }
+    }
+
+    dash(){
+        if(Date.now() - this.dashedLast > 500){
+            console.log("Dashed");
+            this.dashedLast = Date.now();
+
+            for(var i = 0;i<4;i++){
+                switch(this.direction){
+                    case RIGHT:
+                        player.x += .5*TS;
+                        break;
+                    case LEFT:
+                        player.x -= .5*TS;
+                        break;
+                    case UP:
+                        player.y -= .5*TS;
+                        break;
+                    case DOWN:
+                        player.y += .5*TS;
+                        break;
+                }
+            }
         }
     }
 

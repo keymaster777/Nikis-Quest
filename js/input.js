@@ -17,6 +17,8 @@ var isInput = false;
             key = 'RIGHT'; break;
         case 40:
             key = 'DOWN'; break;
+            case 67:
+            key = 'C'; break;
         default:
             // Convert ASCII codes to letters
             key = String.fromCharCode(code);
@@ -87,5 +89,9 @@ function handleInput(dt) {
         if(player.atDoor() && player.canLeave()){
             activeRoom.nextRoom();
         }
+    }
+
+    if(input.isDown('C')) {
+        player.dash(RIGHT);
     }
 }
