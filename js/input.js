@@ -92,6 +92,6 @@ function handleInput(dt) {
     }
 
     if(input.isDown('C')) {
-        player.dash(RIGHT);
+        player.dash();
     }
 }

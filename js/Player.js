@@ -75,24 +75,33 @@ class Player{
         if(Date.now() - this.dashedLast > 500){
             console.log("Dashed");
             this.dashedLast = Date.now();
-
-            for(var i = 0;i<4;i++){
-                switch(this.direction){
-                    case RIGHT:
-                        player.x += .5*TS;
-                        break;
-                    case LEFT:
-                        player.x -= .5*TS;
-                        break;
-                    case UP:
-                        player.y -= .5*TS;
-                        break;
-                    case DOWN:
-                        player.y += .5*TS;
-                        break;
-                }
+            switch(this.direction){
+                case RIGHT:
+                    player.x += 2.5*TS;
+                    break;
+                case LEFT:
+                    player.x -= 2.5*TS;
+                    break;
+                case UP:
+                    player.y -= 2.5*TS;
+                    break;
+                case DOWN:
+                    player.y += 2.5*TS;
+                    break;
             }
+            if (player.outOfBounds(player.x,player.y)) player.moveToClosestValidSpot();
         }
+    }
+    moveToClosestValidSpot(){
+        let closestLocation = {x: player.x, y: player.y};
+        for( let i = 0; player.outOfBounds(closestLocation["x"], closestLocation["y"]); i+=5){
+            if(!player.outOfBounds(player.x-i, player.y)) closestLocation["x"]=player.x-i;
+            if(!player.outOfBounds(player.x+i, player.y)) closestLocation["x"]=player.x+i;
+            if(!player.outOfBounds(player.x, player.y-i)) closestLocation["y"]=player.y-i;
+            if(!player.outOfBounds(player.x, player.y+i)) closestLocation["y"]=player.y+i;
+        }
+        player.x=closestLocation["x"];
+        player.y=closestLocation["y"];
     }
 
     spriteIdle(){
