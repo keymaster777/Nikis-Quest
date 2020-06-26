@@ -10,10 +10,9 @@ class Player{
         this.speed=TS*1.5;
         this.setupSprite();
         this.dashedLast = Date.now();
-        this.direction;
-
+        this.direction = DOWN;
+        this.maxDashFrames = 8;
     }
-
     
     setupSprite(){
         this.run_right_sprite = new Image();
@@ -75,33 +74,58 @@ class Player{
         if(Date.now() - this.dashedLast > 500){
             console.log("Dashed");
             this.dashedLast = Date.now();
+            this.dashEndLocation = [0,0];
+            this.currentDashFrame = 0;
+            this.isDashing = true;
             switch(this.direction){
                 case RIGHT:
-                    player.x += 2.5*TS;
+                    this.dashEndLocation = player.getClosestValidSpot(player.x + 2.2*TS, player.y);
                     break;
                 case LEFT:
-                    player.x -= 2.5*TS;
+                    this.dashEndLocation = player.getClosestValidSpot(player.x - 2.2*TS, player.y);
                     break;
                 case UP:
-                    player.y -= 2.5*TS;
+                    this.dashEndLocation = player.getClosestValidSpot(player.x, player.y - 2.2*TS);
                     break;
                 case DOWN:
-                    player.y += 2.5*TS;
+                    this.dashEndLocation = player.getClosestValidSpot(player.x, player.y + 2.2*TS);
                     break;
             }
-            if (player.outOfBounds(player.x,player.y)) player.moveToClosestValidSpot();
+            this.rise = player.y-this.dashEndLocation["y"];
+            this.run = player.x-this.dashEndLocation["x"];
+        }
+    }
+    animations(){
+        if(this.isDashing) player.dashAnimation();
+    }
+    dashAnimation(){
+        if(this.currentDashFrame == this.maxDashFrames){
+            player.moveToClosestValidSpot();
+            this.isDashing = false;
+        } else {
+            player.x -= this.run/this.maxDashFrames;
+            player.y -= this.rise/this.maxDashFrames;
+            this.currentDashFrame++;
         }
     }
     moveToClosestValidSpot(){
-        let closestLocation = {x: player.x, y: player.y};
-        for( let i = 0; player.outOfBounds(closestLocation["x"], closestLocation["y"]); i+=5){
-            if(!player.outOfBounds(player.x-i, player.y)) closestLocation["x"]=player.x-i;
-            if(!player.outOfBounds(player.x+i, player.y)) closestLocation["x"]=player.x+i;
-            if(!player.outOfBounds(player.x, player.y-i)) closestLocation["y"]=player.y-i;
-            if(!player.outOfBounds(player.x, player.y+i)) closestLocation["y"]=player.y+i;
-        }
+        let closestLocation = player.getClosestValidSpot(player.x, player.y);
         player.x=closestLocation["x"];
         player.y=closestLocation["y"];
+    }
+    getClosestValidSpot(x, y){
+        let closestLocation = {x: x, y: y};
+        for( let i = 0; player.outOfBounds(closestLocation["x"], closestLocation["y"]); i+=5){
+            if(!player.outOfBounds(x-i, y)) closestLocation["x"]=x-i;
+            else if(!player.outOfBounds(x-i*.5, y-i*.5)) closestLocation={x: x-i*.5, y: y-i*.5};
+            else if(!player.outOfBounds(x, y+i)) closestLocation["y"]=y+i;
+            else if(!player.outOfBounds(x+i*.5, y-i*.5)) closestLocation={x: x+i*.5, y: y-i*.5};
+            else if(!player.outOfBounds(x+i, y)) closestLocation["x"]=x+i;
+            else if(!player.outOfBounds(x+i*.5, y+i*.5)) closestLocation={x: x+i*.5, y: y+i*.5};
+            else if(!player.outOfBounds(x, y-i)) closestLocation["y"]=y-i;
+            else if(!player.outOfBounds(x-i*.5, y+i*.5)) closestLocation={x: x-i*.5, y: y+i*.5};
+        }
+        return closestLocation;
     }
 
     spriteIdle(){

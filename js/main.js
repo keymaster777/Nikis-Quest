@@ -518,9 +518,8 @@ function main() {
     handleInput(dt);
     activeRoom.drawRoom();
     lastTime = now;
+    player.animations();
     playerLocation.textContent=Math.floor(player.x) + ", " + Math.floor(player.y);
-    //torch_sprite.update();
-    //torch_sprite.render();
     requestAnimationFrame(main);
 };
 
