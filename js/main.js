@@ -15,21 +15,18 @@ canvas.width = TS*16;
 canvas.height = TS*10;
 document.body.appendChild(canvas);
 var playerLocation = document.getElementById("position");
+var playerHitPoints = document.getElementById("hitpoints");
 
-
-
-var playerImage = new Image();
-playerImage.src = 'img/player/run-right.png';
-var player_sprite = sprite({
+var gnollShamanImage = new Image();
+gnollShamanImage.src = 'img/mobs/GnollShaman_Walk_Right.png';
+var monster_sprite = sprite({
     context: ctx,
-    width: 256,
-    height: 32,
-    image: playerImage,
-    numberOfFrames: 8,
+    width: 64,
+    height: 21,
+    image: gnollShamanImage,
+    numberOfFrames: 4,
     sizescale: .04,
 });
-
-var player = new Player(player_sprite);
 
 startLoadingAllImages(start);
 function start(){
@@ -132,7 +129,9 @@ class Room{
     constructor(width,height,x,y){
         this.x = x;
         this.y = y;
+        this.spawnLocation = {x: null, y: null};
         this.roomTime=Date.now();
+        this.monsters = [];
         this.width=width;
         this.height=height+2;
         this.lpad = this.getlpad();
@@ -156,7 +155,7 @@ class Room{
     /*            Helper Methods           */
     /* =================================== */
     isOccupiedTile(x,y){
-        for(var i =0;i<this.occupiedSpaces.length;i++){
+        for(var i = 0; i<this.occupiedSpaces.length; i++){
             if(this.occupiedSpaces[i][0]==x && this.occupiedSpaces[i][1]==y){
                 return true;
             }
@@ -279,6 +278,11 @@ class Room{
             for(var y=0; y<=this.height; y++){
                 if(!this.isOccupiedTile(x,y)){
                     this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
+                    let random = Math.random();
+                    if (random < .18 && !(this.x == 0 && this.y == 0)){
+                        this.monsters.push(new Monster(monster_sprite, x, y));
+                    }
+                    if(this.spawnLocation["x"] == null) this.spawnLocation = {x: x, y: y};
                 }
             }
         }
@@ -438,6 +442,8 @@ class Room{
             sprite.sprite.update();
             sprite.sprite.render();
         }
+        
+        this.monsters.forEach( monster => monster.draw());
         player.draw();
         for( var i = 0; i<layer3.length; i++){
             layer3[i].draw();
@@ -506,7 +512,17 @@ class Room{
 var activeRoom = new Room(randomIntFromInterval(5,8),randomIntFromInterval(3,6), 0, 0);
 //var activeRoom = new Room(4,3, 0, 0);
 
-
+var playerImage = new Image();
+playerImage.src = 'img/player/run-right.png';
+var player_sprite = sprite({
+    context: ctx,
+    width: 256,
+    height: 32,
+    image: playerImage,
+    numberOfFrames: 8,
+    sizescale: .04,
+});
+var player = new Player(player_sprite);
 
 // The main game loop
 var lastTime;
@@ -519,7 +535,9 @@ function main() {
     activeRoom.drawRoom();
     lastTime = now;
     player.animations();
+    activeRoom.monsters.forEach(monster => monster.animations());
     playerLocation.textContent=Math.floor(player.x) + ", " + Math.floor(player.y);
+    playerHitPoints.textContent=player.hitPoints + "/" + player.maxHitPoints;
     requestAnimationFrame(main);
 };
 

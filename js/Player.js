@@ -2,8 +2,8 @@ class Player{
     
     constructor(sprite){
         this.sprite = sprite;
-        this.x=2*TS;
-        this.y=3*TS;
+        this.x=activeRoom.spawnLocation["x"]*TS+.5*TS;
+        this.y=activeRoom.spawnLocation["y"]*TS+.5*TS;
         this.layer=1;
         this.rlhitbox=.4*TS;
         this.bothitbox=.15*TS;
@@ -11,7 +11,13 @@ class Player{
         this.setupSprite();
         this.dashedLast = Date.now();
         this.direction = DOWN;
-        this.maxDashFrames = 8;
+        this.maxDashFrames = 10;
+        this.maxDamageFrames = 12;
+        console.log(activeRoom.tileArray);
+        this.maxHitPoints = 100;
+        this.hitPoints = this.maxHitPoints;
+        this.takingDamage = false;
+        this.attackDamage = 5;
     }
     
     setupSprite(){
@@ -72,7 +78,6 @@ class Player{
 
     dash(){
         if(Date.now() - this.dashedLast > 500){
-            console.log("Dashed");
             this.dashedLast = Date.now();
             this.dashEndLocation = [0,0];
             this.currentDashFrame = 0;
@@ -93,10 +98,18 @@ class Player{
             }
             this.rise = player.y-this.dashEndLocation["y"];
             this.run = player.x-this.dashEndLocation["x"];
-        }
+        } 
+    }
+    dashDamage(){
+        let closeMonsters = activeRoom.monsters.filter(monster => monster.distanceToPlayer() < 30);
+        closeMonsters.forEach(monster => this.attack(monster));
+    }
+    attack(entity){
+        entity.takeDamage(this.attackDamage);
     }
     animations(){
-        if(this.isDashing) player.dashAnimation();
+        if(this.isDashing) this.dashAnimation();
+        if(this.takingDamage) this.damageAnimation();
     }
     dashAnimation(){
         if(this.currentDashFrame == this.maxDashFrames){
@@ -105,7 +118,16 @@ class Player{
         } else {
             player.x -= this.run/this.maxDashFrames;
             player.y -= this.rise/this.maxDashFrames;
+            this.dashDamage();
             this.currentDashFrame++;
+        }
+    }
+    damageAnimation(){
+        if(this.currentDamageFrame == this.maxDamageFrames){
+            this.takingDamage = false;
+        } else {
+            this.currentDamageFrame % 2 == 0 ? this.x-=10 : this.x+=10;
+            this.currentDamageFrame++;
         }
     }
     moveToClosestValidSpot(){
@@ -128,6 +150,13 @@ class Player{
         return closestLocation;
     }
 
+    takeDamage(damage){
+        if(this.takingDamage || this.isDashing) return;
+        this.currentDamageFrame = 0
+        this.hitPoints -= damage;
+        if (this.hitPoints <= 0) window.location.reload(false);
+        this.takingDamage = true;
+    }
     spriteIdle(){
         this.sprite.width = 32;
         this.sprite.numberOfFrames = 1;
@@ -136,10 +165,11 @@ class Player{
     }
 
     canLeave(){
-        return (Date.now() - activeRoom.roomTime > 500);
+        return (Date.now() - activeRoom.roomTime > 1000);
     }
 
     draw(debug){
+        if (this.isDashing || this.takingDamage) ctx.globalAlpha = 0.6;
         if(debug){this.speed = 3*TS;}
         debug = debug || false;
         this.sprite.x = player.x-.65*TS;
@@ -151,8 +181,9 @@ class Player{
         }
         if (debug){
             ctx.fillStyle = "red";
-            ctx.fillRect(this.x,this.y,10,10); // fill in the pixel at (10,10)
+            ctx.fillRect(this.x,this.y,5,5); // fill in the pixel at (10,10)
         }
+        ctx.globalAlpha = 1;
     }
     setLocation(x,y){
         this.x=x;
@@ -180,7 +211,12 @@ class Player{
         var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile2);
         for(var i = 0;i<doors.length;i++){
             if( doors[i].inArea(this.x,this.y)){
-                return true;
+                if(
+                    player.outOfBounds(player.x-3, player.y) ||
+                    player.outOfBounds(player.x+3, player.y) ||
+                    player.outOfBounds(player.x, player.y-3) ||
+                    player.outOfBounds(player.x, player.y+3)
+                ) return true;
             }
         }
     }

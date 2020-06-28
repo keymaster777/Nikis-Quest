@@ -49,8 +49,8 @@ var isInput = false;
 
 function handleInput(dt) {
     isInput=false;
-    if(input.isDown('DOWN') || input.isDown('s')) {
-        if (!player.outOfBounds(player.x,(player.y+1.5*player.speed*dt)+player.bothitbox ) ){
+    if(input.isDown('s')) {
+        if (!player.outOfBounds(player.x,(player.y+1.5*player.speed*dt)) ){
             player.move(dt, DOWN);
         }else{
             player.move(0, DOWN);
@@ -58,7 +58,7 @@ function handleInput(dt) {
         isInput = true;
     }
 
-    if(input.isDown('UP') || input.isDown('w')) {
+    if(input.isDown('w')) {
         if (!player.outOfBounds(player.x, player.y-1.5*player.speed*dt)){
             player.move(dt, UP);
         }else{
@@ -67,7 +67,7 @@ function handleInput(dt) {
         isInput = true;
     }
 
-    if(input.isDown('LEFT') || input.isDown('a')) {
+    if(input.isDown('a')) {
         if (!player.outOfBounds((player.x - 1.5*player.speed * dt), player.y)){
             player.move(dt, LEFT);
         }else{
@@ -76,7 +76,7 @@ function handleInput(dt) {
         isInput = true;
     }
 
-    if(input.isDown('RIGHT') || input.isDown('d')) {
+    if(input.isDown('d')) {
         if (!player.outOfBounds((player.x + 1.5*player.speed * dt), player.y)){
             player.move(dt, RIGHT);
         }else{
@@ -85,13 +85,11 @@ function handleInput(dt) {
         isInput = true;
     }
 
-    if(input.isDown('SPACE')) {
-        if(player.atDoor() && player.canLeave()){
-            activeRoom.nextRoom();
-        }
+    if(player.atDoor() && player.canLeave()){
+        activeRoom.nextRoom();
     }
 
-    if(input.isDown('C')) {
+    if(input.isDown('SPACE')) {
         player.dash();
     }
 }
