@@ -18,6 +18,9 @@ class Player{
         this.hitPoints = this.maxHitPoints;
         this.takingDamage = false;
         this.attackDamage = 5;
+        this.isAttacking = false;
+        this.attackDirection = RIGHT;
+        this.maxAttackFrame=100;
     }
     
     setupSprite(){
@@ -40,7 +43,7 @@ class Player{
         this.idle = new Image();
         this.idle = this.idle_down;
         this.weapon = new Image();
-        this.weapon.src = 'img/sprites/weapon_golden_sword.png';
+        this.weapon.src = 'img/sprites/weapon_katana.png';
 
     }
 
@@ -51,27 +54,35 @@ class Player{
         switch(direction){
             case DOWN:
                 this.direction = DOWN;
-                this.y+=distance;
-                this.sprite.image = this.run_down_sprite;
-                this.idle = this.idle_down;
+                this.y+=this.isDashing ? distance*3 : distance;
+                if(!this.isAttacking){
+                    this.sprite.image = this.run_down_sprite;
+                    this.idle = this.idle_down;
+                }
                 break;
             case UP:
                 this.direction = UP;
-                this.y-=distance;
-                this.sprite.image = this.run_up_sprite;
-                this.idle = this.idle_up;
+                this.y-=this.isDashing ? distance*3 : distance;
+                if(!this.isAttacking){
+                    this.sprite.image = this.run_up_sprite;
+                    this.idle = this.idle_up;
+                }
                 break;
             case LEFT:
                 this.direction = LEFT;
-                this.x-=distance;
-                this.sprite.image = this.run_left_sprite;
-                this.idle = this.idle_left;
+                this.x-=this.isDashing ? distance*3 : distance;
+                if(!this.isAttacking){
+                    this.sprite.image = this.run_left_sprite;
+                    this.idle = this.idle_left;
+                } 
                 break;
             case RIGHT:
                 this.direction = RIGHT;
-                this.x+=distance;
-                this.sprite.image = this.run_right_sprite;
-                this.idle = this.idle_right;
+                this.x+=this.isDashing ? distance*3 : distance;
+                if(!this.isAttacking){
+                    this.sprite.image = this.run_right_sprite;
+                    this.idle = this.idle_right;
+                }
                 break;
         }
     }
@@ -109,7 +120,60 @@ class Player{
     }
     animations(){
         if(this.isDashing) this.dashAnimation();
-        if(this.takingDamage) this.damageAnimation();
+        if(this.takingDamage) this.damagedAnimation();
+        
+    }
+    attackingAnimation(){
+        this.strafeSprite();
+        ctx.save();
+        ctx.translate(this.x, this.y-.3*TS);
+        ctx.rotate((this.attackSwingStartingPoint()+this.attackFrame)*Math.PI/180);
+        ctx.drawImage(this.weapon, -.15*TS, -(TS+.25*TS), .35*TS, TS);
+        ctx.restore();
+        this.attackFrame+=6.5;
+        if(this.attackFrame >= this.maxAttackFrame) this.isAttacking = false;
+
+        let thirdAngle = 180-(90+this.attackSwingStartingPoint()+this.attackFrame);
+        let Y = ((TS+TS*.25)/Math.sin(90 * Math.PI / 180))*Math.sin(thirdAngle * Math.PI / 180);
+        let X = ((TS+TS*.25)/Math.sin(90 * Math.PI / 180))*Math.sin((this.attackSwingStartingPoint()+this.attackFrame) * Math.PI / 180);
+        ctx.fillStyle = "red";
+        for(let i = 1; i<10; i++) {
+            //ctx.fillRect(this.x+((.1*i)*X),this.y-((.1*i)*Y)-(.3*TS),5,5);
+            let closeMonsters = activeRoom.monsters.filter(monster => monster.distanceToCoord(this.x+(.1*i)*X, this.y-(.1*i)*Y-(.3*TS)) < 35);
+            closeMonsters.forEach(monster => this.attack(monster));
+        }
+    }
+    strafeSprite(){
+        switch(this.attackDirection){
+            case UP:
+                this.sprite.image = this.run_up_sprite;
+                this.idle = this.idle_up;            
+                break;
+            case RIGHT:
+                this.sprite.image = this.run_right_sprite;
+                this.idle = this.idle_right;
+                break;
+            case DOWN:
+                this.sprite.image = this.run_down_sprite;
+                this.idle = this.idle_down;
+                break;
+            case LEFT:
+                this.sprite.image = this.run_left_sprite;
+                this.idle = this.idle_left;
+                break;
+        }
+    }
+    attackSwingStartingPoint(){
+        switch(this.attackDirection){
+            case UP:
+                return -50;
+            case RIGHT:
+                return 40;
+            case DOWN:
+                return 130;
+            case LEFT:
+                return 220;
+        }
     }
     dashAnimation(){
         if(this.currentDashFrame == this.maxDashFrames){
@@ -122,7 +186,7 @@ class Player{
             this.currentDashFrame++;
         }
     }
-    damageAnimation(){
+    damagedAnimation(){
         if(this.currentDamageFrame == this.maxDamageFrames){
             this.takingDamage = false;
         } else {
@@ -176,6 +240,9 @@ class Player{
         this.sprite.y = player.y-1*TS;
         this.sprite.update();
         this.sprite.render();
+
+        if(this.isAttacking) this.attackingAnimation();
+
         if(!isInput){
             this.spriteIdle();
         }

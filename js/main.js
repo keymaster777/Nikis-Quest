@@ -510,7 +510,6 @@ class Room{
 }
 
 var activeRoom = new Room(randomIntFromInterval(5,8),randomIntFromInterval(3,6), 0, 0);
-//var activeRoom = new Room(4,3, 0, 0);
 
 var playerImage = new Image();
 playerImage.src = 'img/player/run-right.png';

@@ -85,6 +85,38 @@ function handleInput(dt) {
         isInput = true;
     }
 
+    if(input.isDown('UP')) {
+        if(!player.isAttacking) {
+            player.isAttacking = true;
+            player.attackDirection = UP;
+            player.attackFrame = 0;
+        }
+    }
+
+    if(input.isDown('RIGHT')) {
+        if(!player.isAttacking) {
+            player.isAttacking = true;
+            player.attackDirection = RIGHT;
+            player.attackFrame = 0;
+        }
+    }
+
+    if(input.isDown('DOWN')) {
+        if(!player.isAttacking) {
+            player.isAttacking = true;
+            player.attackDirection = DOWN;
+            player.attackFrame = 0;
+        }
+    }
+
+    if(input.isDown('LEFT')) {
+        if(!player.isAttacking) {
+            player.isAttacking = true;
+            player.attackDirection = LEFT;
+            player.attackFrame = 0;
+        }
+    }
+
     if(player.atDoor() && player.canLeave()){
         activeRoom.nextRoom();
     }

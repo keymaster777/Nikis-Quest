@@ -53,6 +53,10 @@ class Monster{
         return ((player.x-this.x)**2 + (player.y-this.y)**2)**.5
     }
 
+    distanceToCoord(x1,y1){
+        return ((x1-this.x)**2 + (y1-this.y)**2)**.5
+    }
+
     attack(entity){
         if(Date.now() - this.attackedLast > 400){
             console.log("Monster Attacked");
