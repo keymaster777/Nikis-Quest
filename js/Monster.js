@@ -53,8 +53,8 @@ class Monster{
         return ((player.x-this.x)**2 + (player.y-this.y)**2)**.5
     }
 
-    distanceToCoord(x1,y1){
-        return ((x1-this.x)**2 + (y1-this.y)**2)**.5
+    isCloseEnoughToHit(x1,y1){
+        return (((x1-this.sprite.x)**2 + (y1-this.sprite.y)**2)**.5) < (TS*.8);
     }
 
     attack(entity){

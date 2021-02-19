@@ -139,7 +139,7 @@ class Player{
         ctx.fillStyle = "red";
         for(let i = 1; i<10; i++) {
             //ctx.fillRect(this.x+((.1*i)*X),this.y-((.1*i)*Y)-(.3*TS),5,5);
-            let closeMonsters = activeRoom.monsters.filter(monster => monster.distanceToCoord(this.x+(.1*i)*X, this.y-(.1*i)*Y-(.3*TS)) < 35);
+            let closeMonsters = activeRoom.monsters.filter(monster => monster.isCloseEnoughToHit(this.x+(.1*i)*X, this.y-(.1*i)*Y-(.3*TS)));
             closeMonsters.forEach(monster => this.attack(monster));
         }
     }
