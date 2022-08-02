@@ -57,9 +57,103 @@ class Item extends Tile{
     }
 }
 
+class Chest extends Tile{
+    constructor(x, y, TS){
+        super(itemimgs[0], "*", x, y, TS);
+        this.obstructing = true;
+        this.hitPoints = 15;
+        this.takingDamage = false;
+        this.maxDamageFrames = 18;
+    }
+
+    animations(){
+        if(this.takingDamage) this.damageAnimation();
+    }
+
+    damageAnimation(){
+        if(this.currentDamageFrame == this.maxDamageFrames){
+            this.takingDamage = false;
+        } else {
+            this.currentDamageFrame % 2 == 0 ? this.x-=.1 : this.x+=.1;
+            this.currentDamageFrame++;
+        }
+    }
+
+    takeDamage(damage){
+        if(this.takingDamage) return;
+        this.currentDamageFrame = 0
+        this.hitPoints -= damage;
+        if (this.hitPoints <= 0){
+            activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != this)
+            let random = Math.random();
+            if(random >= .9){
+                activeRoom.monsters.push(new Monster(this.x, this.y))
+                activeRoom.monsters.push(new Monster(this.x, this.y))
+            }
+            if(random > .7){
+                console.log("Stamina Pot spawn")
+            } else {
+                activeRoom.tileArray.push(new Potion(this.x, this.y, TS));
+            }
+        }
+        this.takingDamage = true;
+    }
+
+    distanceToCoord(x1,y1){
+        return ((x1-this.x*TS)**2 + (y1-this.y*TS)**2)**.5
+    }
+
+    inArea(x,y){
+        if(this.obstructing && x>=this.x*TS+15 && x<this.x*TS+TS-15 &&  y>=this.y*TS+15 && y<this.y*TS+TS-10 ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+
+class Potion extends Tile{
+    constructor(x, y, TS){
+        super(itemimgs[1], "*", x, y, TS);
+        this.obstructing = false;
+    }
+
+    inArea(x,y){
+        if( x>=this.x*TS+10 && x<this.x*TS+TS-10 &&  y>=this.y*TS+20 && y<this.y*TS+TS-10 ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+} 
+
 class FloorTile extends Tile{
-    constructor(tileimg, layer, x, y, TS){
-        super(tileimg, layer, x, y, TS);
+    constructor(x, y, TS){
+        super(randomFloor(), 0, x, y, TS);
+    }
+
+    randomFloor() {
+        let random = Math.random();
+        switch(true){
+            case random < .05:
+                return floorimgs[1];
+                break;
+            case random < .1:
+                return floorimgs[2];
+                break;
+            case random < .15:
+                return floorimgs[3];
+                break;
+            case random < .2:
+                return floorimgs[4];
+                break;
+            case random < .225:
+                return floorimgs[5];
+                break;
+            default:
+                return floorimgs[0];
+                break;
+        }
     }
 }
 

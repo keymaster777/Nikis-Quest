@@ -13,9 +13,11 @@ class Player{
         this.direction = DOWN;
         this.maxDashFrames = 10;
         this.maxDamageFrames = 12;
-        console.log(activeRoom.tileArray);
+        // console.log(activeRoom.tileArray);
         this.maxHitPoints = 100;
         this.hitPoints = this.maxHitPoints;
+        this.maxStamina = 100;
+        this.stamina = this.maxStamina;
         this.takingDamage = false;
         this.attackDamage = 5;
         this.isAttacking = false;
@@ -85,10 +87,21 @@ class Player{
                 }
                 break;
         }
+
+        // Check if in potion area
+        let potions = activeRoom.tileArray.filter(tile => tile instanceof Potion);
+        potions.forEach((potion) => {
+            if(potion.inArea(player.x, player.y) && player.hitPoints < player.maxHitPoints){
+                activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != potion );
+                player.hitPoints = Math.min(player.hitPoints + 20, player.maxHitPoints) 
+            }
+        })
     }
 
     dash(){
-        if(Date.now() - this.dashedLast > 500){
+        let dashCost = 30;
+        if(Date.now() - this.dashedLast > 500 && this.stamina >= dashCost){
+            this.stamina -= dashCost
             this.dashedLast = Date.now();
             this.dashEndLocation = [0,0];
             this.currentDashFrame = 0;
@@ -124,7 +137,6 @@ class Player{
         
     }
     attackingAnimation(){
-        this.strafeSprite();
         ctx.save();
         ctx.translate(this.x, this.y-.3*TS);
         ctx.rotate((this.attackSwingStartingPoint()+this.attackFrame)*Math.PI/180);
@@ -136,11 +148,15 @@ class Player{
         let thirdAngle = 180-(90+this.attackSwingStartingPoint()+this.attackFrame);
         let Y = ((TS+TS*.25)/Math.sin(90 * Math.PI / 180))*Math.sin(thirdAngle * Math.PI / 180);
         let X = ((TS+TS*.25)/Math.sin(90 * Math.PI / 180))*Math.sin((this.attackSwingStartingPoint()+this.attackFrame) * Math.PI / 180);
-        ctx.fillStyle = "red";
         for(let i = 1; i<10; i++) {
-            //ctx.fillRect(this.x+((.1*i)*X),this.y-((.1*i)*Y)-(.3*TS),5,5);
+            // ctx.fillStyle = "red";
+            // ctx.fillRect(this.x+((.1*i)*X),this.y-((.1*i)*Y)-(.3*TS),5,5);
             let closeMonsters = activeRoom.monsters.filter(monster => monster.distanceToCoord(this.x+(.1*i)*X, this.y-(.1*i)*Y-(.3*TS)) < 35);
             closeMonsters.forEach(monster => this.attack(monster));
+
+
+            let closeChests = activeRoom.tileArray.filter(tile => tile instanceof Chest && tile.inArea(this.x+(.1*i)*X, this.y-(.1*i)*Y-(.3*TS)));
+            closeChests.forEach(chest => this.attack(chest));
         }
     }
     strafeSprite(){
@@ -221,11 +237,11 @@ class Player{
         if (this.hitPoints <= 0) window.location.reload(false);
         this.takingDamage = true;
     }
+
     spriteIdle(){
-        this.sprite.width = 32;
+        this.sprite.width = 32
         this.sprite.numberOfFrames = 1;
         this.sprite.image = this.idle;
-        this.sprite.setFrame();
     }
 
     canLeave(){
@@ -238,14 +254,19 @@ class Player{
         debug = debug || false;
         this.sprite.x = player.x-.65*TS;
         this.sprite.y = player.y-1*TS;
+
+        if(this.isAttacking) this.strafeSprite();
+
+        if(this.isAttacking && this.attackDirection != DOWN) this.attackingAnimation();
+
+
         this.sprite.update();
         this.sprite.render();
 
-        if(this.isAttacking) this.attackingAnimation();
+        if(!isInput) this.spriteIdle();
 
-        if(!isInput){
-            this.spriteIdle();
-        }
+        if(this.isAttacking && this.attackDirection == DOWN) this.attackingAnimation();
+        
         if (debug){
             ctx.fillStyle = "red";
             ctx.fillRect(this.x,this.y,5,5); // fill in the pixel at (10,10)
@@ -290,7 +311,6 @@ class Player{
 }
 
 function sprite (options) {
-				
     var that = {},
     frameIndex = 0,
     tickCount = 0,
@@ -306,15 +326,13 @@ function sprite (options) {
     that.y = options.y || TS;
     that.loop = options.loop;
 
-    that.setFrame = function(){
-        frameIndex = 0;
-    }
+    that.setFrame = (newFrameIndex) => frameIndex = newFrameIndex
 
     that.update = function () {
 
         tickCount += 1;
 			
-        if (tickCount > ticksPerFrame) {
+        if (that.numberOfFrames == 1 || tickCount > ticksPerFrame) {
         
         	tickCount = 0;
         	
@@ -356,6 +374,11 @@ function sprite (options) {
            TS*that.sizescale*that.height);
         }
     };
+
+    that.draw = function () {
+        that.update()
+        that.render()
+    }
 
     return that;
 }

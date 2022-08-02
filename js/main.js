@@ -11,22 +11,9 @@ const DOWNLEFT = "downleft";
 const DOWNRIGHT = "downright";
 var roomHistory=[];
 var uniqueRooms = 0;
-canvas.width = TS*16;
+canvas.width = TS*18;
 canvas.height = TS*10;
 document.body.appendChild(canvas);
-var playerLocation = document.getElementById("position");
-var playerHitPoints = document.getElementById("hitpoints");
-
-var gnollShamanImage = new Image();
-gnollShamanImage.src = 'img/mobs/GnollShaman_Walk_Right.png';
-var monster_sprite = sprite({
-    context: ctx,
-    width: 64,
-    height: 21,
-    image: gnollShamanImage,
-    numberOfFrames: 4,
-    sizescale: .04,
-});
 
 startLoadingAllImages(start);
 function start(){
@@ -146,7 +133,8 @@ class Room{
         this.buildDoors();
         this.buildWalls();
         this.buildFloor();
-        this.buildItems();
+        this.spawnItems();
+        this.spawnMonsters();
         this.positionPlayer();
         this.leftFrom;
     }
@@ -246,6 +234,7 @@ class Room{
 
     }
     randomFloorConstruct(x,y){
+
         let random = Math.random();
         switch(true){
             case random < .5:
@@ -277,16 +266,13 @@ class Room{
         for(var x=0; x<this.width; x++){
             for(var y=0; y<=this.height; y++){
                 if(!this.isOccupiedTile(x,y)){
-                    this.tileArray.push(new FloorTile(randomFloor(), 0 , x, y, TS));
-                    let random = Math.random();
-                    if (random < .18 && !(this.x == 0 && this.y == 0)){
-                        this.monsters.push(new Monster(monster_sprite, x, y));
-                    }
+                    this.tileArray.push(new FloorTile(x, y, TS));
                     if(this.spawnLocation["x"] == null) this.spawnLocation = {x: x, y: y};
                 }
             }
         }
     }
+
     buildWalls(){
         //Builds corners
         this.corners[0] = new Corner(0, 0, this, UPLEFT);
@@ -395,22 +381,32 @@ class Room{
         this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile2);
     }
 
-    buildItems(){
-        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile && tile.enabled == true);
+    spawnItems(){
+        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile && tile.x > 0 && tile.x < this.width-1);
         for(var i = 0; i<floorArray.length;i++){
             var random = randomIntFromInterval(1,1000);
             switch(true){
                 case random < 10:
-                    //Chest
-                    this.tileArray.push(new Item(itemimgs[0], 0, floorArray[i].x, floorArray[i].y, TS, true));
+                    this.tileArray.push(new Chest(floorArray[i].x, floorArray[i].y, TS, true));
+                    this.occupiedSpaces = this.occupiedSpaces.concat([floorArray[i].x, floorArray[i].y]);
                 break;
                 case random < 20:
-                    //Potion
-                    this.tileArray.push(new Item(itemimgs[1], 0, floorArray[i].x, floorArray[i].y, TS, false));
+                    this.tileArray.push(new Potion(floorArray[i].x, floorArray[i].y, TS));
+                    this.occupiedSpaces = this.occupiedSpaces.concat([floorArray[i].x, floorArray[i].y]);
                 break;
             break;
             }
         }
+    }
+
+    spawnMonsters(){
+        let unoccupiedFloorArray = this.tileArray.filter(tile => tile instanceof FloorTile && !this.isOccupiedTile(tile.x, tile.y));
+        unoccupiedFloorArray.forEach(tile => {
+            let random = Math.random();
+            if (random < .18 && !(this.x == 0 && this.y == 0)){
+                this.monsters.push(new Monster(tile.x, tile.y));
+            }
+        })
     }
     
     drawRoom = function(){
@@ -421,33 +417,30 @@ class Room{
         var layer2 = this.tileArray.filter(tile => tile.layer == 2);
         var layer3 = this.tileArray.filter(tile => tile.layer == 3);
 
-        for( var i = 0; i<layerVaries.length; i++){
-            if(player.y<layerVaries[i].y*TS+TS){
-                layer3.push(layerVaries[i]);
-            }else{
-                layer2.push(layerVaries[i]);
-            }
-        }
+        layer0.forEach(ele => ele.draw())
+        layer1.forEach(ele => ele.draw())
+        layer2.forEach(ele => ele.draw())
 
-        for( var i = 0; i<layer0.length; i++){
-            layer0[i].draw();
-        }
-        for( var i = 0; i<layer1.length; i++){
-            layer1[i].draw();
-        }
-        for( var i = 0; i<layer2.length; i++){
-            layer2[i].draw();
-        }
-        for(var sprite of this.sprites){
-            sprite.sprite.update();
-            sprite.sprite.render();
-        }
-        
-        this.monsters.forEach( monster => monster.draw());
-        player.draw();
-        for( var i = 0; i<layer3.length; i++){
-            layer3[i].draw();
-        }
+        var sprites = this.sprites.map(ele => ele.sprite)
+
+        var objectsWithLayerVariety = [...layerVaries, ...this.monsters, ...sprites, player]
+
+        objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
+            var elements = [a,b].map(ele => {
+                if (ele instanceof WallTile2) return ele.y*TS+TS; 
+                if (ele instanceof Potion) return ele.y*TS+40;
+                if (ele instanceof Chest) return ele.y*TS+40;
+                if (ele.numberOfFrames != undefined) return ele.y+50
+                return ele.y
+            })
+            
+            return elements[0] - elements[1]
+        })
+
+        objectsWithLayerVariety.forEach(ele => ele.draw())
+
+        layer3.forEach(ele => ele.draw())
+
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
@@ -523,20 +516,51 @@ var player_sprite = sprite({
 });
 var player = new Player(player_sprite);
 
+var heartImage = new Image();
+heartImage.src = 'img/UIelements/Sprite_heart.png'
+
 // The main game loop
 var lastTime;
 function main() {
     var now = Date.now();
     var dt = (now - lastTime) / 1000.0;
+
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // UI Components
+
+    ctx.fillStyle = "#555";
+    ctx.fillRect(10, 10, 200, canvas.height-20);
+
+
+    ctx.drawImage(heartImage, 20, 20, 25, 25);
+
+    ctx.fillStyle = "#111"
+    ctx.fillRect(50, 20, 150, 25);
+
+    ctx.fillStyle = "#c03a47"
+    ctx.fillRect(52, 22, 146*(player.hitPoints/player.maxHitPoints), 21);
+
+    ctx.fillStyle = "#5dBB63"
+    ctx.font = "26px Arial";
+    ctx.fillText("E", 23, 76); 
+
+    ctx.fillStyle = "#111"
+    ctx.fillRect(50, 55, 150, 25);
+
+    ctx.fillStyle = "#5dBB63"
+    ctx.fillRect(52, 57, 146*(player.stamina/player.maxStamina), 21);
+
+    // Regen Components
+    if (player.stamina < 100) player.stamina += 0.25;
+
     handleInput(dt);
     activeRoom.drawRoom();
     lastTime = now;
     player.animations();
     activeRoom.monsters.forEach(monster => monster.animations());
-    playerLocation.textContent=Math.floor(player.x) + ", " + Math.floor(player.y);
-    playerHitPoints.textContent=player.hitPoints + "/" + player.maxHitPoints;
+    activeRoom.tileArray.filter(tile => tile instanceof Chest).forEach(tile => tile.animations())
     requestAnimationFrame(main);
 };
 
