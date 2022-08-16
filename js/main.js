@@ -454,13 +454,11 @@ class Room{
     }
 
     nextRoom(){
-        var doorTiles = this.doorTiles;
-        for(var i = 0;i<doorTiles.length;i++){
-            if(doorTiles[i].inArea(player.x, player.y)){
-                this.leftFrom = doorTiles[i].direction;
-            } 
-        }
+        document.getElementById('first-room-tip').style.display = "none"
+
+        this.leftFrom = this.doorTiles.find(tile => tile.inArea(player.x, player.y)).direction
         roomHistory.push(activeRoom);
+
         switch(this.leftFrom){
             case UP:
                 if(this.getRoom(this.x, this.y+1)){
