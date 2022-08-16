@@ -1,0 +1,23 @@
+{
+  "name": "nikis_quest",
+  "version": "1.0.0",
+  "description": "Sprite game and passion project named after my wife",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymaster777/Nikis-Quest.git"
+  },
+  "author": "Riley Cleary",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/keymaster777/Nikis-Quest/issues"
+  },
+  "homepage": "https://github.com/keymaster777/Nikis-Quest#readme",
+  "devDependencies": {
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}

@@ -500,6 +500,9 @@ class Room{
     }
 }
 
+let myTest = new Level();
+myTest.test()
+
 var activeRoom = new Room(randomIntFromInterval(5,8),randomIntFromInterval(3,6), 0, 0);
 
 var playerImage = new Image();
