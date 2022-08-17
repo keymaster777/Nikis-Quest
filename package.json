@@ -4,7 +4,9 @@
   "description": "Sprite game and passion project named after my wife",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode=production",
+    "run": "webpack serve --mode=development"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,13 @@
   },
   "homepage": "https://github.com/keymaster777/Nikis-Quest#readme",
   "devDependencies": {
+    "@babel/core": "^7.18.10",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.18.10",
+    "babel-loader": "^8.2.5",
+    "file-loader": "^6.2.0",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.10.0"
   }
 }
