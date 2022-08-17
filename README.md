@@ -12,3 +12,4 @@ Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
 - Add map to UI to track 'discovered' rooms
 - Move controller tips outside of index.html into styled elements in the canvas.
 - Add "level completion" criteria and scaling difficulty between levels
+- Refactor Player, Monster, and Tile classes to use composition.
