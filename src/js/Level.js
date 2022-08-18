@@ -8,6 +8,9 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
+    this.enemiesFelled = 0
+    this.chestsOpened = 0
+    this.potionsConsumed = 0
   }
 
   getRoom(x,y, createNewRoom = false){
@@ -21,13 +24,12 @@ class Level{
 
     // Ensures entered from is correct in the event that the room has already been entered previously
     requestedRoom.enteredFrom = enteredFrom
+    requestedRoom.randomNum = Math.random() // Reset rooms random factor, currently just for message events
 
     return requestedRoom
   }
 
   nextRoom(){
-    document.getElementById('first-room-tip').style.display = "none"
-    
     activeRoom.leftFrom = activeRoom.doorTiles.find(tile => tile.inArea(player.x, player.y)).direction
     let x = activeRoom.x
     let y = activeRoom.y

@@ -3,6 +3,7 @@ import {sprite} from "./helpers"
 import DoorTile2 from "./tiles/DoorTile2";
 import Potion from "./tiles/Potion";
 import Chest from "./tiles/Chest"
+import Level from "./Level";
 
 class Player{
   constructor(initialCoords){
@@ -85,6 +86,7 @@ class Player{
     potions.forEach((potion) => {
         if(potion.inArea(player.x, player.y) && player.hitPoints < player.maxHitPoints){
             activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != potion );
+            level.potionsConsumed += 1
             player.hitPoints = Math.min(player.hitPoints + 20, player.maxHitPoints) 
         }
     })

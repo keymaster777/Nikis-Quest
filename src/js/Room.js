@@ -13,7 +13,8 @@ import Monster from "./Monster"
 import Pit from "./structures/Pit";
 
 import {randomIntFromInterval} from "./helpers"
-import {TS, UP, LEFT, RIGHT, DOWN, DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT, CANVAS_WIDTH} from "./constants"
+import {TS, UP, LEFT, RIGHT, DOWN, DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT, CANVAS_WIDTH, CANVAS_HEIGHT} from "./constants"
+import Level from "./Level";
 
 class Room{
     constructor( x, y, enteredFrom = false, allRooms = [] ){
@@ -37,6 +38,7 @@ class Room{
         this.spawnMonsters();
         this.leftFrom;
         this.lpad = (CANVAS_WIDTH-(this.width*TS))/2
+        this.randomNum = Math.random()
     }
 
     /* =================================== */
@@ -294,6 +296,27 @@ class Room{
             }
         })
     }
+
+    rareMessage() {
+       if (this.randomNum >= 0 && this.randomNum < 0.01) return "**distant baby crying**"
+       if (this.randomNum >= 0.01  && this.randomNum < 0.02) return "**tornado siren wailing**"
+       if (this.randomNum >= 0.02  && this.randomNum < 0.03) return "**low whispers that sound like gen Z slang**"
+       if (this.randomNum >= 0.03  && this.randomNum < 0.04) return "**the sound of your mother saying you should have become a doctor**"
+       if (this.randomNum >= 0.04  && this.randomNum < 0.05) return "**the sound of being hopelessly lost**"
+       return null 
+    }
+
+    roomMessage(){
+        // These are organized in priority, each condition overwrites the message
+        let message = this.rareMessage() || ""
+        if (this.sprites.find(sprite => sprite instanceof TorchWall)) message = "**torch crackling**"
+        if (player.isMoving) message = "**footsteps**"
+        if (this.monsters.length > 0) message = "**angry goblin noises**"
+        if (this.monsters.find(monster => monster.takingDamage)) message = "**angrier goblin noises**"
+        if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "**wood splintering**" 
+        if (level.rooms.length == 1) message = "LEAVE THIS ROOM THROUGH ONE OF THE 4 DOORS."
+        return message
+    }
     
     drawRoom(){
         ctx.translate(activeRoom.lpad, 0);
@@ -328,6 +351,11 @@ class Room{
         layer3.forEach(ele => ele.draw())
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        ctx.fillStyle = "#b8b5b9"
+        ctx.textAlign = "center"
+        ctx.font = "20px Arial";
+        ctx.fillText(this.roomMessage(), CANVAS_WIDTH/2, CANVAS_HEIGHT - 10);
     }
 }
 

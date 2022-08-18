@@ -1,5 +1,6 @@
 import {sprite} from "./helpers"
 import {TS} from "./constants"
+import Level from "./Level";
 
 class Monster{
   constructor(x, y){
@@ -78,8 +79,8 @@ class Monster{
       this.currentDamageFrame = 0
       this.hitPoints -= damage;
       if (this.hitPoints <= 0){
-          this.speed = 0;
-          this.x = -1000;
+          activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
+          level.enemiesFelled += 1
       }
       this.takingDamage = true;
   }

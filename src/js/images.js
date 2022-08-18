@@ -1,5 +1,14 @@
 // UI Image Imports
 import HeartImage from '../img/UIelements/Sprite_heart.png'
+import LeftArrowImg from '../img/UIelements/ARROWLEFT.png'
+import RightArrowImg from '../img/UIelements/ARROWRIGHT.png'
+import UpArrowImg from '../img/UIelements/ARROWUP.png'
+import DownArrowImg from '../img/UIelements/ARROWDOWN.png'
+import LetterAImg from '../img/UIelements/A.png'
+import LetterWImg from '../img/UIelements/W.png'
+import LetterSImg from '../img/UIelements/S.png'
+import LetterDImg from '../img/UIelements/D.png'
+import SpaceBarImg from '../img/UIelements/SPACE.png'
 
 // Player Image Imports
 import RunRightSprite from "../img/player/run-right.png"
@@ -68,6 +77,24 @@ function setUpImages() {
   // UI Images and Sprites
   imgs.heart = new Image()
   imgs.heart.src = HeartImage
+  imgs.letterA = new Image()
+  imgs.letterA.src = LetterAImg
+  imgs.letterW = new Image()
+  imgs.letterW.src = LetterWImg
+  imgs.letterS = new Image()
+  imgs.letterS.src = LetterSImg
+  imgs.letterD = new Image()
+  imgs.letterD.src = LetterDImg
+  imgs.leftArrow = new Image()
+  imgs.leftArrow.src = LeftArrowImg
+  imgs.rightArrow = new Image()
+  imgs.rightArrow.src = RightArrowImg
+  imgs.upArrow = new Image()
+  imgs.upArrow.src = UpArrowImg
+  imgs.downArrow = new Image()
+  imgs.downArrow.src = DownArrowImg
+  imgs.spaceBar = new Image()
+  imgs.spaceBar.src = SpaceBarImg
 
   // Player Images and Sprites
   imgs.runRight = new Image()

@@ -24,6 +24,7 @@ const startGame = () => {
   global.activeRoom = new Room(0,0)
   global.player = new Player(activeRoom.spawnLocation)
   global.level = new Level(1)
+
   main()
 }
 
@@ -85,7 +86,7 @@ function main() {
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // UI Components
+    // UI Components Left Side
 
     ctx.fillStyle = "#555";
     ctx.fillRect(10, 10, 200, canvas.height-20);
@@ -100,6 +101,7 @@ function main() {
 
     ctx.fillStyle = "#5dBB63"
     ctx.font = "26px Arial";
+    ctx.textAlign = "left"
     ctx.fillText("E", 23, 76); 
 
     ctx.fillStyle = "#111"
@@ -107,6 +109,43 @@ function main() {
 
     ctx.fillStyle = "#5dBB63"
     ctx.fillRect(52, 57, 146*(player.stamina/player.maxStamina), 21);
+
+    // Current room coords
+    ctx.fillStyle = "#b8b5b9"
+    ctx.textAlign = "center"
+    ctx.font = "16px Arial";
+    ctx.fillText(`Current Room: ${activeRoom.x},${activeRoom.y}`,110, canvas.height-40);
+    ctx.fillText(`Rooms Explored: ${level.rooms.length}`,110, canvas.height-60);
+    ctx.fillText(`Enemies Felled: ${level.enemiesFelled}`,110, canvas.height-80);
+    ctx.fillText(`Chests Opened: ${level.chestsOpened}`,110, canvas.height-100);
+    ctx.fillText(`Potions Devoured: ${level.potionsConsumed}`,110, canvas.height-120);
+
+    // UI Components Right Side
+    
+    ctx.fillStyle = "#555";
+    ctx.fillRect(canvas.width-210, 10, 200, canvas.height-20);
+
+    ctx.textAlign = 'center'
+    ctx.fillStyle = "#b8b5b9"
+    ctx.font = "16px Arial";
+
+    ctx.drawImage(imgs.letterW, canvas.width-135, 100, 50, 50);
+    ctx.drawImage(imgs.letterA, canvas.width-185, 150, 50, 50);
+    ctx.drawImage(imgs.letterS, canvas.width-135, 150, 50, 50);
+    ctx.drawImage(imgs.letterD, canvas.width-85, 150, 50, 50);
+
+    ctx.fillText("TO MOVE AROUND", canvas.width-110, 220);
+
+    ctx.drawImage(imgs.upArrow, canvas.width-135, 240, 50, 50);
+    ctx.drawImage(imgs.leftArrow, canvas.width-185, 290, 50, 50);
+    ctx.drawImage(imgs.downArrow, canvas.width-135, 290, 50, 50);
+    ctx.drawImage(imgs.rightArrow, canvas.width-85, 290, 50, 50);
+
+    ctx.fillText("TO ATTACK", canvas.width-110, 360);
+
+    ctx.drawImage(imgs.spaceBar, canvas.width-185, 380, 150, 50);
+
+    ctx.fillText("TO DASH", canvas.width-110, 450);
 
     // Regen Components
     if (player.stamina < 100) player.stamina += 0.25;
