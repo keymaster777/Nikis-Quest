@@ -16,6 +16,7 @@ Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
 - Add "level completion" criteria and scaling difficulty between levels
 - Refactor Player, Monster, and Tile classes with composition to make boundary box behavior more flexible.
 - Move UI code into an actual UI class with relative coordinates instead of hard coded in relation to the global canvas coordinates.
+- Add **the sound of silence** as a rare message in rooms
 ## Credits
 - Most of the tiles and monsters are from [this pack](https://0x72.itch.io/dungeontileset-ii)
 - Torch sprites and chest assets are from [this pack](https://pixel-poem.itch.io/dungeon-assetpuck)
