@@ -69,7 +69,7 @@ class Monster{
       if(this.currentDamageFrame == this.maxDamageFrames){
           this.takingDamage = false;
       } else {
-          this.currentDamageFrame % 2 == 0 ? this.x-=10 : this.x+=10;
+          this.currentDamageFrame % 2 == 0 ? this.sprite.xAdjust=-5 : this.sprite.xAdjust=5;
           this.currentDamageFrame++;
       }
   }

@@ -109,6 +109,7 @@ function sprite (options) {
     that.defaultSize = options.defaultSize || false;
     that.x = options.x || TS;
     that.y = options.y || TS;
+    that.xAdjust = 0
     that.loop = options.loop;
 
     that.setFrame = (newFrameIndex) => frameIndex = newFrameIndex
@@ -141,22 +142,24 @@ function sprite (options) {
                 0,
                 that.width / that.numberOfFrames,
                 that.height,
-                that.x,
+                (that.x + that.xAdjust),
                 that.y,
                 TS,
-                TS);
+                TS
+            );
             
         }else{
-        that.context.drawImage(
-           that.image,
-           frameIndex * that.width / that.numberOfFrames,
-           0,
-           that.width / that.numberOfFrames,
-           that.height,
-           that.x,
-           that.y,
-           TS*that.sizescale*that.width / that.numberOfFrames,
-           TS*that.sizescale*that.height);
+            that.context.drawImage(
+                that.image,
+                frameIndex * that.width / that.numberOfFrames,
+                0,
+                that.width / that.numberOfFrames,
+                that.height,
+                (that.x + that.xAdjust),
+                that.y,
+                TS*that.sizescale*that.width / that.numberOfFrames,
+                TS*that.sizescale*that.height
+            );
         }
     };
 
