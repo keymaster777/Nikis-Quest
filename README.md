@@ -7,12 +7,13 @@ Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
 - Added docker, node and webpacker config.
 - Added controller tips to designated spot in UI
 - Added emulated sound to make the game more entertaining
-- Added level statistics to make the game more entertaining until actual level completion criteria is finished.
+- Added level statistics to make the game more entertaining.
 - Added Map of current level
 - Fixed bug with doors occasionally not being built right in a room
+- Added level completion criteria and progress tracking
 ## TO-DO
 - Refactor the rest of the old JS code to use ES6
-- Add "level completion" criteria and scaling difficulty between levels
+- Add scaling difficulty between levels
 - Refactor Player, Monster, and Tile classes with composition to make boundary box behavior more flexible.
 - Move UI code into an actual UI class with relative coordinates instead of hard coded in relation to the global canvas coordinates.
 ## Credits
