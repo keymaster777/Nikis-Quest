@@ -40,6 +40,7 @@ class Level{
   }
 
   nextRoom(){
+    level.allMonstersKilled = level.haveAllMonstersBeenKilled()
     activeRoom.leftFrom = activeRoom.doorTiles.find(tile => tile.inArea(player.x, player.y)).direction
     let enteredFrom = oppositeDirection( activeRoom.leftFrom )
     let x = activeRoom.x
