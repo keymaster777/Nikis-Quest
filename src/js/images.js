@@ -9,6 +9,8 @@ import LetterWImg from '../img/UIelements/W.png'
 import LetterSImg from '../img/UIelements/S.png'
 import LetterDImg from '../img/UIelements/D.png'
 import SpaceBarImg from '../img/UIelements/SPACE.png'
+import CheckboxImg from '../img/UIelements/checkbox.png'
+import CheckboxCheckImg from '../img/UIelements/checkbox_check.png'
 
 // Player Image Imports
 import RunRightSprite from "../img/player/run-right.png"
@@ -95,6 +97,10 @@ function setUpImages() {
   imgs.downArrow.src = DownArrowImg
   imgs.spaceBar = new Image()
   imgs.spaceBar.src = SpaceBarImg
+  imgs.checkbox = new Image()
+  imgs.checkbox.src = CheckboxImg
+  imgs.checkboxCheck = new Image()
+  imgs.checkboxCheck.src = CheckboxCheckImg
 
   // Player Images and Sprites
   imgs.runRight = new Image()

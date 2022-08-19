@@ -110,17 +110,20 @@ function main() {
     ctx.fillStyle = "#5dBB63"
     ctx.fillRect(52, 57, 146*(player.stamina/player.maxStamina), 21);
 
-    level.drawMap(20, 120)
+    level.drawMap(20, 105)
+
+    level.drawCompletionCriteria(20, 320)
 
     // Current room coords
     ctx.fillStyle = "#b8b5b9"
     ctx.textAlign = "center"
     ctx.font = "16px Arial";
-    ctx.fillText(`Current Room: ${activeRoom.x},${activeRoom.y}`,110, canvas.height-40);
-    ctx.fillText(`Rooms Explored: ${level.rooms.length + (level.allRoomsDiscovered ? "(all)": "")}`,110, canvas.height-60);
-    ctx.fillText(`Enemies Felled: ${level.enemiesFelled + (level.allMonstersKilled ? "(all)": "")}`,110, canvas.height-80);
-    ctx.fillText(`Chests Opened: ${level.chestsOpened}`,110, canvas.height-100);
-    ctx.fillText(`Potions Devoured: ${level.potionsConsumed}`,110, canvas.height-120);
+
+    ctx.fillText(`Dungeon Level: ${level.levelNum}`,110, canvas.height-20);
+    ctx.fillText(`Rooms Explored: ${player.roomsExplored}`,110, canvas.height-40);
+    ctx.fillText(`Enemies Felled: ${player.enemiesFelled}`,110, canvas.height-60);
+    ctx.fillText(`Chests Opened: ${player.chestsOpened}`,110, canvas.height-80);
+    ctx.fillText(`Potions Devoured: ${player.potionsConsumed}`,110, canvas.height-100);
 
     // UI Components Right Side
     
@@ -158,6 +161,25 @@ function main() {
 
     activeRoom.drawRoom();
 
+    if (level.isComplete()){
+        ctx.fillStyle = "#111";
+        ctx.globalAlpha = 0.65
+        ctx.fillRect(280, 200, canvas.width-560, 130); 
+        ctx.globalAlpha = 1.0 
+
+        ctx.fillStyle = "#ddd";
+        ctx.font = "40px Arial"
+        ctx.fillText("LEVEL COMPLETE", canvas.width/2, canvas.height/2 -35)
+
+        ctx.font = "20px Arial"
+        let countDown = Math.abs(Math.floor((Date.now() - player.lastLeftRoomTime)/1000) - 5) 
+        ctx.fillText( `Proceeding to next level in ${countDown}`, canvas.width/2, canvas.height/2 +10)
+        if(Date.now() - player.lastLeftRoomTime > 6000){
+            activeRoom = new Room(0,0)
+            player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
+            level = new Level(level.levelNum + 1)
+        }
+    }
     lastTime = now;
     player.animations();
     activeRoom.monsters.forEach(monster => monster.animations());

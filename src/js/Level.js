@@ -9,9 +9,6 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
-    this.enemiesFelled = 0
-    this.chestsOpened = 0
-    this.potionsConsumed = 0
     this.allRoomsDiscovered = false
     this.allMonstersKilled = false
     this.mapPlayerSprite = sprite({
@@ -36,6 +33,7 @@ class Level{
     if (requestedRoom == undefined && createNewRoom) {
       requestedRoom = new Room(x,y, oppositeDirection(activeRoom.leftFrom), this.rooms)
       this.rooms.push(requestedRoom)
+      player.roomsExplored += 1
     }
 
     return requestedRoom
@@ -99,6 +97,33 @@ class Level{
     let monsterCount = 0
     this.rooms.forEach(room => monsterCount += room.monsters.length)
     return monsterCount == 0 
+  }
+
+  drawCompletionCriteria(x,y){
+    ctx.fillStyle = "#b8b5b9"
+    ctx.font = "16px Arial";
+
+    ctx.fillText("LEVEL COMPLETION: ", x, y);
+
+    ctx.drawImage(this.allRoomsDiscovered ? imgs.checkboxCheck : imgs.checkbox, x, y+5, 40, 40);
+    ctx.fillText("Explore all rooms", x+35, y+31);
+
+    ctx.drawImage(this.allMonstersKilled ? imgs.checkboxCheck : imgs.checkbox, x, y+35, 40, 40);
+    ctx.fillText("Kill all monsters" , x+35, y+61);
+
+    ctx.drawImage((activeRoom.x==0 && activeRoom.y==0 && this.allMonstersKilled) ? imgs.checkboxCheck : imgs.checkbox, x, y+65, 40, 40);
+    ctx.fillText("Return to start", x+35, y+91);
+  }
+
+  isComplete(){
+    return (activeRoom.x == 0 && activeRoom.y == 0 && this.allMonstersKilled)
+  }
+
+  nextLevel(){
+    this.levelNum += 1
+    activeRoom = new Room(0,0)
+    this.rooms = [activeRoom]
+    player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
   }
 
   drawMap(x,y){

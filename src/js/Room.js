@@ -45,12 +45,7 @@ class Room{
     /*            Helper Methods           */
     /* =================================== */
     isOccupiedTile(x,y){
-        for(var i = 0; i<this.occupiedSpaces.length; i++){
-            if(this.occupiedSpaces[i][0]==x && this.occupiedSpaces[i][1]==y){
-                return true;
-            }
-        }
-        return false;
+        return this.occupiedSpaces.find(space => space[0] == x && space[1] == y) != undefined
     }
 
     hasDoor(direction){
@@ -245,37 +240,29 @@ class Room{
         //Disables door if adjacent discovered room lacks a sister door in that spot
         if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == false){
             this.doors[2].enabled = false;
-            console.log("Left door disabled")
         }
         if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == false){
             this.doors[3].enabled = false;
-            console.log("Right door disabled")
         }
         if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == false){
             this.doors[0].enabled = false;
-            console.log("Top door disabled")
         }
         if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == false){
             this.doors[1].enabled = false;
-            console.log("Bottom door disabled")
         }
 
         //Enables door if adjacent discovered room has a sister door in that spot
         if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == true){
             this.doors[2].enabled = true;
-            console.log("Left door enabled")
         }
         if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == true){
             this.doors[3].enabled = true;
-            console.log("Right door enabled")
         }
         if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == true){
             this.doors[0].enabled = true;
-            console.log("Top door enabled")
         }
         if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == true){
             this.doors[1].enabled = true;
-            console.log("Bottom door enabled")
         }
        
 
@@ -288,7 +275,6 @@ class Room{
         }
 
         this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile2);
-        console.log("all doors built for room")
     }
 
     spawnItems(){

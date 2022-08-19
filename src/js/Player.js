@@ -39,6 +39,11 @@ class Player{
     this.maxAttackFrame=100;
     this.lastLeftRoomTime = Date.now()
     this.isMoving = false;
+
+    this.enemiesFelled = 0
+    this.chestsOpened = 0
+    this.potionsConsumed = 0
+    this.roomsExplored = 1
   }
     
   move(dt, direction = false){
@@ -84,10 +89,10 @@ class Player{
     // Check if in potion area
     let potions = activeRoom.tileArray.filter(tile => tile instanceof Potion);
     potions.forEach((potion) => {
-        if(potion.inArea(player.x, player.y) && player.hitPoints < player.maxHitPoints){
+        if(potion.inArea(this.x, this.y) && this.hitPoints < this.maxHitPoints){
             activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != potion );
-            level.potionsConsumed += 1
-            player.hitPoints = Math.min(player.hitPoints + 20, player.maxHitPoints) 
+            this.potionsConsumed += 1
+            this.hitPoints = Math.min(this.hitPoints + 20, this.maxHitPoints) 
         }
     })
   }

@@ -80,7 +80,8 @@ class Monster{
       this.hitPoints -= damage;
       if (this.hitPoints <= 0){
           activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
-          level.enemiesFelled += 1
+          player.enemiesFelled += 1
+
           level.allMonstersKilled = level.haveAllMonstersBeenKilled()
       }
       this.takingDamage = true;

@@ -32,7 +32,7 @@ class Chest extends Tile{
     this.hitPoints -= damage;
     if (this.hitPoints <= 0){
       activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != this)
-      level.chestsOpened += 1
+      player.chestsOpened += 1
       let random = Math.random();
       if(random >= .9){
         activeRoom.monsters.push(new Monster(this.x, this.y))
