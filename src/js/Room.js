@@ -59,6 +59,7 @@ class Room{
                 return true;
             }
         }
+        return false
     }
 
     entranceCoords(){
@@ -71,10 +72,7 @@ class Room{
     }
 
     distanceFromCenter(){
-        let a = this.x;
-        let b = this.y;
-        if (a == 0 && b == 0){ return 1}; 
-        return (Math.sqrt( a*a + b*b ));
+        return (Math.sqrt( this.x**2 + this.y**2 ));
     }
 
     randomWallConstruct(x,y,direction){
@@ -239,7 +237,7 @@ class Room{
         //Enable doors randomly based on how far from origin room current room is
         for( var i = 0; i<this.doors.length; i++){
             let random = Math.random() * this.distanceFromCenter();
-            if(random<1){
+            if(random < 0.6){
                 this.doors[i].enabled = true;
             }
         }
@@ -247,16 +245,39 @@ class Room{
         //Disables door if adjacent discovered room lacks a sister door in that spot
         if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == false){
             this.doors[2].enabled = false;
+            console.log("Left door disabled")
         }
         if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == false){
             this.doors[3].enabled = false;
+            console.log("Right door disabled")
         }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(DOWN) == false){
+        if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == false){
             this.doors[0].enabled = false;
+            console.log("Top door disabled")
         }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(UP) == false){
+        if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == false){
             this.doors[1].enabled = false;
+            console.log("Bottom door disabled")
         }
+
+        //Enables door if adjacent discovered room has a sister door in that spot
+        if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == true){
+            this.doors[2].enabled = true;
+            console.log("Left door enabled")
+        }
+        if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == true){
+            this.doors[3].enabled = true;
+            console.log("Right door enabled")
+        }
+        if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == true){
+            this.doors[0].enabled = true;
+            console.log("Top door enabled")
+        }
+        if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == true){
+            this.doors[1].enabled = true;
+            console.log("Bottom door enabled")
+        }
+       
 
         //Adds all enabled doors to the main tile array
         for(var door of this.doors){
@@ -267,6 +288,7 @@ class Room{
         }
 
         this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile2);
+        console.log("all doors built for room")
     }
 
     spawnItems(){
@@ -302,7 +324,8 @@ class Room{
        if (this.randomNum >= 0.01  && this.randomNum < 0.02) return "**tornado siren wailing**"
        if (this.randomNum >= 0.02  && this.randomNum < 0.03) return "**low whispers that sound like gen Z slang**"
        if (this.randomNum >= 0.03  && this.randomNum < 0.04) return "**the sound of your mother saying you should have become a doctor**"
-       if (this.randomNum >= 0.04  && this.randomNum < 0.05) return "**the sound of being hopelessly lost**"
+       if (this.randomNum >= 0.04  && this.randomNum < 0.05) return "**sounds of being hopelessly lost**"
+       if (this.randomNum >= 0.05  && this.randomNum < 0.06) return "**the sound of silence**"
        return null 
     }
 

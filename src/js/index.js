@@ -110,13 +110,15 @@ function main() {
     ctx.fillStyle = "#5dBB63"
     ctx.fillRect(52, 57, 146*(player.stamina/player.maxStamina), 21);
 
+    level.drawMap(20, 120)
+
     // Current room coords
     ctx.fillStyle = "#b8b5b9"
     ctx.textAlign = "center"
     ctx.font = "16px Arial";
     ctx.fillText(`Current Room: ${activeRoom.x},${activeRoom.y}`,110, canvas.height-40);
-    ctx.fillText(`Rooms Explored: ${level.rooms.length}`,110, canvas.height-60);
-    ctx.fillText(`Enemies Felled: ${level.enemiesFelled}`,110, canvas.height-80);
+    ctx.fillText(`Rooms Explored: ${level.rooms.length + (level.allRoomsDiscovered ? "(all)": "")}`,110, canvas.height-60);
+    ctx.fillText(`Enemies Felled: ${level.enemiesFelled + (level.allMonstersKilled ? "(all)": "")}`,110, canvas.height-80);
     ctx.fillText(`Chests Opened: ${level.chestsOpened}`,110, canvas.height-100);
     ctx.fillText(`Potions Devoured: ${level.potionsConsumed}`,110, canvas.height-120);
 
