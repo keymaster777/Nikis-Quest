@@ -1,7 +1,7 @@
 import Tile from "./Tile";
 import { TS } from "../constants"
 import Potion from "./Potion";
-import Monster from "../Monster";
+import Goblin from "../monsters/Goblin";
 import Level from "../Level";
 
 class Chest extends Tile{
@@ -35,8 +35,8 @@ class Chest extends Tile{
       player.chestsOpened += 1
       let random = Math.random();
       if(random >= .9){
-        activeRoom.monsters.push(new Monster(this.x, this.y))
-        activeRoom.monsters.push(new Monster(this.x, this.y))
+        activeRoom.monsters.push(new Goblin(this.x, this.y))
+        activeRoom.monsters.push(new Goblin(this.x, this.y))
       }
       if(random > .7){
         console.log("Stamina Pot spawn")

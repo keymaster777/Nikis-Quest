@@ -1,14 +1,12 @@
-import {sprite} from "./helpers"
-import {TS} from "./constants"
-import Level from "./Level";
+import {sprite} from "../helpers"
+import {TS} from "../constants"
 
-class Monster{
+class Chort{
   constructor(x, y){
-
     this.sprite = sprite({
         width: 64,
-        height: 21,
-        image: imgs.gnollShamanWalkRight,
+        height: 24,
+        image: imgs.chortIdleLeft,
         numberOfFrames: 4,
         sizescale: .045,
     });
@@ -19,30 +17,37 @@ class Monster{
     this.layer=1;
     this.isFacingRight = true;
     this.rlhitbox=.4*TS;
-    this.bothitbox=1.15*TS;
-    this.speed=Math.random() + .75;
+    this.bothitbox=.8*TS;
+    this.speed=5.5;
     this.attackedLast = Date.now();
     this.attackDamage = 8;
-    this.hitPoints = 15;
+    this.hitPoints = 8;
     this.takingDamage = false;
-    this.maxDamageFrames = 18;
+    this.maxDamageFrames = 12;
   }
   
   move(){
-    if (player.x < this.x-20) {
-        this.sprite.image = imgs.gnollShamanWalkLeft;
-        if(!this.outOfBounds(this.x - this.speed, this.y)) this.x -= this.speed;
-    } else if (player.x > this.x+20) {
-        this.sprite.image = imgs.gnollShamanWalkRight;
-        if(!this.outOfBounds(this.x + this.speed, this.y)) this.x += this.speed;
-    }
+    if ( this.takingDamage || (player.isMoving && this.distanceToPlayer() < 2.5*TS)) {
+        this.isMoving = true
+        if (player.x < this.x-20) {
+            this.sprite.setFrame(0)
+            this.sprite.image = imgs.chortIdleLeft;
+            if(!this.outOfBounds(this.x - this.speed, this.y)) this.x -= this.speed;
+        } else if (player.x > this.x+20) {
+            this.sprite.setFrame(3)
+            this.sprite.image = imgs.chortIdleRight;
+            if(!this.outOfBounds(this.x + this.speed, this.y)) this.x += this.speed;
+        }
 
-    if (player.y < this.y-20) {
-        if(!this.outOfBounds(this.x, this.y - this.speed)) this.y -= this.speed;
-    } else if (player.y > this.y+20) {
-        if(!this.outOfBounds(this.x, this.y + this.speed)) this.y += this.speed;
+        if (player.y < this.y-20) {
+            if(!this.outOfBounds(this.x, this.y - this.speed)) this.y -= this.speed;
+        } else if (player.y > this.y+20) {
+            if(!this.outOfBounds(this.x, this.y + this.speed)) this.y += this.speed;
+        }
+    } else {
+        this.isMoving = false
     }
-
+    
     if ( this.distanceToPlayer() < 30) this.attack(player);
   }
 
@@ -90,7 +95,9 @@ class Monster{
       this.sprite.y = this.y-.85*TS;
       
       this.move();
-      this.sprite.update();
+      if (this.isMoving == false) {
+        this.sprite.update();
+      }
       this.sprite.render();
       if (debug){
           ctx.fillStyle = "red";
@@ -122,4 +129,4 @@ class Monster{
   }
 }
 
-export default Monster
+export default Chort

@@ -9,7 +9,8 @@ import FloorTile from "./tiles/FloorTile";
 import WallTile2 from "./tiles/WallTile2";
 import Potion from "./tiles/Potion";
 import Chest from "./tiles/Chest"
-import Monster from "./Monster"
+import Goblin from "./monsters/Goblin"
+import Chort from "./monsters/Chort"
 import Pit from "./structures/Pit";
 
 import {randomIntFromInterval} from "./helpers"
@@ -296,12 +297,12 @@ class Room{
     }
 
     spawnMonsters(){
+        if (this.x == 0 && this.y == 0) return null;
         let unoccupiedFloorArray = this.tileArray.filter(tile => tile instanceof FloorTile && !this.isOccupiedTile(tile.x, tile.y));
         unoccupiedFloorArray.forEach(tile => {
             let random = Math.random();
-            if (random < .18 && !(this.x == 0 && this.y == 0)){
-                this.monsters.push(new Monster(tile.x, tile.y));
-            }
+            if (random >= 0 && random < 0.15) this.monsters.push(new Goblin(tile.x, tile.y))
+            if (random >= 0.15 && random < .18) this.monsters.push(new Chort(tile.x, tile.y))
         })
     }
 
@@ -309,7 +310,7 @@ class Room{
        if (this.randomNum >= 0 && this.randomNum < 0.01) return "**distant baby crying**"
        if (this.randomNum >= 0.01  && this.randomNum < 0.02) return "**tornado siren wailing**"
        if (this.randomNum >= 0.02  && this.randomNum < 0.03) return "**low whispers that sound like gen Z slang**"
-       if (this.randomNum >= 0.03  && this.randomNum < 0.04) return "**the sound of your mother saying you should have become a doctor**"
+       if (this.randomNum >= 0.03  && this.randomNum < 0.04) return "**crickets**"
        if (this.randomNum >= 0.04  && this.randomNum < 0.05) return "**sounds of being hopelessly lost**"
        if (this.randomNum >= 0.05  && this.randomNum < 0.06) return "**the sound of silence**"
        return null 
@@ -320,9 +321,11 @@ class Room{
         let message = this.rareMessage() || ""
         if (this.sprites.find(sprite => sprite instanceof TorchWall)) message = "**torch crackling**"
         if (player.isMoving) message = "**footsteps**"
-        if (this.monsters.length > 0) message = "**angry goblin noises**"
-        if (this.monsters.find(monster => monster.takingDamage)) message = "**angrier goblin noises**"
+        if (this.monsters.find(monster => monster instanceof Chort)) message = "**Chorts snickering**"
+        if (this.monsters.find(monster => monster instanceof Goblin)) message = "**angry goblin noises**"
+        if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "**angrier goblin noises**"
         if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "**wood splintering**" 
+        if (this.monsters.find(monster => monster instanceof Chort && monster.isMoving)) message = "**CHORTS SHRIEKING**"
         if (level.rooms.length == 1) message = "LEAVE THIS ROOM THROUGH ONE OF THE 4 DOORS."
         return message
     }

@@ -25,6 +25,8 @@ import IdleUpImg from "../img/player/idle-up.png"
 // Monster Image Imports
 import GnollShamanWalkLeftSprite from '../img/Mobs/GnollShaman_Walk_Left.png'
 import GnollShamanWalkRightSprite from '../img/Mobs/GnollShaman_Walk_Right.png'
+import ChortIdleLeft from '../img/Mobs/chort_idle_left.png'
+import ChortIdleRight from '../img/Mobs/chort_idle_right.png'
 
 // Weapon Image Imports
 import KatanaImg from "../img/sprites/weapon_katana.png"
@@ -125,6 +127,10 @@ function setUpImages() {
   imgs.gnollShamanWalkLeft.src = GnollShamanWalkLeftSprite
   imgs.gnollShamanWalkRight = new Image()
   imgs.gnollShamanWalkRight.src = GnollShamanWalkRightSprite
+  imgs.chortIdleLeft = new Image()
+  imgs.chortIdleLeft.src = ChortIdleLeft
+  imgs.chortIdleRight = new Image()
+  imgs.chortIdleRight.src = ChortIdleRight
 
   // Weapon Images and Sprites
   imgs.katana = new Image()
