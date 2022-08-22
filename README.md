@@ -1,7 +1,7 @@
 # Nikis-Quest
 An ambitious 2d rogue-like game with Niki (My wife) as the protagonist.
 <br>
-Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
+Check out the game <a href="https://keymaster777.github.io/Nikis-Quest/" target="_blank">here</a>.
 
 ## Recent Updates
 - Added Map of current level
