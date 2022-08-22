@@ -4,13 +4,11 @@ An ambitious 2d rogue-like game with Niki (My wife) as the protagonist.
 Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
 
 ## Recent Updates
-- Added docker, node and webpacker config.
-- Added controller tips to designated spot in UI
-- Added emulated sound to make the game more entertaining
-- Added level statistics to make the game more entertaining.
 - Added Map of current level
-- Fixed bug with doors occasionally not being built right in a room
 - Added level completion criteria and progress tracking
+- Added new monster called "Chort"
+## What is a Chort?
+- A tricky demonoid creature that waits for you to get close before rushing you while shreaking as loud as possible
 ## TO-DO
 - Refactor the rest of the old JS code to use ES6
 - Add scaling difficulty between levels
