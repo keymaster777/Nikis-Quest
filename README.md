@@ -7,11 +7,11 @@ Check out the game [here](https://keymaster777.github.io/Nikis-Quest/).
 - Added Map of current level
 - Added level completion criteria and progress tracking
 - Added new monster called "Chort"
+- Added some scaling difficulty between levels
 ## What is a Chort?
 - A tricky demonoid creature that waits for you to get close before rushing you while shreaking as loud as possible
 ## TO-DO
 - Refactor the rest of the old JS code to use ES6
-- Add scaling difficulty between levels
 - Refactor Player, Monster, and Tile classes with composition to make boundary box behavior more flexible.
 - Move UI code into an actual UI class with relative coordinates instead of hard coded in relation to the global canvas coordinates.
 ## Credits
