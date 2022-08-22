@@ -1,7 +1,7 @@
 import Tile from "./Tile"
 import {TS} from "../constants"
 
-class WallTile2 extends Tile{
+class WallTile extends Tile{
     
     constructor(tileimg, layer, x, y, options){
         super(tileimg, layer, x, y);
@@ -32,4 +32,4 @@ class WallTile2 extends Tile{
     }
 }
 
-export default WallTile2
+export default WallTile

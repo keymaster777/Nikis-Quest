@@ -1,12 +1,12 @@
 import {TS, UP, LEFT, DOWN, RIGHT} from "./constants"
 import {sprite} from "./helpers"
-import DoorTile2 from "./tiles/DoorTile2";
+import DoorTile from "./tiles/DoorTile";
 import Potion from "./tiles/Potion";
 import Chest from "./tiles/Chest"
 import Level from "./Level";
 
 class Player{
-  constructor(initialCoords){
+  constructor(){
     let player_sprite = sprite({
       width: 256,
       height: 32,
@@ -16,8 +16,8 @@ class Player{
     })
 
     this.sprite = player_sprite;
-    this.x=initialCoords.x;
-    this.y=initialCoords.y;
+    this.x=0;
+    this.y=0;
     this.layer=1;
     this.rlhitbox=.4*TS;
     this.bothitbox=.15*TS;
@@ -297,7 +297,7 @@ class Player{
   }
 
   atDoor(){
-      var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile2);
+      var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile);
       for(var i = 0;i<doors.length;i++){
           if( doors[i].inArea(this.x,this.y)){
               if(

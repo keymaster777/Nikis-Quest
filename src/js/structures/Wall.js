@@ -1,6 +1,6 @@
 import Structure from "./Structure";
 import FloorTile from "../tiles/FloorTile";
-import WallTile2 from "../tiles/WallTile2";
+import WallTile from "../tiles/WallTile";
 import { UP, DOWN, LEFT, RIGHT } from "../constants"
 
 class Wall extends Structure{
@@ -44,19 +44,19 @@ class Wall extends Structure{
         switch(this.direction){
             case DOWN:
                 this.selfArray.push(new FloorTile(this.x, this.y-1));
-                this.selfArray.push(new WallTile2(imgs.wallMidTop, 3 , this.x, this.y-1, {},true));
-                this.selfArray.push(new WallTile2(this.wallImg(false), 3 , this.x, this.y, {obstructing:true},true));
+                this.selfArray.push(new WallTile(imgs.wallMidTop, 3 , this.x, this.y-1, {},true));
+                this.selfArray.push(new WallTile(this.wallImg(false), 3 , this.x, this.y, {obstructing:true},true));
                 break;
             case UP:
-                this.selfArray.push(new WallTile2(imgs.wallMidTop, 3 , this.x, this.y, {},true));
-                this.selfArray.push(new WallTile2(this.wallImg(), 2 , this.x, this.y+1, {obstructing:true},true));
+                this.selfArray.push(new WallTile(imgs.wallMidTop, 3 , this.x, this.y, {},true));
+                this.selfArray.push(new WallTile(this.wallImg(), 2 , this.x, this.y+1, {obstructing:true},true));
                 break;
             case LEFT:
-                this.selfArray.push(new WallTile2(imgs.wallSideMidRight, 3 , this.x, this.y, {obstructing:true, hitboxLeft:true},true));
+                this.selfArray.push(new WallTile(imgs.wallSideMidRight, 3 , this.x, this.y, {obstructing:true, hitboxLeft:true},true));
                 this.selfArray.push(new FloorTile(this.x, this.y));
                 break;
             case RIGHT:
-                this.selfArray.push(new WallTile2(imgs.wallSideMidLeft, 3 , this.x, this.y, {obstructing:true, hitboxRight:true},true));
+                this.selfArray.push(new WallTile(imgs.wallSideMidLeft, 3 , this.x, this.y, {obstructing:true, hitboxRight:true},true));
                 this.selfArray.push(new FloorTile(this.x, this.y));
                 break;
         }

@@ -22,8 +22,10 @@ ctx.imageSmoothingEnabled = false;
 const startGame = () => {
   // TODO: Move these into Level class as instance variables
   global.activeRoom = new Room(0,0)
-  global.player = new Player(activeRoom.spawnLocation)
+  global.player = new Player()
   global.level = new Level(1)
+  level.buildOutRooms()
+  player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
 
   main()
 }
@@ -118,9 +120,7 @@ function main() {
     ctx.fillStyle = "#b8b5b9"
     ctx.textAlign = "center"
     ctx.font = "16px Arial";
-
     ctx.fillText(`Dungeon Level: ${level.levelNum}`,110, canvas.height-20);
-    ctx.fillText(`Rooms Explored: ${player.roomsExplored}`,110, canvas.height-40);
     ctx.fillText(`Enemies Felled: ${player.enemiesFelled}`,110, canvas.height-60);
     ctx.fillText(`Chests Opened: ${player.chestsOpened}`,110, canvas.height-80);
     ctx.fillText(`Potions Devoured: ${player.potionsConsumed}`,110, canvas.height-100);
@@ -163,8 +163,8 @@ function main() {
 
     if (level.isComplete()){
         ctx.fillStyle = "#111";
-        ctx.globalAlpha = 0.65
-        ctx.fillRect(280, 200, canvas.width-560, 130); 
+        ctx.globalAlpha = 0.75
+        ctx.fillRect(280, 200, canvas.width-560, 245); 
         ctx.globalAlpha = 1.0 
 
         ctx.fillStyle = "#ddd";
@@ -172,12 +172,20 @@ function main() {
         ctx.fillText("LEVEL COMPLETE", canvas.width/2, canvas.height/2 -35)
 
         ctx.font = "20px Arial"
-        let countDown = Math.abs(Math.floor((Date.now() - player.lastLeftRoomTime)/1000) - 5) 
-        ctx.fillText( `Proceeding to next level in ${countDown}`, canvas.width/2, canvas.height/2 +10)
-        if(Date.now() - player.lastLeftRoomTime > 6000){
+
+        ctx.fillText( "- Things are now harder", canvas.width/2, canvas.height/2 +10)
+        ctx.fillText( "- Song references are now better", canvas.width/2, canvas.height/2 +35)
+        ctx.fillText( "- Chorts are now faster", canvas.width/2, canvas.height/2 +60)
+        ctx.fillText( "- Goblins have grown stronger", canvas.width/2, canvas.height/2 +85)
+
+        let countDown = Math.abs(Math.floor((Date.now() - player.lastLeftRoomTime)/1000) - 10) 
+        ctx.fillText( `Proceeding to next level in ${countDown}`, canvas.width/2, canvas.height/2 +125)
+        if( Date.now() - player.lastLeftRoomTime > 11*1000){
             activeRoom = new Room(0,0)
-            player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
+            activeRoom.visited = true
             level = new Level(level.levelNum + 1)
+            level.buildOutRooms()
+            player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
         }
     }
     lastTime = now;

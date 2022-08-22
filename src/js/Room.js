@@ -3,10 +3,10 @@ import Corner from "./structures/Corner";
 import Wall from "./structures/Wall"
 import WallColumn from "./structures/WallColumn";
 import FloorColumn from "./structures/FloorColumn";
-import DoorTile2 from "./tiles/DoorTile2";
+import DoorTile from "./tiles/DoorTile";
 import TorchWall from "./structures/TorchWall";
 import FloorTile from "./tiles/FloorTile";
-import WallTile2 from "./tiles/WallTile2";
+import WallTile from "./tiles/WallTile";
 import Potion from "./tiles/Potion";
 import Chest from "./tiles/Chest"
 import Goblin from "./monsters/Goblin"
@@ -15,13 +15,11 @@ import Pit from "./structures/Pit";
 
 import {randomIntFromInterval} from "./helpers"
 import {TS, UP, LEFT, RIGHT, DOWN, DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT, CANVAS_WIDTH, CANVAS_HEIGHT} from "./constants"
-import Level from "./Level";
 
 class Room{
-    constructor( x, y, enteredFrom = false, allRooms = [] ){
+    constructor( x, y){
         this.x = x;
         this.y = y;
-        this.enteredFrom = enteredFrom
         this.spawnLocation = {x: null, y: null};
         this.monsters = [];
         this.width = randomIntFromInterval(5,10);
@@ -32,14 +30,13 @@ class Room{
         this.corners = [];
         this.occupiedSpaces = [];
         this.sprites = [];
-        this.buildDoors(allRooms);
-        this.buildWalls();
-        this.buildFloor();
-        this.spawnItems();
-        this.spawnMonsters();
+        this.built = false
         this.leftFrom;
         this.lpad = (CANVAS_WIDTH-(this.width*TS))/2
         this.randomNum = Math.random()
+        this.visited = false // Player has physically been in the room
+        this.seen = false // Player has been in an adjacent room with door access
+
     }
 
     /* =================================== */
@@ -51,7 +48,7 @@ class Room{
 
     hasDoor(direction){
         for(var door of this.doors){
-            if(door.direction == direction && door.enabled == true){
+            if(door.direction == direction){
                 return true;
             }
         }
@@ -69,6 +66,13 @@ class Room{
 
     distanceFromCenter(){
         return (Math.sqrt( this.x**2 + this.y**2 ));
+    }
+
+    adjacentAccessToRoom(room){
+        if(this.x-1 == room.x && this.y == room.y && this.hasDoor(LEFT)) return true
+        if(this.x+1 == room.x && this.y == room.y && this.hasDoor(RIGHT)) return true
+        if(this.x == room.x && this.y-1 == room.y && this.hasDoor(UP)) return true
+        if(this.x == room.x && this.y+1 == room.y && this.hasDoor(DOWN)) return true
     }
 
     randomWallConstruct(x,y,direction){
@@ -218,64 +222,13 @@ class Room{
         }
     }
 
-    buildDoors(allRooms){
-        this.doors[0] = new Door(randomIntFromInterval(1, this.width-2), 0, UP);
-        this.doors[1] = new Door(randomIntFromInterval(1, this.width-2), this.height, DOWN);
-        this.doors[2] = new Door(0,randomIntFromInterval(3, this.height-2), LEFT);
-        this.doors[3] = new Door(this.width-1, randomIntFromInterval(3, this.height-2), RIGHT);
+    buildDoors(){
+        this.doors.forEach(door => {
+            this.tileArray = this.tileArray.concat(door.selfArray);
+            this.occupiedSpaces = this.occupiedSpaces.concat(door.occupyingSpaces);
+        })
 
-        //Enable door player entered from
-        if (this.enteredFrom) {
-          let entryDoor = this.doors.find(door => door.direction == this.enteredFrom)
-          entryDoor.enabled = true
-        }
-
-        //Enable doors randomly based on how far from origin room current room is
-        for( var i = 0; i<this.doors.length; i++){
-            let random = Math.random() * this.distanceFromCenter();
-            if(random < 0.6){
-                this.doors[i].enabled = true;
-            }
-        }
-
-        //Disables door if adjacent discovered room lacks a sister door in that spot
-        if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == false){
-            this.doors[2].enabled = false;
-        }
-        if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == false){
-            this.doors[3].enabled = false;
-        }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == false){
-            this.doors[0].enabled = false;
-        }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == false){
-            this.doors[1].enabled = false;
-        }
-
-        //Enables door if adjacent discovered room has a sister door in that spot
-        if(allRooms.find(room => room.x == this.x-1 && room.y == this.y)?.hasDoor(RIGHT) == true){
-            this.doors[2].enabled = true;
-        }
-        if(allRooms.find(room => room.x == this.x+1 && room.y == this.y)?.hasDoor(LEFT) == true){
-            this.doors[3].enabled = true;
-        }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y-1)?.hasDoor(DOWN) == true){
-            this.doors[0].enabled = true;
-        }
-        if(allRooms.find(room => room.x == this.x && room.y == this.y+1)?.hasDoor(UP) == true){
-            this.doors[1].enabled = true;
-        }
-       
-
-        //Adds all enabled doors to the main tile array
-        for(var door of this.doors){
-            if(door.enabled == true){
-                this.tileArray = this.tileArray.concat(door.selfArray);
-                this.occupiedSpaces = this.occupiedSpaces.concat(door.occupyingSpaces);
-            }
-        }
-
-        this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile2);
+        this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile);
     }
 
     spawnItems(){
@@ -329,6 +282,16 @@ class Room{
         if (level.rooms.length == 1) message = "LEAVE THIS ROOM THROUGH ONE OF THE 4 DOORS."
         return message
     }
+
+    buildRoom(){
+        this.buildDoors()
+        this.buildWalls();
+        this.buildFloor();
+        this.spawnItems();
+        this.spawnMonsters();
+
+        this.built = true
+    }
     
     drawRoom(){
         ctx.translate(activeRoom.lpad, 0);
@@ -348,7 +311,7 @@ class Room{
 
         objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
             var elements = [a,b].map(ele => {
-                if (ele instanceof WallTile2) return ele.y*TS+TS; 
+                if (ele instanceof WallTile) return ele.y*TS+TS; 
                 if (ele instanceof Potion) return ele.y*TS+40;
                 if (ele instanceof Chest) return ele.y*TS+40;
                 if (ele.numberOfFrames != undefined) return ele.y+50

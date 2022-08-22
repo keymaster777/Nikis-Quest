@@ -1,5 +1,6 @@
 import {sprite} from "../helpers"
 import {TS} from "../constants"
+import Level from "../Level";
 
 class Goblin{
   constructor(x, y){
@@ -21,7 +22,7 @@ class Goblin{
     this.bothitbox=1.15*TS;
     this.speed=Math.random() + .75;
     this.attackedLast = Date.now();
-    this.attackDamage = 8;
+    this.attackDamage = 6+level.levelNum;
     this.hitPoints = 15;
     this.takingDamage = false;
     this.maxDamageFrames = 18;

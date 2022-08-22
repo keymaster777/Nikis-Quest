@@ -1,5 +1,6 @@
 import {sprite} from "../helpers"
 import {TS} from "../constants"
+import Level from "../Level";
 
 class Chort{
   constructor(x, y){
@@ -18,12 +19,12 @@ class Chort{
     this.isFacingRight = true;
     this.rlhitbox=.4*TS;
     this.bothitbox=.8*TS;
-    this.speed=5.5;
+    this.speed=4+level.levelNum;
     this.attackedLast = Date.now();
     this.attackDamage = 8;
     this.hitPoints = 8;
     this.takingDamage = false;
-    this.maxDamageFrames = 12;
+    this.maxDamageFrames = 18;
   }
   
   move(){
