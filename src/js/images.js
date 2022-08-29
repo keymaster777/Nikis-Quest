@@ -30,6 +30,8 @@ import ChortIdleRight from '../img/Mobs/chort_idle_right.png'
 
 // Weapon Image Imports
 import KatanaImg from "../img/sprites/weapon_katana.png"
+import AltSword from "../img/player/alt_sword.png"
+import WoodSword from "../img/player/wood_sword.png"
 
 // Tile Image Imports
 import ChestImg from "../img/2D Pixel Dungeon Asset Pack/items and trap_animation/box_2/box_2_1.png"
@@ -63,9 +65,6 @@ import WallBannerRedImg from '../img/sprites/wall_banner_red.png'
 import WallHole2Img from '../img/sprites/wall_hole_2.png'
 import WallBannerYellowImg from '../img/sprites/wall_banner_yellow.png'
 import WallGooImg from '../img/sprites/wall_goo.png'
-import WallColumnTopImg from '../img/sprites/wall_column_top.png'
-import WallColumnMidImg from '../img/sprites/wall_column_mid.png'
-import WallColumnBaseImg from '../img/sprites/wall_column_base.png'
 
 import ColumnBaseImg from '../img/sprites/column_base.png'
 import ColumnMidImg from '../img/sprites/column_mid.png'
@@ -135,6 +134,10 @@ function setUpImages() {
   // Weapon Images and Sprites
   imgs.katana = new Image()
   imgs.katana.src = KatanaImg
+  imgs.altSword = new Image()
+  imgs.altSword.src = AltSword
+  imgs.woodSword = new Image()
+  imgs.woodSword.src = WoodSword
 
   // Tile Images and Sprites
   imgs.chest = new Image()
@@ -197,12 +200,6 @@ function setUpImages() {
   imgs.wallBannerYellow.src = WallBannerYellowImg
   imgs.wallGoo = new Image()
   imgs.wallGoo.src = WallGooImg
-  imgs.wallColumnBase = new Image()
-  imgs.wallColumnBase.src = WallColumnBaseImg
-  imgs.wallColumnMid = new Image()
-  imgs.wallColumnMid.src = WallColumnMidImg
-  imgs.wallColumnTop = new Image()
-  imgs.wallColumnTop.src = WallColumnTopImg
 
   imgs.columnBase = new Image()
   imgs.columnBase.src = ColumnBaseImg

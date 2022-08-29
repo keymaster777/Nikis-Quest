@@ -3,9 +3,9 @@ import {UP, DOWN, LEFT, RIGHT} from "../constants"
 import {randomIntFromInterval} from "../helpers"
 
 // Tiles
-import WallTile from "../tiles/WallTile";
 import FloorTile from "../tiles/FloorTile";
 import DoorTile from "../tiles/DoorTile";
+import TestTile from "../tiles/TestTile"
 
 class Door extends Structure{
     constructor(roomWidth, roomHeight, direction){
@@ -16,7 +16,6 @@ class Door extends Structure{
         this.direction = direction;
         this.build();
     }
-
 
     calculateDoorLocation(roomWidth, roomHeight, direction) {
         if (direction == UP) return {x: randomIntFromInterval(1, roomWidth-2), y: 0}
@@ -29,31 +28,24 @@ class Door extends Structure{
     build(){
         switch(this.direction){
             case DOWN:
-                this.selfArray.push(new WallTile(imgs.wallArch, 3 , this.x, this.y-1, { obstructing: false }));//Archway
-                this.selfArray.push(new FloorTile(this.x, this.y-1)); //Floor Tile doormat
+                this.selfArray.push(new FloorTile(this.x, this.y-1)); //Floor gap in wall
                 this.selfArray.push(new DoorTile(imgs.floor2, 0, this.x, this.y, DOWN));
+                this.floorSpaces = [[this.x, this.y], [this.x, this.y-1]]
                 break;
             case UP:
-                this.selfArray.push(new WallTile(imgs.wallArch, 3 , this.x, this.y, { obstructing: false }));//Archway
-                this.selfArray.push(new FloorTile(this.x, this.y+2));//Floor Tile doormat
+                this.selfArray.push(new FloorTile(this.x, this.y+2));//Floor gap in wall
                 this.selfArray.push(new DoorTile(imgs.floor2, 0, this.x, this.y+1, UP));
+                this.floorSpaces = [[this.x, this.y+1], [this.x, this.y+2]]
                 break;
             case LEFT:
-                this.selfArray.push( new WallTile(imgs.wallSideFrontRight, 2, this.x, this.y-1, { obstructing:true, hitboxLeft:true}));
-                this.selfArray.push( new WallTile(imgs.wallSideTopRight, 3, this.x, this.y, { obstructing: false}));
-                this.selfArray.push( new FloorTile(this.x, this.y-1));
-                this.selfArray.push( new FloorTile(this.x+1, this.y));//Floor Tile doormat
                 this.selfArray.push(new DoorTile(imgs.floor2, 0, this.x, this.y, LEFT ));
+                this.floorSpaces = [[this.x, this.y]]
                 break;
             case RIGHT:
-                this.selfArray.push( new WallTile(imgs.wallSideFrontLeft, 2, this.x, this.y-1, { hitboxRight:true, obstructing:true}));
-                this.selfArray.push( new WallTile(imgs.wallSideTopLeft, 3, this.x, this.y, { obstructing: false}));
-                this.selfArray.push( new FloorTile(this.x, this.y-1));
-                this.selfArray.push( new FloorTile(this.x-1, this.y));//Floor Tile doormat
                 this.selfArray.push(new DoorTile(imgs.floor2, 0, this.x, this.y, RIGHT ));
+                this.floorSpaces = [[this.x, this.y]]
                 break;
         }
-        this.occupyingSpaces = this.selfArray.map(i => [i.x,i.y]);
     }
 }
 

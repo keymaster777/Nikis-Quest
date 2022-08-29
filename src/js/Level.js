@@ -2,7 +2,7 @@ import Room from "./Room"
 import Door from "./structures/Door"
 import { oppositeDirection } from "./helpers"
 import {UP, LEFT, DOWN, RIGHT} from './constants'
-import {sprite} from "./helpers"
+import Sprite from "./Sprite"
 
 //Images
 
@@ -10,14 +10,14 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
-    this.mapPlayerSprite = sprite({
+    this.mapPlayerSprite = new Sprite({
       width: 256,
       height: 32,
       image: imgs.runDown,
       numberOfFrames: 8,
       sizescale: .02,
     })
-    this.mapMonsterSprite = sprite({
+    this.mapMonsterSprite = new Sprite({
         width: 64,
         height: 21,
         image: imgs.gnollShamanWalkRight,
@@ -87,7 +87,7 @@ class Level{
       })
 
       enabledDoors.forEach(doorDirection => {
-        room.doors.push(new Door(room.width, room.height, doorDirection))
+        room.doors[doorDirection] = new Door(room.width, room.height, doorDirection)
         if(doorDirection == LEFT) this.addRoomToList(room.x-1, room.y)
         if(doorDirection == RIGHT) this.addRoomToList(room.x+1, room.y)
         if(doorDirection == UP) this.addRoomToList(room.x, room.y-1)
@@ -150,8 +150,6 @@ class Level{
     ctx.fillRect(x, y, 180, 180);
     this.mapMonsterSprite.update()
 
-
-
     let mapFirstX = activeRoom.x-2
     let mapFirstY = activeRoom.y-2
 
@@ -165,8 +163,8 @@ class Level{
           ctx.fillStyle = "#f7f2ed"
           ctx.fillRect(xi*34+10+x, yi*34+10+y, 24, 24);
 
-          room.doors.forEach(door => {
-            switch(door.direction){
+          Object.keys(room.doors).forEach(direction => {
+            switch(direction){
               case UP:
                 if(this.getRoom(room.x, room.y-1)?.visited){
                   ctx.fillRect(xi*34+19+x, yi*34+3+y, 6, 7);

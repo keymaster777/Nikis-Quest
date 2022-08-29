@@ -1,7 +1,7 @@
 import {TS} from '../constants'
 
 class Tile{
-    constructor(tileimg, layer, x, y, debug = false){
+    constructor(tileimg, layer, x, y, debug = true){
         this.x = x;
         this.y = y;
         this.layer=layer;
@@ -12,15 +12,18 @@ class Tile{
 
 
     draw(){
-        if(this.debug == true){
-            ctx.save;
-            ctx.globalAlpha=.04;
-            ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
-            ctx.restore;
-        }
-        if(this.enabled && this.debug == false){
-          ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
-        }
+        ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
+        // this.drawDebug()
+    }
+
+    drawDebug(){
+        ctx.save;
+        ctx.textAlign = 'center'
+        ctx.fillStyle = "red"
+        ctx.font = "16px Arial";
+
+        ctx.fillText(`${this.x}, ${this.y}`, this.x*TS+TS*.5, this.y*TS+TS*.5);
+        ctx.restore;
     }
 
     toString() {

@@ -153,7 +153,7 @@ function main() {
     ctx.fillText("TO DASH", canvas.width-110, 450);
 
     // Regen Components
-    if (player.stamina < 100) player.stamina += 0.25;
+    if (player.stamina < 100) player.stamina += 0.35;
 
     let now = Date.now();
     let dt = (now - lastTime) / 1000.0;
@@ -189,9 +189,8 @@ function main() {
         }
     }
     lastTime = now;
-    player.animations();
-    activeRoom.monsters.forEach(monster => monster.animations());
-    activeRoom.tileArray.filter(tile => tile instanceof Chest).forEach(tile => tile.animations())
+    // activeRoom.monsters.forEach(monster => monster.animations());
+
 
     requestAnimationFrame(main);
 };
