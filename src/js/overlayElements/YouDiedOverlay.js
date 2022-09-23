@@ -20,6 +20,7 @@ class YouDiedOverlay extends OverlayElement{
 
   elementTeardown(){
     window.location.reload(false)
+    super.elementTeardown()
   }
 
   render(){
