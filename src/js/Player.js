@@ -1,6 +1,5 @@
 import {TS, UP, LEFT, DOWN, RIGHT} from "./constants"
 import Sprite from "./Sprite";
-import DoorTile from "./tiles/DoorTile";
 import BoundingElliptic from "./boundingAreas/BoundingElliptic"
 import Killable from "./traits/Killable";
 import Fightable from "./traits/Fightable";
@@ -40,7 +39,7 @@ class Player{
     let killable = new Killable({
       maxHitPoints: 100,
       maxDamageFrames: 12,
-      onDeath: () => window.location.reload(false) 
+      onDeath: () => overlayManager.addYouDiedOverlay()
     })
 
     let fightable = new Fightable({
@@ -134,13 +133,16 @@ class Player{
 
       if(this.isAttacking && this.attackDirection != DOWN) this.swingWeapon();
 
+      if(this.hitPoints == 0) ctx.globalAlpha = 0
+
       if(this.isMoving()){
         this.move() 
         this.sprite.draw();
       } else {
         ctx.drawImage(this.idleImg, this.x-.65*TS, this.y-1*TS, TS*32*.04, TS*32*.04);
       }
-      
+
+      ctx.globalAlpha = 1
 
       // this.boundary.drawBounds(activeRoom.boundaries(), 0, 0)
       

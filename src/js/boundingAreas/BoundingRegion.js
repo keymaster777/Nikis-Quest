@@ -22,7 +22,7 @@ class BoundingRegion{
     this.y = updatedCoords.y
   }
 
-  boundaryCollisions(boundaries, xAdjust, yAdjust){
+  boundaryCollisions(boundaries){
     this.updateBoundaryCoords()
     let collidingBoundaries = []
 
@@ -31,9 +31,9 @@ class BoundingRegion{
 
       boundary.updateBoundaryCoords()
 
-      let closestBoundPoint = boundary.closestPointTo(this.x+xAdjust,this.y+yAdjust)
+      let closestBoundPoint = boundary.closestPointTo(this.x,this.y)
 
-      if(this.containsPoint(closestBoundPoint, xAdjust, yAdjust)){
+      if(this.containsPoint(closestBoundPoint)){
         boundary.collisionPoint = closestBoundPoint
         collidingBoundaries.push(boundary)
       }
@@ -42,7 +42,9 @@ class BoundingRegion{
     return collidingBoundaries
   }
 
-  drawBounds(boundaries, xAdjust, yAdjust){
+
+  drawBounds(boundaries){
+    // TODO clean up this method
     let collidingBoundaries = []
 
     boundaries.forEach( boundary => {
@@ -54,17 +56,11 @@ class BoundingRegion{
       ctx.fillStyle = "blue";
       ctx.fillRect(closestBoundPoint.x-2,closestBoundPoint.y-2,5,5); // Creates visual reference for boundaries center mark
 
-
       let selfClosest = this.closestPointTo(closestBoundPoint.x, closestBoundPoint.y)
       if( distance(closestBoundPoint.x, closestBoundPoint.y, selfClosest.x, selfClosest.y) < 50){
-        ctx.fillRect(selfClosest.x-2, selfClosest.y-2,5,5); // Creates visual reference for boundaries center mark
+        ctx.fillRect(selfClosest.x-2, selfClosest.y-2,5,5);
       }
 
-      if(this.containsPoint(closestBoundPoint, xAdjust, yAdjust)){
-        collidingBoundaries.push(boundary)
-        ctx.fillStyle = "green";
-        ctx.fillRect(closestBoundPoint.x-2,closestBoundPoint.y-2,15,15);
-      }
     })
 
     return collidingBoundaries

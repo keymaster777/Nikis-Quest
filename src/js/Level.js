@@ -10,6 +10,7 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
+    this.completedAt = Date.now()
     this.mapPlayerSprite = new Sprite({
       width: 256,
       height: 32,
@@ -24,6 +25,16 @@ class Level{
         numberOfFrames: 4,
         sizescale: .025,
     });
+
+  }
+
+  static nextLevel(){
+    activeRoom = new Room(0,0)
+    activeRoom.visited = true
+    level = new Level(level.levelNum + 1)
+    level.buildOutRooms()
+    player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
+    overlayManager.addLevelStartOverlay()
   }
 
   getRoom(x,y){
@@ -80,7 +91,8 @@ class Level{
       cardinalDirections.forEach(doorDirection => {
         let random = Math.random() * room.distanceFromCenter() ** 2;
 
-        if(!disabledDoors.includes(doorDirection) && !enabledDoors.includes(doorDirection) && random < .6){
+
+        if(!disabledDoors.includes(doorDirection) && !enabledDoors.includes(doorDirection) && random < .5){
           enabledDoors.push(doorDirection) 
         }
       })

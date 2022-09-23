@@ -8,13 +8,11 @@ class BoundingElliptic extends BoundingRegion{
 
     this.xSemiAxis = options.xSemiAxis || TS
     this.ySemiAxis = options.ySemiAxis || TS
-    this.majorSemiAxis = Math.max(this.xSemiAxis, this.ySemiAxis)
-    this.boundaryType = "elliptic"
   }
 
-  angleInRadiansToTargetPoint(x, y, xAdjust, yAdjust) {
-    let dy = y-yAdjust - this.y;
-    let dx = x-xAdjust - this.x;
+  angleInRadiansToTargetPoint(x, y) {
+    let dy = y - this.y;
+    let dx = x - this.x;
     let theta = Math.atan2(dy, dx); // range (-PI, PI]
     return theta
   }
@@ -48,9 +46,9 @@ class BoundingElliptic extends BoundingRegion{
     return point(x,y)
   }
 
-  containsPoint(point, xAdjust, yAdjust){
+  containsPoint(point){
     let radiusFromPoint = this.radiusFromPoint(point.x, point.y)
-    let actualDistToPoint = distance(this.x+xAdjust, this.y+yAdjust, point.x, point.y)
+    let actualDistToPoint = distance(this.x, this.y, point.x, point.y)
     return actualDistToPoint < radiusFromPoint
   }
 }

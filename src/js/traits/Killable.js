@@ -27,10 +27,11 @@ class Killable{
 
   takeDamage(damage){
       if(this.takingDamage || this.isDashing) return;
-      this.currentDamageFrame = 0
-      this.hitPoints -= damage;
-      if (this.hitPoints <= 0) this.onDeath();
       this.takingDamage = true;
+      this.currentDamageFrame = 0
+      this.hitPoints = Math.max(0, this.hitPoints-damage)
+
+      if (this.hitPoints == 0) this.onDeath();
   }
 }
 

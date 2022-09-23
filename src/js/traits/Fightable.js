@@ -36,14 +36,13 @@ class Fightable{
   }
 
   canAttack(entity){
-    let closeEnough = this.hitBox.boundaryCollisions([entity.hitBox], 0,0).length > 0
+    let closeEnough = this.hitBox.boundaryCollisions([entity.hitBox]).length > 0
     let waitedLongEnough = Date.now() - this.attackedLast > this.timeBetweenHits
 
     return closeEnough && waitedLongEnough && this.isFalling != true
   } 
 
   attack(entity){
-    console.log("Attacking!")
     this.attackedLast = Date.now();
     entity.takeDamage(this.attackDamage);
   }
@@ -62,6 +61,7 @@ class Fightable{
   }
 
   swingWeapon(){
+    // TODO clean up this whole method, jeez dude
     if(this.isFalling == true) return
     ctx.save();
     ctx.translate(this.x, this.y-.3*TS);
@@ -80,15 +80,15 @@ class Fightable{
       })
 
       activeRoom.monsters.forEach(monster => {
-        if(monster.hitBox.boundaryCollisions(this.weaponHitBoxArray, 0,0).length > 0) this.attack(monster)
+        if(monster.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(monster)
       })
 
       activeRoom.torches.forEach(torch => {
-        if(torch.hitBox.boundaryCollisions(this.weaponHitBoxArray, 0,0).length > 0) this.attack(torch)
+        if(torch.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(torch)
       })
 
       activeRoom.tileArray.filter(tile => tile.hitBox != undefined).forEach(tile => {
-        if(tile.hitBox.boundaryCollisions(this.weaponHitBoxArray, 0, 0).length > 0) this.attack(tile)
+        if(tile.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(tile)
       })
     }
 

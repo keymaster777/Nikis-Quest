@@ -21,7 +21,7 @@ function distance(x1, y1, x2, y2){
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2)
 }
 
-function handleInput(dt, level) {
+function handleInput() {
 
     if(input.isDown('UP')) {
         if(!player.isAttacking) {

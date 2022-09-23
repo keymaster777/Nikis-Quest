@@ -58,13 +58,13 @@ class Movable{
       if(direction == RIGHT) this.x += speed
     })
 
-    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
 
     this.dashCollision()
 
     if (this.isDashing == false && boundaryCollisions.length > 0){
       let collisionPoint = boundaryCollisions[0].collisionPoint
-      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y, 0, 0) 
+      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y) 
 
       this.x=this.lastValidLocation.x
       this.y=this.lastValidLocation.y
@@ -80,9 +80,9 @@ class Movable{
     }
 
     if(this.isDashing) this.handleDash()
-    if(this.correctingPosition && this.outOfBounds(0,0) == false) this.correctingPosition = false
+    if(this.correctingPosition && this.outOfBounds() == false) this.correctingPosition = false
 
-    if(this.isFalling && this.outOfBounds(0,0) == false){
+    if(this.isFalling && this.outOfBounds() == false){
       this.isFalling = false
       this.sprite.yAdjust = 0
       this.sprite.xAdjust = 0
@@ -90,8 +90,8 @@ class Movable{
     } 
 
     if(this.isDashing == false && this.correctingPosition == false){
-      if(this.outOfBounds(0,0)) this.x = this.lastValidLocation.x
-      if(this.outOfBounds(0,0)) this.y = this.lastValidLocation.y
+      if(this.outOfBounds()) this.x = this.lastValidLocation.x
+      if(this.outOfBounds()) this.y = this.lastValidLocation.y
     } 
     
     // Check if in potion area
@@ -104,7 +104,7 @@ class Movable{
         }
     })
 
-    let effectCollisions = this.boundary.boundaryCollisions(activeRoom.effectBounds(), 0, 0)
+    let effectCollisions = this.boundary.boundaryCollisions(activeRoom.effectBounds())
     if(effectCollisions.length > 0) effectCollisions[0].triggerEvent(this)
 
     this.queuedMovements = []
@@ -137,9 +137,9 @@ class Movable{
   }
 
   dashCollision(){
-    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
 
-    if (this.isDashing && (boundaryCollisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap(0,0))){
+    if (this.isDashing && (boundaryCollisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap())){
       this.x = this.lastValidLocation.x
       this.y = this.lastValidLocation.y
 
@@ -149,8 +149,9 @@ class Movable{
 
   handleDashEnd(){
     this.isDashing = false;
-    if(this.outOfBounds(0,0) && this.canBeCorrected()) this.correctingPosition = true
-    if(this.outOfBounds(0,0) && this.canBeCorrected() == false){
+    // TODO clean up boolean logic here
+    if(this.outOfBounds() && this.canBeCorrected()) this.correctingPosition = true
+    if(this.outOfBounds() && this.canBeCorrected() == false){
       this.isFalling = true
       this.fallTimer = Date.now()
     } 
@@ -158,24 +159,23 @@ class Movable{
 
   canBeCorrected(){
     let canBeCorrected = true
-    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
     collisions.forEach(bound => {
-      if(bound.containsPoint(point(this.x, this.y), 0,0) && bound.canBeFallenInto) canBeCorrected = false
+      if(bound.containsPoint(point(this.x, this.y)) && bound.canBeFallenInto) canBeCorrected = false
     })
     return canBeCorrected
   }
 
-  outOfMap(xAdjust, yAdjust){
-    if (this.x+xAdjust>(activeRoom.width)*TS || this.x+xAdjust<0 ) return true
-    if (this.y+yAdjust<TS || this.y+yAdjust>(activeRoom.height+1)*TS) return true
+  outOfMap(){
+    if (this.x>(activeRoom.width)*TS || this.x<0 ) return true
+    if (this.y<TS || this.y>(activeRoom.height+1)*TS) return true
     return false
   }
 
-  outOfBounds(xAdjust, yAdjust){
-    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), xAdjust, yAdjust)
-
+  outOfBounds(){
+    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
     if (collisions.length > 0) return true
-    return this.outOfMap(xAdjust, yAdjust)
+    return this.outOfMap()
   }
 
   isMoving(){

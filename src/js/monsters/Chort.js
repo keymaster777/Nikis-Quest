@@ -65,8 +65,12 @@ class Chort{
     player.enemiesFelled += 1
   }
 
+  isAgitated(){
+    return this.takingDamage || distance(this.x, this.y, player.x, player.y) < 2*TS
+  }
+
   setupMovements(){
-    if ( this.takingDamage || distance(this.x, this.y, player.x, player.y) < 2*TS){
+    if ( this.isAgitated()){
         if (player.y < this.y) this.queuedMovements.push(UP)
         if (player.y > this.y) this.queuedMovements.push(DOWN)
         if (player.x < this.x-5) this.queuedMovements.push(LEFT)

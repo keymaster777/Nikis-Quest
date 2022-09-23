@@ -204,8 +204,7 @@ class Room{
         if (this.monsters.find(monster => monster instanceof Goblin)) message = "**angry goblin noises**"
         if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "**angrier goblin noises**"
         if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "**wood splintering**" 
-        if (this.monsters.find(monster => monster instanceof Chort && monster.isMoving)) message = "**CHORTS SHRIEKING**"
-        if (level.rooms.filter(room => room.visited).length == 1) message = "LEAVE THIS ROOM THROUGH ONE OF THE 4 DOORS."
+        if (this.monsters.find(monster => monster instanceof Chort && monster.isAgitated())) message = "**CHORTS SHRIEKING**"
         if (player.isFalling && Date.now() - player.fallTimer > 500) message = "**Niki screams as she tumbles into oblivion**"
         return message
     }
@@ -316,7 +315,7 @@ class Room{
 
         // this.hitBoxes().forEach(hitBox => hitBox.drawArea("green"))
         
-        Object.values(this.doors).forEach(door => door.effectBox.drawArea('yellow'))
+        // Object.values(this.doors).forEach(door => door.effectBox.drawArea('yellow'))
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 

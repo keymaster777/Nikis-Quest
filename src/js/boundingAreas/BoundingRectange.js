@@ -11,19 +11,12 @@ class BoundingRectangle extends BoundingRegion{
 
     // Rect boundaries that are static can be automatically merged together with adjacent ones of the same dimensions
     this.staticBoundary = options.staticBoundary || true
-
-    this.boundaryType = "rectangle"
-
-    this.targetPoint = {x: 0, y: 0}
   }
 
   drawArea(fillColor){
     this.updateBoundaryCoords()
-    ctx.save
     ctx.strokeStyle = fillColor;
-    ctx.fillStyle = fillColor;
     ctx.strokeRect(this.x, this.y, this.width, this.height)
-    ctx.restore
   }
 
   closestPointTo(x,y){
@@ -32,13 +25,12 @@ class BoundingRectangle extends BoundingRegion{
     if(this.x + this.width < x) closestPoint.x = this.x+this.width
     if(this.y > y) closestPoint.y = this.y
     if(this.y + this.height < y) closestPoint.y = this.y+this.height
-    // this.targetPoint = closestPoint
     return closestPoint
   }
 
-  containsPoint(point, xAdjust, yAdjust){
-    let xOverlap = this.x + xAdjust <=  point.x && this.x + this.width+xAdjust >= point.x
-    let yOverlap = this.y + yAdjust <= point.y && this.y + this.height + yAdjust >= point.y 
+  containsPoint(point){
+    let xOverlap = this.x <=  point.x && this.x + this.width >= point.x
+    let yOverlap = this.y <= point.y && this.y + this.height >= point.y 
     return xOverlap && yOverlap
   }
 }
