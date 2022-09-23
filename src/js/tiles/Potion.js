@@ -5,6 +5,7 @@ class Potion extends Tile{
   constructor(x, y){
     super(imgs.potion, "*", x, y);
     this.obstructing = false;
+    this.depthBreakpoint = this.y*TS+40
   }
 
   inArea(x,y){

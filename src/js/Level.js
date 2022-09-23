@@ -2,7 +2,7 @@ import Room from "./Room"
 import Door from "./structures/Door"
 import { oppositeDirection } from "./helpers"
 import {UP, LEFT, DOWN, RIGHT} from './constants'
-import {sprite} from "./helpers"
+import Sprite from "./Sprite"
 
 //Images
 
@@ -10,34 +10,44 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
-    this.mapPlayerSprite = sprite({
+    this.completedAt = Date.now()
+    this.mapPlayerSprite = new Sprite({
       width: 256,
       height: 32,
       image: imgs.runDown,
       numberOfFrames: 8,
       sizescale: .02,
     })
-    this.mapMonsterSprite = sprite({
+    this.mapMonsterSprite = new Sprite({
         width: 64,
         height: 21,
         image: imgs.gnollShamanWalkRight,
         numberOfFrames: 4,
         sizescale: .025,
     });
+
+  }
+
+  static nextLevel(){
+    activeRoom = new Room(0,0)
+    activeRoom.visited = true
+    level = new Level(level.levelNum + 1)
+    level.buildOutRooms()
+    player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
+    overlayManager.addLevelStartOverlay()
   }
 
   getRoom(x,y){
     return this.rooms.find(room => room.x == x && room.y == y)
   }
 
-  nextRoom(){
+  nextRoom(leavingFrom){
     level.allMonstersKilled = level.haveAllMonstersBeenKilled()
-    activeRoom.leftFrom = activeRoom.doorTiles.find(tile => tile.inArea(player.x, player.y)).direction
-    let enteredFrom = oppositeDirection( activeRoom.leftFrom )
+    let enteredFrom = oppositeDirection( leavingFrom )
     let x = activeRoom.x
     let y = activeRoom.y
 
-    switch(activeRoom.leftFrom){
+    switch(leavingFrom){
       case UP:
         activeRoom = this.getRoom(x, y-1)
         break;
@@ -81,13 +91,14 @@ class Level{
       cardinalDirections.forEach(doorDirection => {
         let random = Math.random() * room.distanceFromCenter() ** 2;
 
-        if(!disabledDoors.includes(doorDirection) && !enabledDoors.includes(doorDirection) && random < .6){
+
+        if(!disabledDoors.includes(doorDirection) && !enabledDoors.includes(doorDirection) && random < .5){
           enabledDoors.push(doorDirection) 
         }
       })
 
       enabledDoors.forEach(doorDirection => {
-        room.doors.push(new Door(room.width, room.height, doorDirection))
+        room.doors[doorDirection] = new Door(room.width, room.height, doorDirection)
         if(doorDirection == LEFT) this.addRoomToList(room.x-1, room.y)
         if(doorDirection == RIGHT) this.addRoomToList(room.x+1, room.y)
         if(doorDirection == UP) this.addRoomToList(room.x, room.y-1)
@@ -150,8 +161,6 @@ class Level{
     ctx.fillRect(x, y, 180, 180);
     this.mapMonsterSprite.update()
 
-
-
     let mapFirstX = activeRoom.x-2
     let mapFirstY = activeRoom.y-2
 
@@ -165,8 +174,8 @@ class Level{
           ctx.fillStyle = "#f7f2ed"
           ctx.fillRect(xi*34+10+x, yi*34+10+y, 24, 24);
 
-          room.doors.forEach(door => {
-            switch(door.direction){
+          Object.keys(room.doors).forEach(direction => {
+            switch(direction){
               case UP:
                 if(this.getRoom(room.x, room.y-1)?.visited){
                   ctx.fillRect(xi*34+19+x, yi*34+3+y, 6, 7);

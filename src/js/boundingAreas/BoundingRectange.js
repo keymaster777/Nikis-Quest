@@ -1,0 +1,38 @@
+import { TS } from '../constants'
+import {distance, point} from '../helpers'
+import BoundingRegion from './BoundingRegion'
+
+class BoundingRectangle extends BoundingRegion{
+  constructor(options) {
+    super(options)
+
+    this.width = options.width || TS
+    this.height = options.height || TS
+
+    // Rect boundaries that are static can be automatically merged together with adjacent ones of the same dimensions
+    this.staticBoundary = options.staticBoundary || true
+  }
+
+  drawArea(fillColor){
+    this.updateBoundaryCoords()
+    ctx.strokeStyle = fillColor;
+    ctx.strokeRect(this.x, this.y, this.width, this.height)
+  }
+
+  closestPointTo(x,y){
+    let closestPoint = point(x,y) 
+    if(this.x > x) closestPoint.x = this.x
+    if(this.x + this.width < x) closestPoint.x = this.x+this.width
+    if(this.y > y) closestPoint.y = this.y
+    if(this.y + this.height < y) closestPoint.y = this.y+this.height
+    return closestPoint
+  }
+
+  containsPoint(point){
+    let xOverlap = this.x <=  point.x && this.x + this.width >= point.x
+    let yOverlap = this.y <= point.y && this.y + this.height >= point.y 
+    return xOverlap && yOverlap
+  }
+}
+
+export default BoundingRectangle

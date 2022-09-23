@@ -2,61 +2,60 @@ import Tile from "./Tile";
 import { TS } from "../constants"
 import Potion from "./Potion";
 import Goblin from "../monsters/Goblin";
-import Level from "../Level";
+import Killable from "../traits/Killable";
+import BoundingRectangle from "../boundingAreas/BoundingRectange";
 
 class Chest extends Tile{
   constructor(x, y){
     super(imgs.chest, "*", x, y);
     this.obstructing = true;
-    this.hitPoints = 15;
-    this.takingDamage = false;
-    this.maxDamageFrames = 18;
+    this.depthBreakpoint = this.y*TS+40
+
+    let killable = new Killable({
+      maxHitPoints: 15,
+      maxDamageFrames: 18,
+      isATile: true,
+      onDeath: this.destroyChest 
+    })
+
+    this.boundaryCoords = () => ({x: this.x*TS+.15*TS, y: this.y*TS+.45*TS})
+    this.boundary = new BoundingRectangle({
+      coords: this.boundaryCoords.bind(this),
+      width: TS*0.7,
+      height: TS*0.4,
+      cancelsDash: true,
+    })
+
+    this.hitBoxCoords = () => ({x: this.x*TS+.15*TS, y: this.y*TS+.35*TS})
+    this.hitBox = new BoundingRectangle({
+      coords: this.hitBoxCoords.bind(this),
+      width: TS*0.7,
+      height: TS*0.3
+    })
+
+    // compose killable into chest
+    Object.assign(this, killable)
   }
 
-  animations(){
-    if(this.takingDamage) this.damageAnimation();
-  }
-
-  damageAnimation(){
-    if(this.currentDamageFrame == this.maxDamageFrames){
-      this.takingDamage = false;
+  destroyChest(){
+    activeRoom.staticBoundaries = activeRoom.staticBoundaries.filter(boundary => boundary != this.boundary)
+    activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != this)
+    player.chestsOpened += 1
+    let random = Math.random();
+    if(random >= .9){
+      activeRoom.monsters.push(new Goblin(this.x, this.y))
+      activeRoom.monsters.push(new Goblin(this.x, this.y))
+    }
+    if(random > .7){
+      console.log("Stamina Pot spawn")
     } else {
-      this.currentDamageFrame % 2 == 0 ? this.x-=.1 : this.x+=.1;
-      this.currentDamageFrame++;
+      activeRoom.tileArray.push(new Potion(this.x, this.y, TS));
     }
   }
 
-  takeDamage(damage){
-    if(this.takingDamage) return;
-    this.currentDamageFrame = 0
-    this.hitPoints -= damage;
-    if (this.hitPoints <= 0){
-      activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != this)
-      player.chestsOpened += 1
-      let random = Math.random();
-      if(random >= .9){
-        activeRoom.monsters.push(new Goblin(this.x, this.y))
-        activeRoom.monsters.push(new Goblin(this.x, this.y))
-      }
-      if(random > .7){
-        console.log("Stamina Pot spawn")
-      } else {
-        activeRoom.tileArray.push(new Potion(this.x, this.y, TS));
-      }
-    }
-    this.takingDamage = true;
-  }
-
-  distanceToCoord(x1,y1){
-    return ((x1-this.x*TS)**2 + (y1-this.y*TS)**2)**.5
-  }
-
-  inArea(x,y){
-    if(this.obstructing && x>=this.x*TS+15 && x<this.x*TS+TS-15 &&  y>=this.y*TS+15 && y<this.y*TS+TS-10 ){
-      return true;
-    }else{
-      return false;
-    }
+  draw(){
+    super.draw()
+    if(this.takingDamage) this.damagedAnimation();
   }
 }
 

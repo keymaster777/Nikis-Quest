@@ -1,29 +1,42 @@
 import Structure from "./Structure";
+import TestTile from "../tiles/TestTile";
 import FloorTile from "../tiles/FloorTile";
-import WallTile from "../tiles/WallTile";
+import BoundingElliptic from "../boundingAreas/BoundingElliptic";
+import Sprite from "../Sprite";
+import { TS } from "../constants"
+import Torch from "../Torch"
 
 class FloorColumn extends Structure{
-    constructor(x, y){
-        super(x,y);
-        this.build();
-    }
+  constructor(x, y){
+    super()
+    this.x = x
+    this.y = y
 
-    build(){
-        this.selfArray.push(new FloorTile(this.x, this.y-1));
-        this.selfArray.push(new FloorTile(this.x, this.y));
-        this.selfArray.push(new WallTile(imgs.columnBase, 2, this.x, this.y, {obstructing:true, column: true}));
-        this.selfArray.push(new WallTile(imgs.columnMid, '*', this.x, this.y-1, {}));
-        let random = Math.random();
+    this.boundaries = []
+    this.buildTiles()
+  }
 
-        if(random > .7){
-            this.selfArray.push(new WallTile(imgs.columnMid, 3, this.x, this.y-2, {}));
-            this.selfArray.push(new WallTile(imgs.columnTop, 3, this.x, this.y-3, {}));
-        } else {
-            this.selfArray.push(new WallTile(imgs.columnTop, 3, this.x, this.y-2, {}));
-        }
+  buildTiles() {
+    this.boundaries.push(new BoundingElliptic({
+      coords: (() => ({x: this.x*TS+TS*.5, y: this.y*TS})),
+      xSemiAxis: .4*TS,
+      ySemiAxis: .2*TS,
+      cancelsDash: true,
+    }))
 
-        this.occupyingSpaces = [[this.x,this.y],[this.x,this.y-1]];
-    }
+    this.selfArray.push(new FloorTile(this.x, this.y-1));
+    this.selfArray.push(new FloorTile(this.x, this.y));
+
+    this.selfArray.push(new TestTile(imgs.columnBase, '*', this.x, this.y, {depthBreakpoint: this.y*TS}))
+    this.selfArray.push(new TestTile(imgs.columnMid, '*', this.x, this.y-1,{depthBreakpoint: this.y*TS}))
+    this.selfArray.push(new TestTile(imgs.columnTop, '*', this.x, this.y-2,{depthBreakpoint: this.y*TS}))
+
+    this.occupyingSpaces = [[this.x,this.y],[this.x,this.y-1]];
+  }
+
+  addTorch() {
+    this.torch = new Torch(this.x, this.y, {yAdjust: -TS, depthAdjust: TS})
+  }
 }
 
 export default FloorColumn

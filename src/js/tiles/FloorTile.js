@@ -1,6 +1,7 @@
-import Tile from "./Tile"
+import TestTile from "./TestTile"
+import {TS} from "../constants"
 
-class FloorTile extends Tile{
+class FloorTile extends TestTile{
     constructor(x, y){
       const randomFloor = () => {
         let random = Math.random();
@@ -26,7 +27,9 @@ class FloorTile extends Tile{
         }
       }
 
-      super(randomFloor(), 0, x, y);
+
+      super(randomFloor(), '*', x, y, {depthBreakpoint: y*TS-TS});
+
     }
 }
 
