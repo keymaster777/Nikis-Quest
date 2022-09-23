@@ -22,7 +22,8 @@ class Chest extends Tile{
     this.boundary = new BoundingRectangle({
       coords: this.boundaryCoords.bind(this),
       width: TS*0.7,
-      height: TS*0.4
+      height: TS*0.4,
+      cancelsDash: true,
     })
 
     this.hitBoxCoords = () => ({x: this.x*TS+.15*TS, y: this.y*TS+.35*TS})
@@ -37,6 +38,7 @@ class Chest extends Tile{
   }
 
   destroyChest(){
+    activeRoom.staticBoundaries = activeRoom.staticBoundaries.filter(boundary => boundary != this.boundary)
     activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != this)
     player.chestsOpened += 1
     let random = Math.random();

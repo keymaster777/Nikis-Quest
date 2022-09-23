@@ -25,7 +25,6 @@ class TestTile{
     ctx.font = "16px Arial";
     ctx.fillText(`${this.x}, ${this.y}`, this.x*TS+TS*.5, this.y*TS+TS*.5);
     ctx.restore();
-    this.boundaries.forEach(boundary => boundary.drawArea("blue"))
   }
 }
 

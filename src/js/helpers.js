@@ -50,11 +50,11 @@ function handleInput(dt, level) {
             player.attackDirection = LEFT;
         }
     }
-
-    if(player.atDoor() && (Date.now() - player.lastLeftRoomTime > 1000)){
-        player.lastLeftRoomTime = Date.now()
-        level.nextRoom();
-    }
 }
 
-export {randomIntFromInterval, oppositeDirection, handleInput, distance}
+function point(x,y) {
+    return {x: x, y: y}
+}
+
+
+export {randomIntFromInterval, oppositeDirection, handleInput, distance, point}

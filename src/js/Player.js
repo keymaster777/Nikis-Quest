@@ -52,13 +52,12 @@ class Player{
 
     let movable = new Movable({
         speed: 2.5,
-        dashSpeedMultiplier: 3
+        dashSpeed: 7.5
     })
 
     this.idleImg = imgs.idleDown
     this.maxStamina = 100;
     this.stamina = this.maxStamina;
-    this.lastLeftRoomTime = Date.now()
     this.enemiesFelled = 0
     this.chestsOpened = 0
     this.potionsConsumed = 0
@@ -80,20 +79,6 @@ class Player{
   setLocation(x,y){
       this.x=x;
       this.y=y;
-  }
-
-  atDoor(){
-      var doors=activeRoom.tileArray.filter(tile => tile instanceof DoorTile);
-      for(var i = 0;i<doors.length;i++){
-          if( doors[i].inArea(this.x,this.y)){
-              if(
-                  this.outOfBounds(-3, 0) ||
-                  this.outOfBounds(3, 0) ||
-                  this.outOfBounds(0, -3) ||
-                  this.outOfBounds(0, 3)
-              ) return true;
-          }
-      }
   }
 
   setupMovements(){
@@ -147,25 +132,22 @@ class Player{
 
       if(input.isDown('SPACE') && this.isDashing == false) this.attemptToDash();
 
-      if (this.isDashing || this.takingDamage) ctx.globalAlpha = 0.6;
-
       if(this.isAttacking && this.attackDirection != DOWN) this.swingWeapon();
 
-      if(this.queuedMovements.length > 0){
-        this.move()
+      if(this.isMoving()){
+        this.move() 
         this.sprite.draw();
       } else {
         ctx.drawImage(this.idleImg, this.x-.65*TS, this.y-1*TS, TS*32*.04, TS*32*.04);
       }
       
-      if(this.isDashing) this.updateDashStatus()
+
+      // this.boundary.drawBounds(activeRoom.boundaries(), 0, 0)
+      
 
       if(this.isAttacking && this.attackDirection == DOWN) this.swingWeapon();
 
-      // if(this.isDashing) this.dashAnimation();
       if(this.takingDamage) this.damagedAnimation();
-    
-      ctx.globalAlpha = 1;
   }
 }
 

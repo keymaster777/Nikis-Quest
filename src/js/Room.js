@@ -7,7 +7,6 @@ import Chest from "./tiles/Chest"
 import Goblin from "./monsters/Goblin"
 import Chort from "./monsters/Chort"
 import Pit from "./structures/Pit";
-import TestTile from "./tiles/TestTile";
 
 import {randomIntFromInterval} from "./helpers"
 import {TS, UP, LEFT, RIGHT, DOWN, DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT, CANVAS_WIDTH, CANVAS_HEIGHT} from "./constants"
@@ -26,13 +25,12 @@ class Room{
         this.occupiedSpaces = [];
         this.torches = [];
         this.built = false
-        this.leftFrom;
         this.lpad = (CANVAS_WIDTH-(this.width*TS))/2
         this.randomNum = Math.random()
         this.visited = false // Player has physically been in the room
         this.seen = false // Player has been in an adjacent room with door access
         this.staticBoundaries = [];
-        this.tempCounter = 0
+        this.queuedBoundariesForMerge = []
     }
 
     /* =================================== */
@@ -48,11 +46,7 @@ class Room{
 
     entranceCoords(){
       let entryDoor = this.doors[this.enteredFrom]
-      if(this.enteredFrom == UP) {
-        return {x: entryDoor.x*TS+.5*TS, y: entryDoor.y*TS+1.5*TS}
-      } else {
-        return {x: entryDoor.x*TS+.5*TS, y: entryDoor.y*TS+.5*TS}
-      }
+      return {x: entryDoor.x*TS+.5*TS, y: entryDoor.y*TS+.5*TS}
     }
 
     distanceFromCenter(){
@@ -72,58 +66,18 @@ class Room{
 
         if(random < .5 && y > 2) {
             construct = new FloorColumn(x,y+1);
+            construct.boundaries.forEach(boundary => this.staticBoundaries.push(boundary))
+            if(random < .25){
+                construct.addTorch()
+                this.torches.push(construct.torch)
+            }
         } else {
             construct = new Pit(x,y,this.occupiedSpaces);
+            construct.boundaries.forEach(bound => this.queuedBoundariesForMerge.push(bound))
         }
-        construct.boundaries.forEach(boundary => this.addStaticBoundary(boundary))
+
         this.tileArray = this.tileArray.concat(construct.selfArray);
         this.occupiedSpaces = this.occupiedSpaces.concat(construct.occupyingSpaces)
-    }
-
-    addStaticBoundary(b1){
-        if(this.staticBoundaries.length == 0 || b1.boundaryType == "elliptic"){
-            this.staticBoundaries.push(b1)
-            return
-        }
-
-        let potentialMerges = this.staticBoundaries.filter(bound => bound.boundaryType == 'rectangle')
-        let mergeTarget = false
-
-        mergeTarget = potentialMerges.find(b2 =>  b2.x+b2.width == b1.x && b2.height == b1.height && b1.y == b2.y)
-        if( mergeTarget != undefined) {
-            mergeTarget.width += b1.width
-            return
-        }
-
-        mergeTarget = potentialMerges.find(b2 => b2.x == b1.width+b1.x && b2.height == b1.height && b1.y == b2.y)
-        if(mergeTarget != undefined){
-            mergeTarget.width += b1.width
-            mergeTarget.x -= b1.width
-            return
-        }
-
-        mergeTarget = potentialMerges.find(b2 => b2.y == b1.height+b1.y && b2.width == b1.width && b1.x == b2.x)
-        if(mergeTarget != undefined){
-            mergeTarget.height += b1.height
-            mergeTarget.y -= b1.height
-            
-            // Checks if adjustment just connected another boundary to this one
-            let secondTarget = potentialMerges.find(b2 => b2.y+b2.height == mergeTarget.y && b2.width == mergeTarget.width && mergeTarget.x == b2.x)
-            if(secondTarget) {
-                mergeTarget.height += secondTarget.height
-                mergeTarget.y -= secondTarget.height
-                this.staticBoundaries = this.staticBoundaries.filter(boundary => boundary != secondTarget)
-            }
-            return
-        }
-
-        mergeTarget = potentialMerges.find(b2 => b2.y+b2.height == b1.y && b2.width == b1.width && b1.x == b2.x)
-        if(mergeTarget != undefined) {
-            mergeTarget.height += b1.height
-            return
-        }
-
-        if (mergeTarget == undefined) this.staticBoundaries.push(b1)
     }
 
     /* =================================== */
@@ -177,9 +131,10 @@ class Room{
             let createdWall = new Wall(coord.x, coord.y, coord.hasDoor, coordsForWalls)
             if(Math.random() < .15 && createdWall.canHoldTorch()){
                 createdWall.addTorch()
-                this.torches.push(createdWall.torchSprite)
+                this.torches.push(createdWall.torch)
             } 
-            createdWall.boundaries.forEach(bound => this.addStaticBoundary(bound))
+
+            createdWall.boundaries.forEach(bound => this.queuedBoundariesForMerge.push(bound))
 
             this.tileArray = this.tileArray.concat(createdWall.selfArray)
             this.occupiedSpaces = this.occupiedSpaces.concat(createdWall.occupyingSpaces)
@@ -203,6 +158,7 @@ class Room{
                 case random < 10:
                     let chest = new Chest(floorArray[i].x, floorArray[i].y)
                     this.tileArray.push(chest);
+                    this.staticBoundaries.push(chest.boundary)
                     this.occupiedSpaces.push([chest.x, chest.y])
                 break;
                 case random < 20:
@@ -219,9 +175,13 @@ class Room{
         let unoccupiedFloorArray = this.tileArray.filter(tile => tile instanceof FloorTile && !this.isOccupiedTile(tile.x, tile.y));
         unoccupiedFloorArray.forEach(tile => {
             let random = Math.random();
+            let monster = false
+            if (random >= 0 && random < 0.15) monster = new Goblin(tile.x, tile.y)
+            if (random >= 0.15 && random < .18) monster = new Chort(tile.x, tile.y)
 
-            if (random >= 0 && random < 0.15) this.monsters.push(new Goblin(tile.x, tile.y))
-            if (random >= 0.15 && random < .18) this.monsters.push(new Chort(tile.x, tile.y))
+            if (monster){
+                this.monsters.push(monster)
+            }
         })
     }
 
@@ -239,14 +199,52 @@ class Room{
         // These are organized in priority, each condition overwrites the message
         let message = this.rareMessage() || ""
         if (this.torches.length > 0) message = "**torch crackling**"
-        if (player.isMoving) message = "**footsteps**"
+        if (input.isDown('w') || input.isDown('d') || input.isDown('a') || input.isDown('s')) message = "**footsteps**"
         if (this.monsters.find(monster => monster instanceof Chort)) message = "**Chorts snickering**"
         if (this.monsters.find(monster => monster instanceof Goblin)) message = "**angry goblin noises**"
         if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "**angrier goblin noises**"
         if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "**wood splintering**" 
         if (this.monsters.find(monster => monster instanceof Chort && monster.isMoving)) message = "**CHORTS SHRIEKING**"
         if (level.rooms.filter(room => room.visited).length == 1) message = "LEAVE THIS ROOM THROUGH ONE OF THE 4 DOORS."
+        if (player.isFalling && Date.now() - player.fallTimer > 500) message = "**Niki screams as she tumbles into oblivion**"
         return message
+    }
+
+    mergeQueuedBounds() {
+        this.mergeHorizontalBounds()
+        this.mergeVerticalBounds()
+    }
+
+    mergeHorizontalBounds(){
+        let sortedBounds = this.queuedBoundariesForMerge.sort((a, b) => (a.x > b.x) ? 1 : -1)
+        let newBound = sortedBounds.find(bound => bound.width == TS)
+        if (newBound == undefined) return
+        let filteredBounds = sortedBounds.filter(bound => bound.y+bound.height == newBound.y+newBound.height)
+        for(let i = 1; i <= this.width; i++){
+           let bound = filteredBounds.find(bound => bound.x == newBound.x+(TS*i))
+           if (bound == undefined) break
+           newBound.width += bound.width
+           this.queuedBoundariesForMerge = this.queuedBoundariesForMerge.filter(b => b != bound)
+        } 
+        this.queuedBoundariesForMerge = this.queuedBoundariesForMerge.filter(b => b != newBound)
+        this.staticBoundaries.push(newBound)
+        this.mergeHorizontalBounds()
+    }
+
+    mergeVerticalBounds(){
+        let sortedBounds = this.queuedBoundariesForMerge.sort((a, b) => (a.y > b.y) ? 1 : -1)
+        let newBound = sortedBounds.find(bound => bound.height == TS)
+        if (newBound == undefined) return
+        let filteredBounds = sortedBounds.filter(bound => bound.x+bound.width == newBound.x+newBound.width)
+        for(let i = 1; i <= this.height; i++){
+           let bound = filteredBounds.find(bound => bound.y == newBound.y+(TS*i))
+           if (bound == undefined) break
+           newBound.height += bound.height
+           this.queuedBoundariesForMerge = this.queuedBoundariesForMerge.filter(b => b != bound)
+        } 
+        this.queuedBoundariesForMerge = this.queuedBoundariesForMerge.filter(b => b != newBound)
+        this.staticBoundaries.push(newBound)
+        this.mergeVerticalBounds()
     }
 
     buildRoom(){
@@ -255,27 +253,27 @@ class Room{
         this.buildFloor();
         this.spawnItems();
         this.spawnMonsters();
+        this.mergeQueuedBounds();
         this.built = true
     }
 
-    elementsInRoomWithBoundaryRegions(){
-        let tilesWithBoundary = this.tileArray.filter(tile => tile.boundary != undefined)
-        let monstersWithBoundary = this.monsters.filter(monster => monster.boundary != undefined)
-        return [...tilesWithBoundary, ...monstersWithBoundary, player]
-    }
-
     boundaries(){
-        let tileBoundaries = this.tileArray.filter(tile => tile.boundary != undefined).map(tile => tile.boundary)
-        /// let newBounds = this.tileArray.filter(tile => tile.boundaries != undefined && tile.boundaries.length > 0).map(tile => tile.boundaries).flat(1)
-        let monsterBoundaries = this.monsters.filter(monster => monster.boundary != undefined).map(monster => monster.boundary)
-        return [...tileBoundaries, ...monsterBoundaries, ...this.staticBoundaries, player.boundary]
+        let monsterBoundaries = this.monsters.map(monster => monster.boundary)
+        return [...monsterBoundaries, ...this.staticBoundaries, player.boundary]
     }
 
     hitBoxes(){
-        let monsterHitBoxes = this.monsters.filter(monster => monster.hitBox != undefined).map(monster => monster.hitBox)
+        let monsterHitBoxes = this.monsters.map(monster => monster.hitBox)
         let chests = this.tileArray.filter(tile => tile.hitBox != undefined).map(tile => tile.hitBox)
-        return [ ...monsterHitBoxes, ...chests, player.hitBox]
+        let torches = this.torches.map(torch => torch.hitBox)
+        return [ ...monsterHitBoxes, ...chests, ...torches, player.hitBox]
     }
+
+    effectBounds(){
+        let doors = Object.values(this.doors).map(door => door.effectBox)
+        return [ ...doors] 
+    }
+
     
     drawRoom(){
         ctx.translate(activeRoom.lpad, 0);
@@ -295,18 +293,31 @@ class Room{
         objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
             var elements = [a,b].map(ele => {
                 if (ele.depthBreakpoint != undefined) return ele.depthBreakpoint
+                if (ele.isFalling == true) return ele.y - TS
                 return ele.y
             })
             
             return elements[0] - elements[1]
         })
 
-        objectsWithLayerVariety.forEach(ele => ele.draw())
+        objectsWithLayerVariety.forEach(ele => {
+            if (ele.isDashing || ele.takingDamage) ctx.globalAlpha = 0.6;
+            if(ele.isFalling == true){
+                let transparency = 1 - (Date.now() - ele.fallTimer)/1000*.7
+                ctx.globalAlpha = transparency > 0 ? transparency : 0
+            }
+            ele.draw()
+            ctx.globalAlpha = 1;
+        })
 
         layer3.forEach(ele => ele.draw())
 
-        this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
+        // this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
+
         // this.hitBoxes().forEach(hitBox => hitBox.drawArea("green"))
+        
+        Object.values(this.doors).forEach(door => door.effectBox.drawArea('yellow'))
+
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         ctx.fillStyle = "#b8b5b9"

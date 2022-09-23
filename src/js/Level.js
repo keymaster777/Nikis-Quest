@@ -30,14 +30,13 @@ class Level{
     return this.rooms.find(room => room.x == x && room.y == y)
   }
 
-  nextRoom(){
+  nextRoom(leavingFrom){
     level.allMonstersKilled = level.haveAllMonstersBeenKilled()
-    activeRoom.leftFrom = activeRoom.doorTiles.find(tile => tile.inArea(player.x, player.y)).direction
-    let enteredFrom = oppositeDirection( activeRoom.leftFrom )
+    let enteredFrom = oppositeDirection( leavingFrom )
     let x = activeRoom.x
     let y = activeRoom.y
 
-    switch(activeRoom.leftFrom){
+    switch(leavingFrom){
       case UP:
         activeRoom = this.getRoom(x, y-1)
         break;

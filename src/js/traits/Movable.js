@@ -1,88 +1,99 @@
 import {TS, UP, DOWN, LEFT, RIGHT} from '../constants'
 import Potion from '../tiles/Potion'
-import { distance } from '../helpers'
+import { distance, point } from '../helpers'
 
 class Movable{
   constructor(options){
     this.speed = options.speed || 2.5
-    this.dashSpeedMultiplier = options.dashSpeedMultiplier || 1
+    this.dashSpeed = options.dashSpeed || 0
     this.queuedMovements = []
     this.facing = DOWN
+    this.lastValidLocation = point(0,0)
+    this.colliding = false
+    this.correctingPosition = false
+    this.isFalling = false
+    this.fallTimer = Date.now()
 
     // Dash attributes
     this.dashedLast = Date.now()
-    this.maxDashFrames = 10;
+    this.maxDashFrames = 12;
     this.currentDashFrame = 0;
     this.isDashing = false
+    this.dashDirection = DOWN
 
     // Methods
     this.move = this.move
     this.outOfBounds = this.outOfBounds
     this.outOfMap = this.outOfMap
-    this.getClosestValidSpot = this.getClosestValidSpot
-    this.moveToClosestValidSpot = this.moveToClosestValidSpot
     this.dash = this.dash
-    this.updateDashStatus = this.updateDashStatus
+    this.handleDash = this.handleDash
+    this.dashCollision = this.dashCollision
+    this.isMoving = this.isMoving
+    this.canBeCorrected = this.canBeCorrected
+    this.handleDashEnd = this.handleDashEnd
   }
 
   move(){
-    let pendingMovement = {x: 0, y: 0}
-    let speed = this.isDashing ? this.speed*this.dashSpeedMultiplier : this.speed
-    this.facing = [...this.queuedMovements].pop()
-
-    this.queuedMovements.forEach(direction => {
-        switch(direction){
-        case DOWN:
-            pendingMovement.y = speed
-            break;
-        case UP:
-            pendingMovement.y = -speed
-            break;
-        case LEFT:
-            pendingMovement.x = -speed
-            break;
-        case RIGHT:
-            pendingMovement.x = speed
-            break;
-        }
-    })
-
-    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), pendingMovement.x, pendingMovement.y)
-    for (let i = 0; boundaryCollisions.length > 0 && i < 50; i++){
-      let selfReferencePoint = this.boundary.collisionReferencePoint
-      let offendingReferencePoint = boundaryCollisions[0].collisionReferencePoint
-
-      let correctiveRun = selfReferencePoint.x - offendingReferencePoint.x
-      let correctiveRise = selfReferencePoint.y - offendingReferencePoint.y
-
-      pendingMovement.x += correctiveRun*.1
-
-      pendingMovement.y += correctiveRise*.1
-      boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), pendingMovement.x, pendingMovement.y)
+    if(this.isFalling == true){
+      this.sprite.yAdjust += 1.2
+      this.sprite.xAdjust += .1
+      this.sprite.sizescaleAdjust -= .0001
+      if (Date.now() - this.fallTimer > 2000) {
+        this.isDashing = false
+        this.takeDamage(10)
+      }
+      if (Date.now() - this.fallTimer > 500) return
     } 
 
-    if(Math.abs(pendingMovement.x)+Math.abs(pendingMovement.y) > 1){
-      if(this.outOfBounds(pendingMovement.x, pendingMovement.y) == false){
-        this.x += pendingMovement.x
-        this.y += pendingMovement.y
-      } else {
-        if (this.outOfBounds(pendingMovement.x, 0) == false){
-          this.x += pendingMovement.x
-        }
-        if (this.outOfBounds(0, pendingMovement.y) == false){
-          this.y += pendingMovement.y
-        }
-      }
-    }  
-    /*
-    if (this.outOfBounds(pendingMovement.x, pendingMovement.y) == false){
-        if(Math.abs(pendingMovement.x)+Math.abs(pendingMovement.y) > 1){
-            this.x += pendingMovement.x
-            this.y += pendingMovement.y
-        }
+
+    this.lastValidLocation = point(this.x, this.y)
+    let speed = this.isDashing ? this.dashSpeed : this.speed
+    if (this.colliding) speed = this.speed *.5
+    if(this.queuedMovements.length > 0) this.facing = [...this.queuedMovements].pop()
+
+    this.queuedMovements.forEach(direction => {
+      if(direction == DOWN) this.y += speed
+      if(direction == UP) this.y -= speed
+      if(direction == LEFT) this.x -= speed
+      if(direction == RIGHT) this.x += speed
+    })
+
+    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+
+    this.dashCollision()
+
+    if (this.isDashing == false && boundaryCollisions.length > 0){
+      let collisionPoint = boundaryCollisions[0].collisionPoint
+      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y, 0, 0) 
+
+      this.x=this.lastValidLocation.x
+      this.y=this.lastValidLocation.y
+
+      let newX = (Math.cos(collisionAngleRadians+Math.PI) * (this.speed*.5) + this.x)
+      let newY = (Math.sin(collisionAngleRadians+Math.PI) * (this.speed*.5) + this.y)
+
+      this.colliding = true
+      this.x = newX
+      this.y = newY
+    } else {
+      this.colliding = false
     }
-    */
-        
+
+    if(this.isDashing) this.handleDash()
+    if(this.correctingPosition && this.outOfBounds(0,0) == false) this.correctingPosition = false
+
+    if(this.isFalling && this.outOfBounds(0,0) == false){
+      this.isFalling = false
+      this.sprite.yAdjust = 0
+      this.sprite.xAdjust = 0
+      this.sprite.sizescaleAdjust = 0
+    } 
+
+    if(this.isDashing == false && this.correctingPosition == false){
+      if(this.outOfBounds(0,0)) this.x = this.lastValidLocation.x
+      if(this.outOfBounds(0,0)) this.y = this.lastValidLocation.y
+    } 
+    
     // Check if in potion area
     let potions = activeRoom.tileArray.filter(tile => tile instanceof Potion);
     potions.forEach((potion) => {
@@ -93,46 +104,65 @@ class Movable{
         }
     })
 
+    let effectCollisions = this.boundary.boundaryCollisions(activeRoom.effectBounds(), 0, 0)
+    if(effectCollisions.length > 0) effectCollisions[0].triggerEvent(this)
 
     this.queuedMovements = []
   }
 
-  dash(afterDash = null){
-    if(Date.now() - this.dashedLast > 500){
+  dash(afterDashStart = null){
+    if(this.isFalling && Date.now() - this.fallTimer > 800) return
+    if(Date.now() - this.dashedLast > 100){
       this.dashedLast = Date.now();
-      this.dashEndLocation = [0,0];
       this.currentDashFrame = 0;
       this.isDashing = true;
-      switch(this.facing){
-          case RIGHT:
-              this.dashEndLocation = this.getClosestValidSpot(2.2*TS, 0);
-              break;
-          case LEFT:
-              this.dashEndLocation = this.getClosestValidSpot(-2.2*TS, 0);
-              break;
-          case UP:
-              this.dashEndLocation = this.getClosestValidSpot(0, -2.2*TS);
-              break;
-          case DOWN:
-              this.dashEndLocation = this.getClosestValidSpot(0, 2.2*TS);
-              break;
-      }
-      this.rise = this.y-this.dashEndLocation["y"];
-      this.run = this.x-this.dashEndLocation["x"];
+      this.dashDirection = this.facing
 
-      if(afterDash != null) afterDash()
+      if(afterDashStart != null) afterDashStart()
     } 
   }
 
-  updateDashStatus(){
+  handleDash(){
     if(this.currentDashFrame == this.maxDashFrames){
-      this.moveToClosestValidSpot();
-      this.isDashing = false;
+      this.handleDashEnd()
     }else{
-      this.x -= this.run/this.maxDashFrames
-      this.y -= this.rise/this.maxDashFrames;
       this.currentDashFrame++;
+      if(this.dashDirection == UP) this.y -= this.dashSpeed
+      if(this.dashDirection == DOWN) this.y += this.dashSpeed
+      if(this.dashDirection == LEFT) this.x -= this.dashSpeed
+      if(this.dashDirection == RIGHT) this.x += this.dashSpeed
+
+      this.dashCollision()
     }
+  }
+
+  dashCollision(){
+    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+
+    if (this.isDashing && (boundaryCollisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap(0,0))){
+      this.x = this.lastValidLocation.x
+      this.y = this.lastValidLocation.y
+
+      this.handleDashEnd()
+    }
+  }
+
+  handleDashEnd(){
+    this.isDashing = false;
+    if(this.outOfBounds(0,0) && this.canBeCorrected()) this.correctingPosition = true
+    if(this.outOfBounds(0,0) && this.canBeCorrected() == false){
+      this.isFalling = true
+      this.fallTimer = Date.now()
+    } 
+  }
+
+  canBeCorrected(){
+    let canBeCorrected = true
+    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), 0, 0)
+    collisions.forEach(bound => {
+      if(bound.containsPoint(point(this.x, this.y), 0,0) && bound.canBeFallenInto) canBeCorrected = false
+    })
+    return canBeCorrected
   }
 
   outOfMap(xAdjust, yAdjust){
@@ -141,30 +171,15 @@ class Movable{
     return false
   }
 
-  outOfBounds(xAdjust = 0, yAdjust = 0){
-    if (this.boundary.boundaryCollisions(activeRoom.boundaries(), xAdjust, yAdjust).length > 0) return true
+  outOfBounds(xAdjust, yAdjust){
+    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries(), xAdjust, yAdjust)
+
+    if (collisions.length > 0) return true
     return this.outOfMap(xAdjust, yAdjust)
   }
-  
-  getClosestValidSpot(xAdjust=0, yAdjust=0){
-    let adjustment = {x: xAdjust, y: yAdjust};
-    for( let i = 0; this.outOfBounds(adjustment.x, adjustment.y) && i < 1000; i+=5){
-        if(!this.outOfBounds(xAdjust-i, yAdjust)) adjustment.x+=-i
-        else if(!this.outOfBounds(xAdjust-i*.5, yAdjust-i*.5)){ adjustment.x +=-i*.5; adjustment.y+=-i*.5 }
-        else if(!this.outOfBounds(xAdjust, yAdjust+i)) adjustment.y+=i;
-        else if(!this.outOfBounds(xAdjust+i*.5, yAdjust-i*.5)){ adjustment.x+=i*.5; adjustment.y+=-i*.5 }
-        else if(!this.outOfBounds(xAdjust+i, yAdjust)) adjustment.x+=i;
-        else if(!this.outOfBounds(xAdjust+i*.5, yAdjust+i*.5)){ adjustment.x+=i*.5; adjustment.y+=i*.5 }
-        else if(!this.outOfBounds(xAdjust, yAdjust-i)) adjustment.y+=-i;
-        else if(!this.outOfBounds(xAdjust-i*.5, yAdjust+i*.5)){ adjustment.x+=-i*.5; adjustment.y+=i*.5 }
-    }
-    return {x: this.x+adjustment.x, y: this.y+adjustment.y};
-  }
 
-  moveToClosestValidSpot(){
-    let closestLocation = this.getClosestValidSpot();
-    this.x=closestLocation["x"];
-    this.y=closestLocation["y"];
+  isMoving(){
+    return this.queuedMovements.length > 0 || this.isDashing || this.correctingPosition || this.isFalling
   }
 }
 

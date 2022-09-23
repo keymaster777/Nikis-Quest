@@ -1,5 +1,5 @@
 import { TS } from '../constants'
-import {distance} from '../helpers'
+import {distance, point} from '../helpers'
 import BoundingRegion from './BoundingRegion'
 
 class BoundingRectangle extends BoundingRegion{
@@ -17,38 +17,29 @@ class BoundingRectangle extends BoundingRegion{
     this.targetPoint = {x: 0, y: 0}
   }
 
-  drawArea(fillColor, otherBoundaries = []){
+  drawArea(fillColor){
     this.updateBoundaryCoords()
     ctx.save
     ctx.strokeStyle = fillColor;
     ctx.fillStyle = fillColor;
-    ctx.fillRect(this.targetPoint.x, this.targetPoint.y, 5, 5)
     ctx.strokeRect(this.x, this.y, this.width, this.height)
     ctx.restore
   }
 
-  containsPoint(targetX, targetY){
-    let xOverlap = this.x < targetX && this.x+this.width > targetX
-    let yOverlap = this.y < targetY && this.y+this.height > targetY
-    return xOverlap && yOverlap
-  }
-
-  getClosestPointOnRect(targetX, targetY){
-    let closestPoint = {x: targetX, y: targetY}
-    if(this.x > targetX) closestPoint.x = this.x
-    if(this.x + this.width < targetX) closestPoint.x = this.x+this.width
-    if(this.y > targetY) closestPoint.y = this.y
-    if(this.y + this.height < targetY) closestPoint.y = this.y+this.height
-    this.targetPoint = closestPoint
+  closestPointTo(x,y){
+    let closestPoint = point(x,y) 
+    if(this.x > x) closestPoint.x = this.x
+    if(this.x + this.width < x) closestPoint.x = this.x+this.width
+    if(this.y > y) closestPoint.y = this.y
+    if(this.y + this.height < y) closestPoint.y = this.y+this.height
+    // this.targetPoint = closestPoint
     return closestPoint
   }
 
-  canMergeWith(targetBoundary) {
-    console.log("test")
-    console.log(this.x+this.width, this, targetBoundary)
-    if(this.x+this.width == targetBoundary.x && this.height == targetBoundary.height) return true
-    if(this.y+this.height == targetBoundary.height && this.width == targetBoundary.width) return true
-    return true
+  containsPoint(point, xAdjust, yAdjust){
+    let xOverlap = this.x + xAdjust <=  point.x && this.x + this.width+xAdjust >= point.x
+    let yOverlap = this.y + yAdjust <= point.y && this.y + this.height + yAdjust >= point.y 
+    return xOverlap && yOverlap
   }
 }
 

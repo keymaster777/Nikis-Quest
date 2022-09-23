@@ -13,7 +13,8 @@ class Killable{
 
   damagedAnimation(){
       if(this.currentDamageFrame == this.maxDamageFrames){
-          this.takingDamage = false;
+        if(this.sprite) this.sprite.xAdjust = 0
+        this.takingDamage = false;
       } else {
         if(this.isATile){
           this.currentDamageFrame % 2 == 0 ? this.x-=.1 : this.x+=.1;

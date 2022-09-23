@@ -2,6 +2,7 @@ import Structure from "./Structure";
 import TestTile from "../tiles/TestTile";
 import BoundingRectangle from "../boundingAreas/BoundingRectange";
 import Sprite from "../Sprite";
+import Torch from "../Torch";
 import { TS } from "../constants"
 
 class Wall extends Structure{
@@ -17,7 +18,7 @@ class Wall extends Structure{
       this.bottomWall = y == Math.max(...otherWallCoords.map(coord => coord.y))
       this.maxY = Math.max(...otherWallCoords.map(coord => coord.y))
       this.doorBelow = otherWallCoords.find(coord => coord.x == this.x && coord.y == this.y+1)?.hasDoor
-      this.torchSprite = undefined
+      this.torch = undefined
       this.buildTiles()
       this.boundaries = this.buildBoundaries()
 
@@ -48,23 +49,12 @@ class Wall extends Structure{
 
     addTorch() {
       let tile = this.selfArray[0]
-
-      let torchSprite = new Sprite({
-        x: this.x*TS,
-        y: this.y*TS-.3*TS,
-        depthBreakpoint: this.y*TS+.85*TS,
-        width: 64,
-        height: 16,
-        image: imgs.torch,
-        numberOfFrames: 4,
-        sizescale: .065,
-      });
-
       if(this.topWall) tile.img = imgs.wallMid // So torch doesnt render on a flag or slime wall img
-      if(this.leftWall) torchSprite.image = imgs.torchSideLeft
-      if(this.rightWall) torchSprite.image = imgs.torchSideRight
 
-      this.torchSprite = torchSprite
+      this.torch = new Torch(this.x, this.y)
+
+      if(this.leftWall) this.torch.sprite.image = imgs.torchSideLeft
+      if(this.rightWall) this.torch.sprite.image = imgs.torchSideRight
     }
 
     buildBoundaries() {
@@ -78,6 +68,7 @@ class Wall extends Structure{
           coordsAreVolatile: true,
           width: TS*.25,
           height: TS,
+          cancelsDash: true
         })
       )
 
@@ -87,6 +78,7 @@ class Wall extends Structure{
           coordsAreVolatile: true,
           width: TS*.25,
           height: TS,
+          cancelsDash: true
         })
       )
 
@@ -95,6 +87,7 @@ class Wall extends Structure{
           coords: (()=> ({x: this.x*TS, y: this.y*TS})),
           width: TS,
           height: TS,
+          cancelsDash: true
         })
       )
 
@@ -103,6 +96,7 @@ class Wall extends Structure{
           coords: (()=> ({x: this.x*TS, y: this.y*TS+.5*TS})),
           width: TS,
           height: TS*.5,
+          cancelsDash: true
         })
       )
 
@@ -146,7 +140,13 @@ class Wall extends Structure{
         if(this.bottomWall || this.topWall) wallTopper.img = imgs.wallArch
       }
 
-      if(this.doorBelow || this.topWall) wall.layer = 2
+      if(this.topWall) wall.layer = 2
+      if(this.doorBelow){
+        wall.layer = '*'
+        wall.depthBreakpoint = this.y*TS+TS
+      }
+
+
 
       if(this.hasDoor && (this.bottomWall || this.topWall)) {
         this.selfArray.push(wallTopper)

@@ -20,7 +20,9 @@ class Sprite{
     this.height = options.height || 0;
     this.image = options.image;
     this.sizescale = options.sizescale || 1;
+    this.sizescaleAdjust = 0
     this.xAdjust = 0
+    this.yAdjust = 0
   }
 
   update(){
@@ -38,15 +40,15 @@ class Sprite{
       this.y = coords.y
     }
 
-    const {image, frameIndex, width, height, numberOfFrames, xAdjust, sizescale, x, y} = this
+    const {image, frameIndex, width, height, numberOfFrames, xAdjust, sizescale, sizescaleAdjust, x, y} = this
 
     ctx.drawImage(
       image,                                   // Sprite Image
       frameIndex * width / numberOfFrames, 0,  // X and Y starting point for portion of sprite map to show
       width / numberOfFrames, height,          // Width and height of visible portion of sprite map
-      x + xAdjust, y,                          // Where to render sprite
-      TS*sizescale*width / numberOfFrames,     // Horizontal scaling of image
-      TS*sizescale*height                       // Vertical scaling of image
+      x + xAdjust, y+this.yAdjust,                          // Where to render sprite
+      TS*(sizescale+sizescaleAdjust)*width / numberOfFrames,     // Horizontal scaling of image
+      TS*(sizescale+sizescaleAdjust)*height                       // Vertical scaling of image
     );
   }
 

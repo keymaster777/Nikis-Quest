@@ -44,7 +44,7 @@ class Chort{
     })
 
     let fightable = new Fightable({
-        attackDamage: 8,
+        attackDamage: 10,
         timeBetweenHits: 400,
         // weapon: imgs.katana
     })
@@ -60,38 +60,6 @@ class Chort{
     Object.assign(this, killable, fightable, movable)
   }
   
-  move(){
-    if ( this.takingDamage || (player.isMoving && distance(this.x, this.y, player.x, player.y) < 2.5*TS)) {
-        let originalX = {...this}.x
-        let originalY = {...this}.y
-
-        this.isMoving = true
-
-        if (player.x < this.x-5) {
-            this.sprite.frameIndex = 0
-            this.sprite.image = imgs.chortIdleLeft;
-            this.x -= this.speed;
-        } else if (player.x > this.x+5) {
-            this.sprite.frameIndex = 3
-            this.sprite.image = imgs.chortIdleRight;
-            this.x += this.speed;
-        }
-        if(this.outOfBoundsNew()) this.x = originalX
-
-        if (player.y < this.y) {
-            this.y -= this.speed;
-        } else if (player.y > this.y) {
-            this.y += this.speed;
-        }
-        if(this.outOfBoundsNew()) this.y = originalY
-
-    } else {
-        this.isMoving = false
-    }
-    
-    if (this.canAttack(player)) this.attack(player)
-  }
-
   killChort(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
     player.enemiesFelled += 1

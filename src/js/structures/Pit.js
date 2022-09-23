@@ -18,6 +18,7 @@ class Pit extends Structure{
             coordsAreVolatile: true,
             width: TS,
             height: TS,
+            canBeFallenInto: true,
         }))
         this.selfArray.push(new PitTile(this.x, this.y));
         
@@ -30,6 +31,7 @@ class Pit extends Structure{
                     coordsAreVolatile: true,
                     width: TS,
                     height: TS,
+                    canBeFallenInto: true,
                 }))
                 this.selfArray.push(new PitTile(validSpot[0], validSpot[1]));
             }
