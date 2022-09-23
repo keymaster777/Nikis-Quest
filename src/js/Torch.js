@@ -43,6 +43,8 @@ class Torch{
   destroyTorch(){
     console.log("destroying torch")
     activeRoom.torches = activeRoom.torches.filter(torch => torch != this)
+    console.log(activeRoom.torches.length)
+    if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
   }
 
   draw(){

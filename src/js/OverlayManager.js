@@ -3,6 +3,7 @@ import ControlsInfoOverlay from "./overlayElements/ControlsInfoOverlay"
 import LevelCompleteOverlay from "./overlayElements/LevelCompleteOverlay"
 import LevelStartOverlay from "./overlayElements/LevelStartOverlay"
 import YouDiedOverlay from "./overlayElements/YouDiedOverlay"
+import DarkRoomOverlay from "./overlayElements/DarkRoomOverlay"
 
 class OverlayManager {
   constructor(){
@@ -10,7 +11,8 @@ class OverlayManager {
   }
 
   renderLayovers(){
-    this.activeOverlayElements.forEach(overlay => {
+    let elements = this.activeOverlayElements.sort((b,a) => a.renderPriority - b.renderPriority)
+    elements.forEach(overlay => {
       ctx.save()
       overlay.render()
       ctx.restore()
@@ -37,6 +39,11 @@ class OverlayManager {
   addYouDiedOverlay() {
     if(this.activeOverlayElements.find(overlay => overlay.name == "You Died Overlay")) return
     this.activeOverlayElements.push(new YouDiedOverlay())
+  }
+
+  addDarkRoomOverlay() {
+    if(this.activeOverlayElements.find(overlay => overlay.name == "Dark Room Overlay")) return
+    this.activeOverlayElements.push(new DarkRoomOverlay())
   }
 
 }

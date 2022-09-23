@@ -69,6 +69,7 @@ class Level{
     let roomEntranceCoords = activeRoom.entranceCoords()
 
     player.setLocation(roomEntranceCoords.x, roomEntranceCoords.y)
+    if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
   }
 
   updateMap(){

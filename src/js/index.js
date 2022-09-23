@@ -31,6 +31,8 @@ const startGame = () => {
   overlayManager.addPrimaryOverlay()
   overlayManager.addControlsInfoOverlay()
   overlayManager.addLevelStartOverlay()
+  if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
+
   main()
 }
 
