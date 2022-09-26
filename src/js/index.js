@@ -5,16 +5,23 @@ import { setUpImages } from './images';
 import Player from "./Player"
 import Room from "./Room"
 import OverlayManager from './OverlayManager';
+import BitPotion from '../fonts/BitPotion.ttf'
+import AntiquityPrint from '../fonts/antiquity-print.ttf'
 
 
-var canvas = document.createElement("canvas");
+let canvas = document.createElement("canvas");
+let bitPotionFont = new FontFace('bitPotionFont', `url(${BitPotion})`)
+let antiquityPrintFont = new FontFace('antiquityFont', `url(${AntiquityPrint})`)
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
 global.ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
+
 ( async () => {
+  document.fonts.add(bitPotionFont)
+  document.fonts.add(antiquityPrintFont)
   await setUpImages()
   startGame()
 })()
@@ -31,6 +38,7 @@ const startGame = () => {
   overlayManager.addPrimaryOverlay()
   overlayManager.addControlsInfoOverlay()
   overlayManager.addLevelStartOverlay()
+  // overlayManager.addExitInstructionsOverlay()
   if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
 
   main()

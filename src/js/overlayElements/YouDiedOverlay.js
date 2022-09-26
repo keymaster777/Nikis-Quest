@@ -32,10 +32,12 @@ class YouDiedOverlay extends OverlayElement{
     ctx.globalAlpha = 1.0 
 
     ctx.fillStyle = "#c03a47"
-    ctx.font = "70px Arial"
-    ctx.fillText("YOU AWOKE", this.width/2, 75)
+    // ctx.font = "70px Arial"
+    ctx.font = "39px antiquityFont"
+    ctx.fillText("You Woke Up", this.width/2, 75)
 
-    ctx.font = "20px Arial"
+    ctx.font = "36px bitPotionFont"
+
     ctx.fillStyle = "#ddd";
 
     ctx.fillText( "*in a cold sweat*", this.width/2, 110)

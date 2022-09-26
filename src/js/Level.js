@@ -34,7 +34,7 @@ class Level{
     level = new Level(level.levelNum + 1)
     level.buildOutRooms()
     player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
-    overlayManager.addLevelStartOverlay()
+    overlayManager.addExitInstructionsOverlay()
   }
 
   getRoom(x,y){
@@ -138,19 +138,6 @@ class Level{
     let monsterCount = 0
     this.rooms.forEach(room => monsterCount += room.monsters.length)
     return monsterCount == 0 
-  }
-
-  drawCompletionCriteria(x,y){
-    ctx.fillStyle = "#b8b5b9"
-    ctx.font = "16px Arial";
-
-    ctx.fillText("LEVEL COMPLETION: ", x, y);
-
-    ctx.drawImage(this.haveAllMonstersBeenKilled() ? imgs.checkboxCheck : imgs.checkbox, x, y+5, 40, 40);
-    ctx.fillText("Clear all rooms", x+35, y+31);
-
-    ctx.drawImage(this.isComplete() ? imgs.checkboxCheck : imgs.checkbox, x, y+35, 40, 40);
-    ctx.fillText("Return to start" , x+35, y+61);
   }
 
   isComplete(){

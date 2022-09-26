@@ -4,6 +4,7 @@ import LevelCompleteOverlay from "./overlayElements/LevelCompleteOverlay"
 import LevelStartOverlay from "./overlayElements/LevelStartOverlay"
 import YouDiedOverlay from "./overlayElements/YouDiedOverlay"
 import DarkRoomOverlay from "./overlayElements/DarkRoomOverlay"
+import ExitInstructionsOverlay from "./overlayElements/ExitInstructionsOverlay"
 
 class OverlayManager {
   constructor(){
@@ -34,6 +35,11 @@ class OverlayManager {
 
   addLevelStartOverlay() {
     this.activeOverlayElements.push(new LevelStartOverlay())
+  }
+
+  addExitInstructionsOverlay() {
+    if(activeRoom.x != 0 || activeRoom.y != 0) return
+    this.activeOverlayElements.push(new ExitInstructionsOverlay())
   }
 
   addYouDiedOverlay() {

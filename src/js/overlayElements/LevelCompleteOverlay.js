@@ -31,12 +31,10 @@ class LevelCompleteOverlay extends OverlayElement{
     ctx.globalAlpha = 1.0 
 
     ctx.fillStyle = "#ddd";
-    ctx.font = "40px Arial"
+    ctx.font = "26px antiquityFont"
     ctx.fillText("LEVEL COMPLETE", this.width/2, 50)
 
-
-    ctx.font = "20px Arial"
-
+    ctx.font = "36px bitPotionFont"
     ctx.fillText( "- Things are now harder", this.width/2, 95)
     ctx.fillText( "- Song references are now better", this.width/2, 120)
     ctx.fillText( "- Chorts are now faster", this.width/2, 145)

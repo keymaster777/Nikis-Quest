@@ -15,20 +15,20 @@ const config = {
           presets: ['@babel/preset-env']
         }
       },
-      /*
-      {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-        use: 'file-loader'
-      },
-      */
       {
         test: /\.(jpe?g|png|gif|svg)$/i, 
         loader: 'file-loader',
         options: {
           name: 'images/[name].[ext]'
         }
-      }
+      },
+      {
+        test:/\.(woff|woff2|ttf|eot)$/, 
+        loader: 'file-loader',
+        options: {
+          name: 'fonts/[name].[ext]'
+        }
+      },
     ]
   },
   devServer: {

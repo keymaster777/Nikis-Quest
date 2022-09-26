@@ -198,14 +198,14 @@ class Room{
     roomMessage(){
         // These are organized in priority, each condition overwrites the message
         let message = this.rareMessage() || ""
-        if (this.torches.length > 0) message = "**torch crackling**"
-        if (input.isDown('w') || input.isDown('d') || input.isDown('a') || input.isDown('s')) message = "**footsteps**"
-        if (this.monsters.find(monster => monster instanceof Chort)) message = "**Chorts snickering**"
-        if (this.monsters.find(monster => monster instanceof Goblin)) message = "**angry goblin noises**"
-        if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "**angrier goblin noises**"
-        if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "**wood splintering**" 
-        if (this.monsters.find(monster => monster instanceof Chort && monster.isAgitated())) message = "**CHORTS SHRIEKING**"
-        if (player.isFalling && Date.now() - player.fallTimer > 500) message = "**Niki screams as she tumbles into oblivion**"
+        if (this.torches.length > 0) message = "** torch crackling **"
+        if (input.isDown('w') || input.isDown('d') || input.isDown('a') || input.isDown('s')) message = "** footsteps **"
+        if (this.monsters.find(monster => monster instanceof Chort)) message = "** Chorts snickering **"
+        if (this.monsters.find(monster => monster instanceof Goblin)) message = "** angry goblin noises **"
+        if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "** angrier goblin noises **"
+        if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "** wood splintering **" 
+        if (this.monsters.find(monster => monster instanceof Chort && monster.isAgitated())) message = "** CHORTS SHRIEKING **"
+        if (player.isFalling && Date.now() - player.fallTimer > 500) message = "** Niki screams as she tumbles into oblivion **"
         return message
     }
 
@@ -321,8 +321,9 @@ class Room{
 
         ctx.fillStyle = "#b8b5b9"
         ctx.textAlign = "center"
-        ctx.font = "20px Arial";
-        ctx.fillText(this.roomMessage(), CANVAS_WIDTH/2, CANVAS_HEIGHT - 10);
+        // ctx.font = "20px Arial";
+        ctx.font = "36px bitPotionFont"
+        ctx.fillText(this.roomMessage(), CANVAS_WIDTH/2, CANVAS_HEIGHT - 15);
     }
 }
 
