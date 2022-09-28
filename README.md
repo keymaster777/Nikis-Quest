@@ -28,3 +28,7 @@ Check out the game <a href="https://keymaster777.github.io/Nikis-Quest" target="
 - Adds "Super Mobs", mobs can drink a potion after being hurt and if they do they become empowered, grow twice as large, and fly over pits.
 - Adds a boss bar overlay component, currently only used for super mobs but eventually will be used for real bosses
 - Various optimizations and clean up of code
+
+### [711ccd2 - 9/26/22](https://github.com/keymaster777/Nikis-Quest/commit/711ccd2b1a7042ba114c30ce6aa0a1b54696beea)
+- Adds two fonts to game and replaces Arial text
+- Adds game start overlay with the games title, overlay fades out.
