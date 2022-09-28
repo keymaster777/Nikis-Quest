@@ -1,12 +1,13 @@
 import {TS, UP, DOWN, LEFT, RIGHT, NAMES} from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
 import Sprite from "../Sprite";
-import Killable from "../traits/Killable";
-import Fightable from "../traits/Fightable";
-import Movable from "../traits/Movable";
+import Killable from "../entityTraits/Killable";
+import Fightable from "../entityTraits/Fightable";
+import Movable from "../entityTraits/Movable";
+import Potion from "./Potion";
 
 class Goblin{
-  constructor(tileSizeX, tileSizeY){
+  constructor(tileSizeX, tileSizeY, spawnEmpowered = false){
     this.x=(tileSizeX*TS)+.5*TS;
     this.y=(tileSizeY*TS)+.5*TS;
 
@@ -28,7 +29,7 @@ class Goblin{
       isMovingBoundary: true,
     })
 
-    this.hitBoxCoords = () => ({x: this.x, y: this.y-(.3*TS)})
+    this.hitBoxCoords = () => ({x: this.x, y: this.y-(.25*TS)})
     this.hitBox = new BoundingElliptic({
       coords: this.hitBoxCoords.bind(this),
       xSemiAxis: .3*TS,
@@ -45,6 +46,7 @@ class Goblin{
     let fightable = new Fightable({
       attackDamage: 6+level.levelNum,
       timeBetweenHits: 400,
+      targets: (() => [player, ...activeRoom.chests])
     })
 
     let movable = new Movable({
@@ -58,26 +60,29 @@ class Goblin{
 
     // compose killable, fightable, movable into Goblin
     Object.assign(this, killable, fightable, movable)
-    if(Math.random() < level.levelNum*.01) this.powerUp() 
+    if(spawnEmpowered || Math.random() < level.levelNum*.01) this.drinkPotion() 
+  }
+
+  drinkPotion(){
+    overlayManager.addBossBarOverlay()
+    this.powerUp()
+    this.hitPoints = this.maxHitPoints
+    this.potionsConsumed += 1
   }
 
   powerUp(){
-    overlayManager.addBossBarOverlay()
     if(this.potionsConsumed == 0){
       this.name = NAMES.sort(() => 0.5 - Math.random())[0]
-      this.hasWings = true
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*5
       this.speed += .5
       this.attackDamage += 4
+      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash == true))
     } else {
       this.speed += .25
       this.attackDamage += 2
       this.maxHitPoints = Math.round(this.maxHitPoints*1.25)
     }
-
-    this.hitPoints = this.maxHitPoints
-    this.potionsConsumed += 1
   }
 
   fullName(){
@@ -97,6 +102,9 @@ class Goblin{
   killGoblin(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
     player.enemiesFelled += 1
+    if(this.potionsConsumed > 0) {
+      activeRoom.potions.push(new Potion(this.x-.5*TS, this.y-.2*TS, false))
+    }
   }
 
   setupMovements(){
@@ -112,13 +120,13 @@ class Goblin{
   }
 
   draw(){
-      this.setupMovements()
-      this.setSpriteImage()
-      this.move();
+    this.setupMovements()
+    this.setSpriteImage()
+    this.move();
+    this.tryToAttackTargets()
 
-      if (this.canAttack(player)) this.attack(player)
-      this.sprite.draw()
-      if(this.takingDamage) this.damagedAnimation();
+    this.sprite.draw()
+    if(this.takingDamage) this.damagedAnimation();
   }
 }
 

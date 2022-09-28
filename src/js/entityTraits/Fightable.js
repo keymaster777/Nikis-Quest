@@ -1,12 +1,11 @@
-import { distance } from "../helpers";
 import {UP, DOWN, LEFT, RIGHT, TS} from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
-import Chest from "../tiles/Chest";
 
 class Fightable{
   constructor(options){
     // General attributes
     this.attackDamage = options.attackDamage || 5;
+    this.targets = options.targets || this.fightableTargets
 
     // Attributes for fightable without weapon
     this.timeBetweenHits = options.timeBetweenHits || 400 // milliseconds
@@ -33,6 +32,11 @@ class Fightable{
     this.attack = this.attack
     this.swingWeapon = this.swingWeapon
     this.attackSwingStartingPoint = this.attackSwingStartingPoint
+    this.tryToAttackTargets = this.tryToAttackTargets
+  }
+
+  fightableTargets(){
+    return activeRoom.hitBoxEntities()
   }
 
   canAttack(entity){
@@ -45,6 +49,12 @@ class Fightable{
   attack(entity){
     this.attackedLast = Date.now();
     entity.takeDamage(this.attackDamage);
+  }
+
+  tryToAttackTargets(){
+    this.targets().forEach(target => {
+      if(this.canAttack(target)) this.attack(target)
+    })
   }
 
   attackSwingStartingPoint(){
@@ -79,16 +89,9 @@ class Fightable{
         // hitBox.drawArea("green")
       })
 
-      activeRoom.monsters.forEach(monster => {
-        if(monster.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(monster)
-      })
-
-      activeRoom.torches.forEach(torch => {
-        if(torch.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(torch)
-      })
-
-      activeRoom.tileArray.filter(tile => tile.hitBox != undefined).forEach(tile => {
-        if(tile.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(tile)
+      this.targets().forEach(target => {
+        if(this == target) return // Dont try to attack self
+        if(target.hitBox.boundaryCollisions(this.weaponHitBoxArray).length > 0) this.attack(target)
       })
     }
 

@@ -1,9 +1,9 @@
-import {TS, UP, LEFT, DOWN, RIGHT} from "./constants"
-import Sprite from "./Sprite";
-import BoundingElliptic from "./boundingAreas/BoundingElliptic"
-import Killable from "./traits/Killable";
-import Fightable from "./traits/Fightable";
-import Movable from "./traits/Movable";
+import {TS, UP, LEFT, DOWN, RIGHT} from "../constants"
+import Sprite from "../Sprite";
+import BoundingElliptic from "../boundingAreas/BoundingElliptic"
+import Killable from "../entityTraits/Killable";
+import Fightable from "../entityTraits/Fightable";
+import Movable from "../entityTraits/Movable";
 
 class Player{
   constructor(){
@@ -47,7 +47,7 @@ class Player{
         attackDamage: 6,
         timeBetweenHits: 400,
         range: 30,
-        weapon: imgs.woodSword
+        weapon: imgs.woodSword,
     })
 
     let movable = new Movable({
@@ -73,6 +73,11 @@ class Player{
     this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
     this.boundary.multiplySize(multiplier)
     this.hitBox.multiplySize(multiplier)
+  }
+
+  drinkPotion(){
+    this.potionsConsumed += 1
+    this.hitPoints = Math.min(this.hitPoints + 20, this.maxHitPoints)
   }
 
   attemptToDash(){

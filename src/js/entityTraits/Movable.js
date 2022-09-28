@@ -13,6 +13,8 @@ class Movable{
     this.isFalling = false
     this.fallTimer = Date.now()
     this.speedDebuff = options.speedDebuff || (() => false)
+    this.collisionTargets = options.collisionTargets || (() => activeRoom.boundaries())
+    this.effectTargets = options.effectTargets || (() => activeRoom.effectEntities())
 
     // Dash attributes
     this.dashedLast = Date.now()
@@ -31,6 +33,7 @@ class Movable{
     this.isMoving = this.isMoving
     this.canBeCorrected = this.canBeCorrected
     this.handleDashEnd = this.handleDashEnd
+    this.effectCollisions = this.effectCollisions
   }
 
   move(){
@@ -59,10 +62,7 @@ class Movable{
       if(direction == RIGHT) this.x += speed
     })
 
-    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
-    if(this.hasWings == true) {
-      boundaryCollisions = boundaryCollisions.filter(bound => bound.cancelsDash == true)
-    }
+    let boundaryCollisions = this.boundary.boundaryCollisions(this.collisionTargets())
 
     this.dashCollision()
 
@@ -97,11 +97,16 @@ class Movable{
       if(this.outOfBounds()) this.x = this.lastValidLocation.x
       if(this.outOfBounds()) this.y = this.lastValidLocation.y
     } 
-   
-    let effectCollisions = this.boundary.boundaryCollisions(activeRoom.effectBounds())
-    if(effectCollisions.length > 0) effectCollisions[0].triggerEvent(this)
+    
+    this.effectCollisions()
 
     this.queuedMovements = []
+  }
+
+  effectCollisions(){
+    this.effectTargets().forEach(entity => {
+      if(this.boundary.collidesWith(entity.effectBox)) entity.effectBox.triggerEvent(this)
+    })
   }
 
   dash(afterDashStart = null){
@@ -131,7 +136,7 @@ class Movable{
   }
 
   dashCollision(){
-    let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
+    let boundaryCollisions = this.boundary.boundaryCollisions(this.collisionTargets())
 
     if (this.isDashing && (boundaryCollisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap())){
       this.x = this.lastValidLocation.x
@@ -153,7 +158,7 @@ class Movable{
 
   canBeCorrected(){
     let canBeCorrected = true
-    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
+    let collisions = this.boundary.boundaryCollisions(this.collisionTargets())
     collisions.forEach(bound => {
       if(bound.containsPoint(point(this.x, this.y)) && bound.canBeFallenInto) canBeCorrected = false
     })
@@ -167,10 +172,7 @@ class Movable{
   }
 
   outOfBounds(){
-    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
-    if(this.hasWings == true) {
-      collisions = collisions.filter(bound => bound.cancelsDash == true)
-    }
+    let collisions = this.boundary.boundaryCollisions(this.collisionTargets())
     if (collisions.length > 0) return true
     return this.outOfMap()
   }

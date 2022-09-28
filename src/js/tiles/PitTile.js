@@ -1,7 +1,7 @@
-import TestTile from "./TestTile";
+import Tile from "./Tile";
 import {TS} from "../constants"
 
-class PitTile extends TestTile{
+class PitTile extends Tile{
   constructor(x,y){
     super(imgs.edge, 0, x, y);
   }

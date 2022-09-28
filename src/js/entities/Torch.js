@@ -1,7 +1,7 @@
-import {TS} from "./constants"
-import BoundingElliptic from "./boundingAreas/BoundingElliptic";
-import Sprite from "./Sprite";
-import Killable from "./traits/Killable";
+import {TS} from "../constants"
+import BoundingElliptic from "../boundingAreas/BoundingElliptic";
+import Sprite from "../Sprite";
+import Killable from "../entityTraits/Killable";
 
 class Torch{
   constructor(tileSizeX, tileSizeY, options={}){

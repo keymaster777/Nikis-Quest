@@ -1,8 +1,7 @@
 import OverlayElement from "./OverlayElement"
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from "../constants"
-import Chest from "../tiles/Chest"
-import Goblin from "../monsters/Goblin"
-import Chort from "../monsters/Chort"
+import Goblin from "../entities/Goblin"
+import Chort from "../entities/Chort"
 
 
 class RoomMessageOverlay extends OverlayElement{
@@ -41,7 +40,7 @@ class RoomMessageOverlay extends OverlayElement{
     if (room.monsters.find(monster => monster instanceof Chort)) message = "** Chorts snickering **"
     if (room.monsters.find(monster => monster instanceof Goblin)) message = "** angry goblin noises **"
     if (room.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "** angrier goblin noises **"
-    if (room.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "** wood splintering **" 
+    if (room.chests.find(chest => chest.takingDamage)) message = "** wood splintering **" 
     if (room.monsters.find(monster => monster instanceof Chort && monster.isAgitated())) message = "** CHORTS SHRIEKING **"
     if (player.isFalling && Date.now() - player.fallTimer > 500) message = "** Niki screams as she tumbles into oblivion **"
     return message

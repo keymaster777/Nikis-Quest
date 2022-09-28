@@ -1,9 +1,9 @@
 import Structure from "./Structure";
-import TestTile from "../tiles/TestTile";
+import Tile from "../tiles/Tile";
 import FloorTile from "../tiles/FloorTile";
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
 import { TS } from "../constants"
-import Torch from "../Torch"
+import Torch from "../entities/Torch"
 
 class FloorColumn extends Structure{
   constructor(x, y){
@@ -26,9 +26,9 @@ class FloorColumn extends Structure{
     this.selfArray.push(new FloorTile(this.x, this.y-1));
     this.selfArray.push(new FloorTile(this.x, this.y));
 
-    this.selfArray.push(new TestTile(imgs.columnBase, '*', this.x, this.y, {depthBreakpoint: this.y*TS}))
-    this.selfArray.push(new TestTile(imgs.columnMid, '*', this.x, this.y-1,{depthBreakpoint: this.y*TS}))
-    this.selfArray.push(new TestTile(imgs.columnTop, '*', this.x, this.y-2,{depthBreakpoint: this.y*TS}))
+    this.selfArray.push(new Tile(imgs.columnBase, '*', this.x, this.y, {depthBreakpoint: this.y*TS}))
+    this.selfArray.push(new Tile(imgs.columnMid, '*', this.x, this.y-1,{depthBreakpoint: this.y*TS}))
+    this.selfArray.push(new Tile(imgs.columnTop, '*', this.x, this.y-2,{depthBreakpoint: this.y*TS}))
 
     this.occupyingSpaces = [[this.x,this.y],[this.x,this.y-1]];
   }

@@ -2,9 +2,9 @@ import {TS, UP, DOWN, LEFT, RIGHT, NAMES} from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
 import { distance } from "../helpers";
 import Sprite from "../Sprite";
-import Killable from "../traits/Killable";
-import Fightable from "../traits/Fightable";
-import Movable from "../traits/Movable";
+import Killable from "../entityTraits/Killable";
+import Fightable from "../entityTraits/Fightable";
+import Movable from "../entityTraits/Movable";
 
 class Chort{
   constructor(tileSizeX, tileSizeY){
@@ -30,7 +30,7 @@ class Chort{
       isMovingBoundary: true,
     })
 
-    this.hitBoxCoords = () => ({x: this.x, y: this.y-(.3*TS)})
+    this.hitBoxCoords = () => ({x: this.x, y: this.y-(.25*TS)})
     this.hitBox = new BoundingElliptic({
       coords: this.hitBoxCoords.bind(this),
       xSemiAxis: .25*TS,
@@ -47,7 +47,7 @@ class Chort{
     let fightable = new Fightable({
       attackDamage: 10,
       timeBetweenHits: 400,
-      // weapon: imgs.katana
+      targets: (() => [player, ...activeRoom.chests])
     })
 
     let movable = new Movable({
@@ -64,6 +64,17 @@ class Chort{
     Object.assign(this, killable, fightable, movable)
   }
 
+  fightableTargets(){
+    return [player]
+  }
+
+  drinkPotion(){
+    overlayManager.addBossBarOverlay()
+    this.powerUp()
+    this.hitPoints = this.maxHitPoints
+    this.potionsConsumed += 1
+  }
+
   multiplySize(multiplier){
     this.sprite.sizescale *= multiplier
     this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
@@ -72,18 +83,14 @@ class Chort{
   }
 
   powerUp(){
-    overlayManager.addBossBarOverlay()
     if(this.potionsConsumed == 0){
       this.name = NAMES.sort(() => 0.5 - Math.random())[0]
-      this.hasWings = true
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*4
+      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash == true))
     } else {
       this.maxHitPoints = Math.round(this.maxHitPoints*1.1)
     }
-
-    this.hitPoints = this.maxHitPoints
-    this.potionsConsumed += 1
   }
 
   fullName(){
@@ -96,6 +103,10 @@ class Chort{
   killChort(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
     player.enemiesFelled += 1
+
+    if(this.potionsConsumed > 0) {
+      activeRoom.potions.push(new Potion(this.x-.5*TS, this.y-.2*TS, false))
+    }
   }
 
   isAgitated(){
@@ -128,9 +139,9 @@ class Chort{
     this.setSpriteImage()
 
     if (this.queuedMovements.length == 0) this.sprite.update();
-    this.move();
 
-    if (this.canAttack(player)) this.attack(player)
+    this.move();
+    this.tryToAttackTargets();
     this.sprite.render();
 
     if(this.takingDamage) this.damagedAnimation();

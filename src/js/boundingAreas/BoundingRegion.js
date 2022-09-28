@@ -22,6 +22,10 @@ class BoundingRegion{
     this.y = updatedCoords.y
   }
 
+  collidesWith(boundary){
+    return this.boundaryCollisions([boundary]).length == 1
+  }
+
   boundaryCollisions(boundaries){
     this.updateBoundaryCoords()
     let collidingBoundaries = []

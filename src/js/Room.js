@@ -1,10 +1,10 @@
 import Wall from "./structures/Wall"
 import FloorColumn from "./structures/FloorColumn";
 import FloorTile from "./tiles/FloorTile";
-import Potion from "./Potion";
-import Chest from "./tiles/Chest"
-import Goblin from "./monsters/Goblin"
-import Chort from "./monsters/Chort"
+import Potion from "./entities/Potion";
+import Chest from "./entities/Chest"
+import Goblin from "./entities/Goblin"
+import Chort from "./entities/Chort"
 import Pit from "./structures/Pit";
 
 import {randomIntFromInterval} from "./helpers"
@@ -15,14 +15,19 @@ class Room{
         this.x = x;
         this.y = y;
         this.spawnLocation = {x: null, y: null};
-        this.monsters = [];
         this.width = randomIntFromInterval(5,10);
         this.height = randomIntFromInterval(3,6) + 2;
         this.tileArray = [];
+
+        // Room entities start 
+        this.monsters = [];
         this.doors = [];
         this.occupiedSpaces = [];
         this.torches = [];
         this.potions = [];
+        this.chests = [];
+        // Room entities end
+
         this.built = false
         this.lpad = (CANVAS_WIDTH-(this.width*TS))/2
         this.randomNum = Math.random()
@@ -71,7 +76,6 @@ class Room{
     /*            Build Methods            */
     /* =================================== */
     buildFloor(){
-
         for(var x=1; x<this.width-1; x++){
             for(var y=3; y<this.height-1; y++){
                 if(!this.isOccupiedTile(x,y)){
@@ -99,7 +103,6 @@ class Room{
 
     buildWalls(){
         let coordsForWalls = []
-
         let doorCoords = this.doors.map(door => ({x: door.x, y: door.y}))
 
         for(var w = 0; w < this.width; w++){
@@ -136,36 +139,20 @@ class Room{
         })
     }
 
-    spawnItems(){
-        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile && tile.x > 0 && tile.x < this.width-1);
-        for(var i = 0; i<floorArray.length;i++){
-            var random = randomIntFromInterval(1,1000);
-            switch(true){
-                case random < 10:
-                    let chest = new Chest(floorArray[i].x, floorArray[i].y)
-                    this.tileArray.push(chest);
-                    this.staticBoundaries.push(chest.boundary)
-                    this.occupiedSpaces.push([chest.x, chest.y])
-                break;
-                case random < 20:
-                    this.potions.push(new Potion(floorArray[i].x, floorArray[i].y));
-                    this.occupiedSpaces = this.occupiedSpaces.concat([floorArray[i].x, floorArray[i].y]);
-                break;
-            break;
-            }
-        }
-    }
+    populateFloor(){
+        let floorArray = this.tileArray.filter(tile => tile instanceof FloorTile);
+        floorArray.forEach(tile => {
+            let random = Math.random();
 
-    spawnMonsters(){
-        if (this.x == 0 && this.y == 0) return null;
-        let unoccupiedFloorArray = this.tileArray.filter(tile => tile instanceof FloorTile && !this.isOccupiedTile(tile.x, tile.y));
-        unoccupiedFloorArray.forEach(tile => {
-            if(tile.x > 0 && tile.x < this.width-1){
-                let random = Math.random();
-                if (random >= 0 && random < 0.15) this.monsters.push(new Goblin(tile.x, tile.y))
-                if (random >= 0.15 && random < .18) this.monsters.push(new Chort(tile.x, tile.y))
-            }
-            
+            // Below stops mobs and items from spawning in doors and along narrow side walls
+            if(tile.x == 0 || tile.x == this.width-1 || tile.y == 1 || tile.y == this.height) return
+            if(random >= .000 && random < .015) this.chests.push(new Chest(tile.x, tile.y))
+            if(random >= .015 && random < .04) this.potions.push(new Potion(tile.x, tile.y))
+
+            // Below stops mobs from spawining in initial room
+            if (this.x == 0 && this.y == 0) return
+            if (random >= 0.04 && random < 0.17) this.monsters.push(new Goblin(tile.x, tile.y))
+            if (random >= 0.17 && random < 0.19) this.monsters.push(new Chort(tile.x, tile.y))
         })
     }
 
@@ -210,28 +197,37 @@ class Room{
         this.buildDoors()
         this.buildWalls();
         this.buildFloor();
-        this.spawnItems();
-        this.spawnMonsters();
+        this.populateFloor();
         this.mergeQueuedBounds();
         this.built = true
     }
 
+    allEntities(){
+        return [
+            ...this.torches,
+            ...this.potions,
+            ...this.chests,
+            ...this.monsters,
+            ...this.doors,
+            player
+        ]
+    }
+
+    boundaryEntities(){
+        return this.allEntities().filter(entity => entity.boundary != undefined)
+    }
+
+    hitBoxEntities(){
+        return this.allEntities().filter(entity => entity.hitBox != undefined)
+    }
+
+    effectEntities(){
+        return this.allEntities().filter(entity => entity.effectBox != undefined)
+    }
+
     boundaries(){
-        let monsterBoundaries = this.monsters.map(monster => monster.boundary)
-        return [...monsterBoundaries, ...this.staticBoundaries, player.boundary]
-    }
-
-    hitBoxes(){
-        let monsterHitBoxes = this.monsters.map(monster => monster.hitBox)
-        let chests = this.tileArray.filter(tile => tile.hitBox != undefined).map(tile => tile.hitBox)
-        let torches = this.torches.map(torch => torch.hitBox)
-        return [ ...monsterHitBoxes, ...chests, ...torches, player.hitBox]
-    }
-
-    effectBounds(){
-        let doors = Object.values(this.doors).map(door => door.effectBox)
-        let potions = Object.values(this.potions).map(potion => potion.effectBox)
-        return [ ...doors, ...potions] 
+        let dynamicBoundaries = this.boundaryEntities().map(entity => entity.boundary)
+        return [ ...this.staticBoundaries, ...dynamicBoundaries]
     }
 
     drawRoom(){
@@ -247,7 +243,7 @@ class Room{
         layer1.forEach(ele => ele.draw())
         layer2.forEach(ele => ele.draw())
 
-        var objectsWithLayerVariety = [...layerVaries, ...this.potions, ...this.monsters, ...this.torches, player]
+        var objectsWithLayerVariety = [...layerVaries, ...this.chests, ...this.potions, ...this.monsters, ...this.torches, player]
 
         objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
             var elements = [a,b].map(ele => {
@@ -272,10 +268,10 @@ class Room{
         layer3.forEach(ele => ele.draw())
 
         // this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
-        // this.hitBoxes().forEach(hitBox => hitBox.drawArea("green"))
+        // this.hitBoxEntities().forEach(entity => entity.hitBox.drawArea("green"))
         
-        // Object.values(this.doors).forEach(door => door.effectBox.drawArea('yellow'))
-        // Object.values(this.potions).forEach(potion => potion.effectBox.drawArea('yellow'))
+        // this.doors.forEach(door => door.effectBox.drawArea('yellow'))
+        // this.potions.forEach(potion => potion.effectBox.drawArea('yellow'))
        
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }

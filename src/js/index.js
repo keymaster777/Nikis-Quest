@@ -2,7 +2,7 @@ import Level from './Level'
 import {CANVAS_HEIGHT, CANVAS_WIDTH} from "./constants"
 import { handleInput } from "./helpers";
 import { setUpImages } from './images';
-import Player from "./Player"
+import Player from "./entities/Player"
 import Room from "./Room"
 import OverlayManager from './OverlayManager';
 import BitPotion from '../fonts/BitPotion.ttf'
@@ -19,8 +19,8 @@ ctx.imageSmoothingEnabled = false;
 
 
 ( async () => {
-  document.fonts.add(bitPotionFont)
-  document.fonts.add(antiquityPrintFont)
+  await document.fonts.add(bitPotionFont)
+  await document.fonts.add(antiquityPrintFont)
   await setUpImages()
   startGame()
 })()

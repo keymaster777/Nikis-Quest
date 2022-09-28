@@ -1,8 +1,7 @@
 import Structure from "./Structure";
-import TestTile from "../tiles/TestTile";
+import Tile from "../tiles/Tile";
 import BoundingRectangle from "../boundingAreas/BoundingRectange";
-import Sprite from "../Sprite";
-import Torch from "../Torch";
+import Torch from "../entities/Torch";
 import { TS } from "../constants"
 
 class Wall extends Structure{
@@ -104,9 +103,9 @@ class Wall extends Structure{
     }
 
     buildTiles() {
-      let wall = new TestTile(imgs.wallMid, 3, this.x, this.y /*{boundaries: this.buildBoundaries()}*/)
+      let wall = new Tile(imgs.wallMid, 3, this.x, this.y )
 
-      let wallTopper = new TestTile(imgs.wallMidTop, 3, this.x, this.y-1)
+      let wallTopper = new Tile(imgs.wallMidTop, 3, this.x, this.y-1)
 
       if(this.bottomWall) wall.img = this.randomBottomWallImg()
 
