@@ -15,7 +15,7 @@ Check out the game <a href="https://keymaster777.github.io/Nikis-Quest" target="
 - Keyboard buttons in UI are from [this pack](https://beamedeighth.itch.io/simplekeys-animated-pixel-keyboard-keys)
 
 ## Patch Notes
-[d26949a - 9/28/22](https://github.com/keymaster777/Nikis-Quest/commit/d26949a417c836442dd3a4c25ca87e01e9473265)
+### [d26949a - 9/28/22](https://github.com/keymaster777/Nikis-Quest/commit/d26949a417c836442dd3a4c25ca87e01e9473265)
 - Empowered mobs will drop a potion on death
 - Mobs will break chests if they are in the way of the player
 - Chest has a rare chance to spawn an empowered goblin
@@ -23,3 +23,8 @@ Check out the game <a href="https://keymaster777.github.io/Nikis-Quest" target="
 - Slightly reduced mob spawn rate per room
 - Slightly increased potion spawn rate
 - Optimizes and cleans up various sections of code
+
+### [4ea4e58 - 9/27/22](https://github.com/keymaster777/Nikis-Quest/commit/4ea4e58ff9e5c40bc87f05dd562df9d9107fb462#diff-e8fc127025153b9e1444ea5a8d51a47ab7ccc59e9863760916d88c4110288b5d)
+- Adds "Super Mobs", mobs can drink a potion after being hurt and if they do they become empowered, grow twice as large, and fly over pits.
+- Adds a boss bar overlay component, currently only used for super mobs but eventually will be used for real bosses
+- Various optimizations and clean up of code
