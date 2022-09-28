@@ -9,5 +9,8 @@ const DOWNLEFT = "downleft";
 const DOWNRIGHT = "downright";
 const CANVAS_WIDTH = TS*18
 const CANVAS_HEIGHT = TS*10
+const NAMES = [
+    "Levi", "Alyssa", "Riley", "Rowan", "Ember", "Finn", "Ben", "Vivian", "Mark", "Bryan", "Sereena"
+]
 
-export {TS, UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, CANVAS_HEIGHT, CANVAS_WIDTH}
+export {TS, UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, CANVAS_HEIGHT, CANVAS_WIDTH, NAMES}

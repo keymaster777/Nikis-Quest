@@ -10,8 +10,8 @@ class Torch{
     this.depthBreakpoint = this.y + .85*TS + (options.depthAdjust || 0)
 
     let torchSprite = new Sprite({
-      x: this.x,
-      y: this.y-.4*TS,
+      x: this.x+.5*TS,
+      y: this.y+(.7*TS),
       width: 64,
       height: 16,
       image: imgs.torch,
@@ -24,16 +24,16 @@ class Torch{
     this.hitBoxCoords = () => ({x: this.x+(.5*TS), y: this.y+(.4*TS)})
 
     this.hitBox = new BoundingElliptic({
-        coords: this.hitBoxCoords.bind(this),
-        xSemiAxis: .2*TS,
-        ySemiAxis: .1*TS,
-        isMovingBoundary: true,
+      coords: this.hitBoxCoords.bind(this),
+      xSemiAxis: .2*TS,
+      ySemiAxis: .1*TS,
+      isMovingBoundary: true,
     })
 
     let killable = new Killable({
-        maxHitPoints: 10,
-        maxDamageFrames: 10,
-        onDeath: this.destroyTorch 
+      maxHitPoints: 10,
+      maxDamageFrames: 10,
+      onDeath: this.destroyTorch 
     })
 
     // compose killable into torch
@@ -41,9 +41,7 @@ class Torch{
   }
   
   destroyTorch(){
-    console.log("destroying torch")
     activeRoom.torches = activeRoom.torches.filter(torch => torch != this)
-    console.log(activeRoom.torches.length)
     if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
   }
 

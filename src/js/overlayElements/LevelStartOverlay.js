@@ -18,6 +18,7 @@ class LevelStartOverlay extends OverlayElement{
 
   elementTeardown(){
     overlayManager.addExitInstructionsOverlay()
+    overlayManager.addRoomMessageOverlay()
     super.elementTeardown()
   }
 
@@ -31,6 +32,7 @@ class LevelStartOverlay extends OverlayElement{
 
     ctx.translate(this.x, this.y)
 
+    ctx.textAlign = "center"
     ctx.fillStyle = "#111";
     ctx.globalAlpha = transparency * .75
     ctx.fillRect(0, 0, this.width, this.height); 

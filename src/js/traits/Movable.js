@@ -1,6 +1,5 @@
 import {TS, UP, DOWN, LEFT, RIGHT} from '../constants'
-import Potion from '../tiles/Potion'
-import { distance, point } from '../helpers'
+import { point } from '../helpers'
 
 class Movable{
   constructor(options){
@@ -13,6 +12,7 @@ class Movable{
     this.correctingPosition = false
     this.isFalling = false
     this.fallTimer = Date.now()
+    this.speedDebuff = options.speedDebuff || (() => false)
 
     // Dash attributes
     this.dashedLast = Date.now()
@@ -48,6 +48,7 @@ class Movable{
 
     this.lastValidLocation = point(this.x, this.y)
     let speed = this.isDashing ? this.dashSpeed : this.speed
+    if (this.speedDebuff()) speed = this.speed * .8
     if (this.colliding) speed = this.speed *.5
     if(this.queuedMovements.length > 0) this.facing = [...this.queuedMovements].pop()
 
@@ -59,6 +60,9 @@ class Movable{
     })
 
     let boundaryCollisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
+    if(this.hasWings == true) {
+      boundaryCollisions = boundaryCollisions.filter(bound => bound.cancelsDash == true)
+    }
 
     this.dashCollision()
 
@@ -93,17 +97,7 @@ class Movable{
       if(this.outOfBounds()) this.x = this.lastValidLocation.x
       if(this.outOfBounds()) this.y = this.lastValidLocation.y
     } 
-    
-    // Check if in potion area
-    let potions = activeRoom.tileArray.filter(tile => tile instanceof Potion);
-    potions.forEach((potion) => {
-        if(potion.inArea(this.x, this.y) && this.hitPoints < this.maxHitPoints){
-            activeRoom.tileArray = activeRoom.tileArray.filter(tile => tile != potion );
-            this.potionsConsumed += 1
-            this.hitPoints = Math.min(this.hitPoints + 20, this.maxHitPoints) 
-        }
-    })
-
+   
     let effectCollisions = this.boundary.boundaryCollisions(activeRoom.effectBounds())
     if(effectCollisions.length > 0) effectCollisions[0].triggerEvent(this)
 
@@ -174,6 +168,9 @@ class Movable{
 
   outOfBounds(){
     let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
+    if(this.hasWings == true) {
+      collisions = collisions.filter(bound => bound.cancelsDash == true)
+    }
     if (collisions.length > 0) return true
     return this.outOfMap()
   }

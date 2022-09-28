@@ -31,6 +31,8 @@ class YouDiedOverlay extends OverlayElement{
     ctx.fillRect(0, 0, this.width, this.height); 
     ctx.globalAlpha = 1.0 
 
+    ctx.textAlign = "center"
+
     ctx.fillStyle = "#c03a47"
     // ctx.font = "70px Arial"
     ctx.font = "39px antiquityFont"

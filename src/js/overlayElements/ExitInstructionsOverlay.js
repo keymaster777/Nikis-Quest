@@ -15,6 +15,7 @@ class ExitInstructionsOverlay extends OverlayElement{
   render(){
     ctx.translate(this.x, this.y)
 
+    ctx.textAlign = "center"
     ctx.fillStyle = "#111";
     ctx.globalAlpha = 0.75
     ctx.fillRect(0, 0, this.width, this.height); 

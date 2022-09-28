@@ -10,7 +10,8 @@ class Player{
     this.x=50;
     this.y=0;
 
-    this.spriteCoords = () => ({x: this.x-.65*TS, y: this.y-1*TS})
+    this.spriteCoords = () => ({x: this.x, y: this.y+(.3*TS)})
+
     this.sprite = new Sprite({
       coords: this.spriteCoords.bind(this),
       width: 256,
@@ -31,8 +32,8 @@ class Player{
     this.hitBoxCoords = () => ({x: this.x, y: this.y-(.2*TS)})
     this.hitBox = new BoundingElliptic({
         coords: this.hitBoxCoords.bind(this),
-        xSemiAxis: .3*TS,
-        ySemiAxis: .15*TS,
+        xSemiAxis: .4*TS,
+        ySemiAxis: .2*TS,
         isMovingBoundary: true,
     })
 
@@ -51,7 +52,8 @@ class Player{
 
     let movable = new Movable({
         speed: 2.5,
-        dashSpeed: 7.5
+        dashSpeed: 7.5,
+        speedDebuff: (() => activeRoom.torches.length == 0)
     })
 
     this.idleImg = imgs.idleDown
@@ -66,18 +68,21 @@ class Player{
     Object.assign(this, killable, fightable, movable)
   }
 
+  multiplySize(multiplier){
+    this.sprite.sizescale *= multiplier
+    this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
+    this.boundary.multiplySize(multiplier)
+    this.hitBox.multiplySize(multiplier)
+  }
+
   attemptToDash(){
     let dashCost = 30;
     if(this.stamina >= dashCost) this.dash(() => {this.stamina -= dashCost})
   }
 
-  canLeave(){
-      return (Date.now() - activeRoom.roomTime > 1000);
-  }
-
-  setLocation(x,y){
-      this.x=x;
-      this.y=y;
+  setLocation(coord){
+    this.x=coord.x;
+    this.y=coord.y;
   }
 
   setupMovements(){

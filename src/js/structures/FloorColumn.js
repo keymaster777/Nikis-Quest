@@ -2,7 +2,6 @@ import Structure from "./Structure";
 import TestTile from "../tiles/TestTile";
 import FloorTile from "../tiles/FloorTile";
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
-import Sprite from "../Sprite";
 import { TS } from "../constants"
 import Torch from "../Torch"
 

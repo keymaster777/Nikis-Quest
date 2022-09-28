@@ -8,7 +8,6 @@ import OverlayManager from './OverlayManager';
 import BitPotion from '../fonts/BitPotion.ttf'
 import AntiquityPrint from '../fonts/antiquity-print.ttf'
 
-
 let canvas = document.createElement("canvas");
 let bitPotionFont = new FontFace('bitPotionFont', `url(${BitPotion})`)
 let antiquityPrintFont = new FontFace('antiquityFont', `url(${AntiquityPrint})`)
@@ -31,14 +30,14 @@ const startGame = () => {
   global.activeRoom = new Room(0,0)
   global.player = new Player()
   global.level = new Level(1)
-  level.buildOutRooms()
-  player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
-
   global.overlayManager = new OverlayManager()
+
+  level.buildOutRooms()
+  player.setLocation(activeRoom.spawnLocation)
+
   overlayManager.addPrimaryOverlay()
   overlayManager.addControlsInfoOverlay()
   overlayManager.addLevelStartOverlay()
-  // overlayManager.addExitInstructionsOverlay()
   if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
 
   main()
@@ -103,7 +102,7 @@ function main() {
     handleInput();
 
     activeRoom.drawRoom() 
-    overlayManager.renderLayovers()
+    overlayManager.renderOverlays()
     if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
 
     requestAnimationFrame(main);

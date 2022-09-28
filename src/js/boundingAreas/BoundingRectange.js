@@ -13,6 +13,11 @@ class BoundingRectangle extends BoundingRegion{
     this.staticBoundary = options.staticBoundary || true
   }
 
+  multiplySize(multiplier){
+    this.width = this.width * multiplier
+    this.height = this.height * multiplier
+  }
+
   drawArea(fillColor){
     this.updateBoundaryCoords()
     ctx.strokeStyle = fillColor;

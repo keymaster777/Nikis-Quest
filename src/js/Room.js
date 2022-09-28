@@ -1,15 +1,14 @@
 import Wall from "./structures/Wall"
 import FloorColumn from "./structures/FloorColumn";
-import DoorTile from "./tiles/DoorTile";
 import FloorTile from "./tiles/FloorTile";
-import Potion from "./tiles/Potion";
+import Potion from "./Potion";
 import Chest from "./tiles/Chest"
 import Goblin from "./monsters/Goblin"
 import Chort from "./monsters/Chort"
 import Pit from "./structures/Pit";
 
 import {randomIntFromInterval} from "./helpers"
-import {TS, UP, LEFT, RIGHT, DOWN, DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT, CANVAS_WIDTH, CANVAS_HEIGHT} from "./constants"
+import {TS, CANVAS_WIDTH} from "./constants"
 
 class Room{
     constructor( x, y){
@@ -20,10 +19,10 @@ class Room{
         this.width = randomIntFromInterval(5,10);
         this.height = randomIntFromInterval(3,6) + 2;
         this.tileArray = [];
-        this.doorTiles = [];
-        this.doors = {};
+        this.doors = [];
         this.occupiedSpaces = [];
         this.torches = [];
+        this.potions = [];
         this.built = false
         this.lpad = (CANVAS_WIDTH-(this.width*TS))/2
         this.randomNum = Math.random()
@@ -40,24 +39,12 @@ class Room{
         return this.occupiedSpaces.find(space => space[0] == x && space[1] == y) != undefined
     }
 
-    hasDoor(direction){
-        return this.doors[direction] != undefined
-    }
-
-    entranceCoords(){
-      let entryDoor = this.doors[this.enteredFrom]
-      return {x: entryDoor.x*TS+.5*TS, y: entryDoor.y*TS+.5*TS}
-    }
-
     distanceFromCenter(){
-        return (Math.sqrt( this.x**2 + this.y**2 ));
+      return (Math.sqrt( this.x**2 + this.y**2 ));
     }
 
     adjacentAccessToRoom(room){
-        if(this.x-1 == room.x && this.y == room.y && this.hasDoor(LEFT)) return true
-        if(this.x+1 == room.x && this.y == room.y && this.hasDoor(RIGHT)) return true
-        if(this.x == room.x && this.y-1 == room.y && this.hasDoor(UP)) return true
-        if(this.x == room.x && this.y+1 == room.y && this.hasDoor(DOWN)) return true
+      return this.doors.find(door => door.adjacentRoom == room) != undefined
     }
 
     randomFloorConstruct(x,y){
@@ -112,7 +99,8 @@ class Room{
 
     buildWalls(){
         let coordsForWalls = []
-        let doorCoords = this.doorTiles.map(tile => ({x: tile.x, y: tile.y}))
+
+        let doorCoords = this.doors.map(door => ({x: door.x, y: door.y}))
 
         for(var w = 0; w < this.width; w++){
             let topDoorPresent = doorCoords.find(coord => coord.x == w && coord.y == 1) != undefined
@@ -142,12 +130,10 @@ class Room{
     }
 
     buildDoors(){
-        [UP, DOWN, LEFT, RIGHT].forEach(direction => {
-            this.tileArray = this.tileArray.concat(this.doors[direction]?.selfArray || []);
-            this.occupiedSpaces = this.occupiedSpaces.concat(this.doors[direction]?.floorSpaces || []);
+        this.doors.forEach(door => {
+            this.tileArray = this.tileArray.concat(door.selfArray);
+            this.occupiedSpaces = this.occupiedSpaces.concat(door.occupyingSpaces);
         })
-
-        this.doorTiles = this.tileArray.filter(tile => tile instanceof DoorTile);
     }
 
     spawnItems(){
@@ -162,7 +148,7 @@ class Room{
                     this.occupiedSpaces.push([chest.x, chest.y])
                 break;
                 case random < 20:
-                    this.tileArray.push(new Potion(floorArray[i].x, floorArray[i].y));
+                    this.potions.push(new Potion(floorArray[i].x, floorArray[i].y));
                     this.occupiedSpaces = this.occupiedSpaces.concat([floorArray[i].x, floorArray[i].y]);
                 break;
             break;
@@ -174,39 +160,13 @@ class Room{
         if (this.x == 0 && this.y == 0) return null;
         let unoccupiedFloorArray = this.tileArray.filter(tile => tile instanceof FloorTile && !this.isOccupiedTile(tile.x, tile.y));
         unoccupiedFloorArray.forEach(tile => {
-            let random = Math.random();
-            let monster = false
-            if (random >= 0 && random < 0.15) monster = new Goblin(tile.x, tile.y)
-            if (random >= 0.15 && random < .18) monster = new Chort(tile.x, tile.y)
-
-            if (monster){
-                this.monsters.push(monster)
+            if(tile.x > 0 && tile.x < this.width-1){
+                let random = Math.random();
+                if (random >= 0 && random < 0.15) this.monsters.push(new Goblin(tile.x, tile.y))
+                if (random >= 0.15 && random < .18) this.monsters.push(new Chort(tile.x, tile.y))
             }
+            
         })
-    }
-
-    rareMessage() {
-       if (this.randomNum >= 0 && this.randomNum < 0.01) return "**distant baby crying**"
-       if (this.randomNum >= 0.01  && this.randomNum < 0.02) return "**tornado siren wailing**"
-       if (this.randomNum >= 0.02  && this.randomNum < 0.03) return "**low whispers that sound like gen Z slang**"
-       if (this.randomNum >= 0.03  && this.randomNum < 0.04) return "**crickets**"
-       if (this.randomNum >= 0.04  && this.randomNum < 0.05) return "**sounds of being hopelessly lost**"
-       if (this.randomNum >= 0.05  && this.randomNum < 0.06) return "**the sound of silence**"
-       return null 
-    }
-
-    roomMessage(){
-        // These are organized in priority, each condition overwrites the message
-        let message = this.rareMessage() || ""
-        if (this.torches.length > 0) message = "** torch crackling **"
-        if (input.isDown('w') || input.isDown('d') || input.isDown('a') || input.isDown('s')) message = "** footsteps **"
-        if (this.monsters.find(monster => monster instanceof Chort)) message = "** Chorts snickering **"
-        if (this.monsters.find(monster => monster instanceof Goblin)) message = "** angry goblin noises **"
-        if (this.monsters.find(monster => monster instanceof Goblin && monster.takingDamage)) message = "** angrier goblin noises **"
-        if (this.tileArray.find(tile => (tile instanceof Chest) && tile.takingDamage)) message = "** wood splintering **" 
-        if (this.monsters.find(monster => monster instanceof Chort && monster.isAgitated())) message = "** CHORTS SHRIEKING **"
-        if (player.isFalling && Date.now() - player.fallTimer > 500) message = "** Niki screams as she tumbles into oblivion **"
-        return message
     }
 
     mergeQueuedBounds() {
@@ -270,10 +230,10 @@ class Room{
 
     effectBounds(){
         let doors = Object.values(this.doors).map(door => door.effectBox)
-        return [ ...doors] 
+        let potions = Object.values(this.potions).map(potion => potion.effectBox)
+        return [ ...doors, ...potions] 
     }
 
-    
     drawRoom(){
         ctx.translate(activeRoom.lpad, 0);
         var layerVaries = this.tileArray.filter(tile => tile.layer == '*');
@@ -287,7 +247,7 @@ class Room{
         layer1.forEach(ele => ele.draw())
         layer2.forEach(ele => ele.draw())
 
-        var objectsWithLayerVariety = [...layerVaries, ...this.monsters, ...this.torches, player]
+        var objectsWithLayerVariety = [...layerVaries, ...this.potions, ...this.monsters, ...this.torches, player]
 
         objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
             var elements = [a,b].map(ele => {
@@ -312,18 +272,12 @@ class Room{
         layer3.forEach(ele => ele.draw())
 
         // this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
-
         // this.hitBoxes().forEach(hitBox => hitBox.drawArea("green"))
         
         // Object.values(this.doors).forEach(door => door.effectBox.drawArea('yellow'))
-
+        // Object.values(this.potions).forEach(potion => potion.effectBox.drawArea('yellow'))
+       
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-        ctx.fillStyle = "#b8b5b9"
-        ctx.textAlign = "center"
-        // ctx.font = "20px Arial";
-        ctx.font = "36px bitPotionFont"
-        ctx.fillText(this.roomMessage(), CANVAS_WIDTH/2, CANVAS_HEIGHT - 15);
     }
 }
 

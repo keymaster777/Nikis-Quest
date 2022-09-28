@@ -1,7 +1,7 @@
-import Tile from "./Tile";
+import TestTile from "./TestTile";
 import {TS} from "../constants"
 
-class PitTile extends Tile{
+class PitTile extends TestTile{
   constructor(x,y){
     super(imgs.edge, 0, x, y);
   }
@@ -9,7 +9,7 @@ class PitTile extends Tile{
   draw(){
     let tileAbovePit = activeRoom.tileArray.find(tile => tile.x == this.x & tile.y == this.y-1)
     if (!(tileAbovePit instanceof PitTile)){
-      ctx.drawImage(this.tileimg, this.x*TS, this.y*TS, TS,TS);
+      ctx.drawImage(this.img, this.x*TS, this.y*TS, TS,TS);
     }
   }
 }

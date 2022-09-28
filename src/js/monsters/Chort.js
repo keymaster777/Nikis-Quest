@@ -1,4 +1,4 @@
-import {TS, UP, DOWN, LEFT, RIGHT} from "../constants"
+import {TS, UP, DOWN, LEFT, RIGHT, NAMES} from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic";
 import { distance } from "../helpers";
 import Sprite from "../Sprite";
@@ -11,7 +11,8 @@ class Chort{
     this.x=(tileSizeX*TS)+.5*TS;
     this.y=(tileSizeY*TS)+.5*TS;
 
-    this.spriteCoords = () => ({x: this.x-.35*TS, y: this.y-TS})
+
+    this.spriteCoords = () => ({x: this.x, y: this.y+(.2*TS)})
     this.sprite = new Sprite({
         coords: this.spriteCoords.bind(this),
         width: 64,
@@ -23,43 +24,75 @@ class Chort{
 
     this.boundaryCoords = () => ({x: this.x, y: this.y})
     this.boundary = new BoundingElliptic({
-        coords: this.boundaryCoords.bind(this),
-        xSemiAxis: .2*TS,
-        ySemiAxis: .1*TS,
-        isMovingBoundary: true,
+      coords: this.boundaryCoords.bind(this),
+      xSemiAxis: .2*TS,
+      ySemiAxis: .1*TS,
+      isMovingBoundary: true,
     })
 
     this.hitBoxCoords = () => ({x: this.x, y: this.y-(.3*TS)})
     this.hitBox = new BoundingElliptic({
-        coords: this.hitBoxCoords.bind(this),
-        xSemiAxis: .25*TS,
-        ySemiAxis: .125*TS,
-        isMovingBoundary: true,
+      coords: this.hitBoxCoords.bind(this),
+      xSemiAxis: .25*TS,
+      ySemiAxis: .125*TS,
+      isMovingBoundary: true,
     })
 
     let killable = new Killable({
-        maxHitPoints: 10,
-        maxDamageFrames: 18,
-        onDeath: this.killChort 
+      maxHitPoints: 10,
+      maxDamageFrames: 18,
+      onDeath: this.killChort 
     })
 
     let fightable = new Fightable({
-        attackDamage: 10,
-        timeBetweenHits: 400,
-        // weapon: imgs.katana
+      attackDamage: 10,
+      timeBetweenHits: 400,
+      // weapon: imgs.katana
     })
 
     let movable = new Movable({
-        speed: 4+level.levelNum,
-        dashSpeedMultiplier: 1.5
+      speed: 3.5+level.levelNum*0.3,
+      dashSpeedMultiplier: 1.5,
+      speedDebuff: (() => this.hitPoints != this.maxHitPoints)
     })
 
-    this.speed=4+level.levelNum;
+    this.potionsConsumed = 0
+    this.hasWings = false
+    this.name = "Kyle" // All average Chorts are named Kyle, this is common knowledge
 
     // compose killable and fightable into chort
     Object.assign(this, killable, fightable, movable)
   }
-  
+
+  multiplySize(multiplier){
+    this.sprite.sizescale *= multiplier
+    this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
+    this.boundary.multiplySize(multiplier)
+    this.hitBox.multiplySize(multiplier)
+  }
+
+  powerUp(){
+    overlayManager.addBossBarOverlay()
+    if(this.potionsConsumed == 0){
+      this.name = NAMES.sort(() => 0.5 - Math.random())[0]
+      this.hasWings = true
+      this.multiplySize(2)
+      this.maxHitPoints = this.maxHitPoints*4
+    } else {
+      this.maxHitPoints = Math.round(this.maxHitPoints*1.1)
+    }
+
+    this.hitPoints = this.maxHitPoints
+    this.potionsConsumed += 1
+  }
+
+  fullName(){
+    let title = ""
+    if(this.potionsConsumed == 1) title = "Super Chort"
+    if(this.potionsConsumed > 1) title = "Super Mega Chort"
+    return `${title} ${this.name}`
+  }
+
   killChort(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
     player.enemiesFelled += 1

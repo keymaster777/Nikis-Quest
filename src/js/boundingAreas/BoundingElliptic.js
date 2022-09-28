@@ -10,6 +10,11 @@ class BoundingElliptic extends BoundingRegion{
     this.ySemiAxis = options.ySemiAxis || TS
   }
 
+  multiplySize(multiplier){
+    this.xSemiAxis = this.xSemiAxis * multiplier
+    this.ySemiAxis = this.ySemiAxis * multiplier
+  }
+
   angleInRadiansToTargetPoint(x, y) {
     let dy = y - this.y;
     let dx = x - this.x;

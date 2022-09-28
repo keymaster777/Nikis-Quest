@@ -5,13 +5,15 @@ import LevelStartOverlay from "./overlayElements/LevelStartOverlay"
 import YouDiedOverlay from "./overlayElements/YouDiedOverlay"
 import DarkRoomOverlay from "./overlayElements/DarkRoomOverlay"
 import ExitInstructionsOverlay from "./overlayElements/ExitInstructionsOverlay"
+import RoomMessageOverlay from "./overlayElements/RoomMessageOverlay"
+import BossBarOverlay from "./overlayElements/BossBarOverlay"
 
 class OverlayManager {
   constructor(){
     this.activeOverlayElements = []
   }
 
-  renderLayovers(){
+  renderOverlays(){
     let elements = this.activeOverlayElements.sort((b,a) => a.renderPriority - b.renderPriority)
     elements.forEach(overlay => {
       ctx.save()
@@ -52,6 +54,14 @@ class OverlayManager {
     this.activeOverlayElements.push(new DarkRoomOverlay())
   }
 
+  addRoomMessageOverlay() {
+    this.activeOverlayElements.push(new RoomMessageOverlay())
+  }
+
+  addBossBarOverlay() {
+    if(this.activeOverlayElements.find(overlay => overlay.name == "Boss Bar Overlay")) return
+    this.activeOverlayElements.push(new BossBarOverlay())
+  }
 }
 
 export default OverlayManager

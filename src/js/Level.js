@@ -1,8 +1,5 @@
 import Room from "./Room"
 import Door from "./structures/Door"
-import { oppositeDirection } from "./helpers"
-import {UP, LEFT, DOWN, RIGHT} from './constants'
-import Sprite from "./Sprite"
 
 //Images
 
@@ -10,30 +7,15 @@ class Level{
   constructor(levelNum) {
     this.levelNum = levelNum
     this.rooms = [activeRoom]
-    this.completedAt = Date.now()
-    this.mapPlayerSprite = new Sprite({
-      width: 256,
-      height: 32,
-      image: imgs.runDown,
-      numberOfFrames: 8,
-      sizescale: .02,
-    })
-    this.mapMonsterSprite = new Sprite({
-        width: 64,
-        height: 21,
-        image: imgs.gnollShamanWalkRight,
-        numberOfFrames: 4,
-        sizescale: .025,
-    });
-
   }
 
-  static nextLevel(){
+  nextLevel(){
     activeRoom = new Room(0,0)
     activeRoom.visited = true
-    level = new Level(level.levelNum + 1)
+    this.rooms = [activeRoom]
+    this.levelNum += 1
     level.buildOutRooms()
-    player.setLocation(activeRoom.spawnLocation.x, activeRoom.spawnLocation.y)
+    player.setLocation(activeRoom.spawnLocation)
     overlayManager.addExitInstructionsOverlay()
   }
 
@@ -41,35 +23,19 @@ class Level{
     return this.rooms.find(room => room.x == x && room.y == y)
   }
 
-  nextRoom(leavingFrom){
+  nextRoom(doorLeftFrom){
     level.allMonstersKilled = level.haveAllMonstersBeenKilled()
-    let enteredFrom = oppositeDirection( leavingFrom )
-    let x = activeRoom.x
-    let y = activeRoom.y
 
-    switch(leavingFrom){
-      case UP:
-        activeRoom = this.getRoom(x, y-1)
-        break;
-      case DOWN:
-        activeRoom = this.getRoom(x, y+1)
-        break;
-      case LEFT:
-        activeRoom = this.getRoom(x-1, y)
-        break;
-      case RIGHT:
-        activeRoom = this.getRoom(x+1, y)
-        break;
-    }
+    activeRoom = doorLeftFrom.adjacentRoom
+    activeRoom.entryDoor = activeRoom.doors.find(door => door.adjacentRoom == doorLeftFrom.room)
 
     this.updateMap()
-    // Ensures entered from is correct in the event that the room has already been entered previously
-    activeRoom.enteredFrom = enteredFrom
-    activeRoom.randomNum = Math.random() // Reset rooms random factor, currently just for message events
-    let roomEntranceCoords = activeRoom.entranceCoords()
 
-    player.setLocation(roomEntranceCoords.x, roomEntranceCoords.y)
+    activeRoom.randomNum = Math.random() // Reset rooms random factor, currently just for message events
+
+    player.setLocation(activeRoom.entryDoor.entranceCoords)
     if(activeRoom.torches.length == 0) overlayManager.addDarkRoomOverlay()
+    if(activeRoom.monsters.find(monster => monster.potionsConsumed > 0)) overlayManager.addBossBarOverlay()
   }
 
   updateMap(){
@@ -84,26 +50,19 @@ class Level{
       this.updateMap()
       return null
     }
+
     roomsToBeProcessed.forEach(room => {
-      let disabledDoors = this.mandatoryDisabledDoorsInRoom(room.x, room.y)
-      let enabledDoors = this.mandatoryEnabledDoorsInRoom(room.x, room.y)
-      let cardinalDirections =  [UP, LEFT, DOWN, RIGHT]
+      let adjacentRoomCoords = [[room.x-1, room.y], [room.x+1, room.y], [room.x, room.y-1], [room.x, room.y+1]]
+      let applicableRoomCoords = adjacentRoomCoords.filter(coords => level.getRoom(...coords) == undefined)
       
-      cardinalDirections.forEach(doorDirection => {
-        let random = Math.random() * room.distanceFromCenter() ** 2;
-
-
-        if(!disabledDoors.includes(doorDirection) && !enabledDoors.includes(doorDirection) && random < .5){
-          enabledDoors.push(doorDirection) 
+      applicableRoomCoords.forEach(coords => {
+        if(Math.random() * room.distanceFromCenter() ** 2 < .5){
+          let newRoom = this.addRoomToList(...coords)
+          if(newRoom){
+            room.doors.push(new Door(room, newRoom))
+            newRoom.doors.push(new Door(newRoom, room))
+          }
         }
-      })
-
-      enabledDoors.forEach(doorDirection => {
-        room.doors[doorDirection] = new Door(room.width, room.height, doorDirection)
-        if(doorDirection == LEFT) this.addRoomToList(room.x-1, room.y)
-        if(doorDirection == RIGHT) this.addRoomToList(room.x+1, room.y)
-        if(doorDirection == UP) this.addRoomToList(room.x, room.y-1)
-        if(doorDirection == DOWN) this.addRoomToList(room.x, room.y+1)
       })
 
       room.buildRoom()
@@ -113,25 +72,13 @@ class Level{
   }
 
   addRoomToList(x, y) {
-    if(this.getRoom(x,y) == undefined) this.rooms.push(new Room(x, y))
-  }
-
-  mandatoryDisabledDoorsInRoom(roomX, roomY){
-    let result = []
-    if(this.getRoom(roomX-1, roomY)?.hasDoor(RIGHT) == false) result.push(LEFT)
-    if(this.getRoom(roomX+1, roomY)?.hasDoor(LEFT) == false) result.push(RIGHT)
-    if(this.getRoom(roomX, roomY-1)?.hasDoor(DOWN) == false) result.push(UP)
-    if(this.getRoom(roomX, roomY+1)?.hasDoor(UP) == false) result.push(DOWN)
-    return result
-  }
-
-  mandatoryEnabledDoorsInRoom(roomX, roomY){
-    let result = []
-    if(this.getRoom(roomX-1, roomY)?.hasDoor(RIGHT) == true) result.push(LEFT)
-    if(this.getRoom(roomX+1, roomY)?.hasDoor(LEFT) == true) result.push(RIGHT)
-    if(this.getRoom(roomX, roomY-1)?.hasDoor(DOWN) == true) result.push(UP)
-    if(this.getRoom(roomX, roomY+1)?.hasDoor(UP) == true) result.push(DOWN)
-    return result
+    if(this.getRoom(x,y) == undefined){
+      let room = new Room(x, y)
+      this.rooms.push(room)
+      return room
+    } else {
+      return false
+    }
   }
 
   haveAllMonstersBeenKilled(){
@@ -142,76 +89,6 @@ class Level{
 
   isComplete(){
     return (activeRoom.x == 0 && activeRoom.y == 0 && this.haveAllMonstersBeenKilled())
-  }
-
-  drawMap(x,y){
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(x, y, 180, 180);
-    this.mapMonsterSprite.update()
-
-    let mapFirstX = activeRoom.x-2
-    let mapFirstY = activeRoom.y-2
-
-    for(let xi = 0; xi < 5; xi++){
-      for(let yi = 0; yi < 5; yi++){
-        let room = this.rooms.find(room => room.x == mapFirstX + xi && room.y == mapFirstY + yi)
-        if(room && (room.visited || room.seen)){
-          ctx.fillStyle = "#785c53"
-          ctx.fillRect(xi*34+7+x, yi*34+7+y, 30, 30);
-
-          ctx.fillStyle = "#f7f2ed"
-          ctx.fillRect(xi*34+10+x, yi*34+10+y, 24, 24);
-
-          Object.keys(room.doors).forEach(direction => {
-            switch(direction){
-              case UP:
-                if(this.getRoom(room.x, room.y-1)?.visited){
-                  ctx.fillRect(xi*34+19+x, yi*34+3+y, 6, 7);
-                } else {
-                  ctx.fillRect(xi*34+19+x, yi*34+7+y, 6, 3);
-                }
-                break;
-              case DOWN:
-                if(this.getRoom(room.x, room.y+1)?.visited){
-                  ctx.fillRect(xi*34+19+x, yi*34+34+y, 6, 7);
-                } else {
-                  ctx.fillRect(xi*34+19+x, yi*34+34+y, 6, 3);
-                }
-                break;
-              case LEFT:
-                if(this.getRoom(room.x-1, room.y)?.visited){
-                  ctx.fillRect(xi*34+3+x, yi*34+19+y, 7, 6);
-                } else {
-                  ctx.fillRect(xi*34+7+x, yi*34+19+y, 3, 6);
-                }
-                break;
-              case RIGHT:
-                if(this.getRoom(room.x+1, room.y)?.visited){
-                  ctx.fillRect(xi*34+34+x, yi*34+19+y, 7, 6);
-                } else {
-                  ctx.fillRect(xi*34+34+x, yi*34+19+y, 3, 6);
-                }
-                break;
-            }        
-          })
-
-          if(room.x == 0 && room.y == 0) {
-            ctx.fillStyle = "#785c53"
-            ctx.fillRect(xi*34+19+x, yi*34+19+y, 6, 6);
-          }
-          if(room == activeRoom) {
-            this.mapPlayerSprite.x = xi*34+x+3
-            this.mapPlayerSprite.y = yi*34+y-2
-            this.mapPlayerSprite.draw()
-          }
-          if (room != activeRoom && room.monsters.length > 0) {
-            this.mapMonsterSprite.x = xi*34+x+7
-            this.mapMonsterSprite.y = yi*34+y+3
-            this.mapMonsterSprite.render()
-          }
-        }
-      }
-    }
   }
 }
 

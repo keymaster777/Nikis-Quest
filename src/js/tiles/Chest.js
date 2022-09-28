@@ -1,6 +1,6 @@
 import Tile from "./Tile";
 import { TS } from "../constants"
-import Potion from "./Potion";
+import Potion from "../Potion";
 import Goblin from "../monsters/Goblin";
 import Killable from "../traits/Killable";
 import BoundingRectangle from "../boundingAreas/BoundingRectange";
@@ -49,7 +49,7 @@ class Chest extends Tile{
     if(random > .7){
       console.log("Stamina Pot spawn")
     } else {
-      activeRoom.tileArray.push(new Potion(this.x, this.y, TS));
+      activeRoom.potions.push(new Potion(this.x, this.y));
     }
   }
 
