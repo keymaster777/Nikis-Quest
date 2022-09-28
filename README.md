@@ -32,3 +32,6 @@ Check out the game <a href="https://keymaster777.github.io/Nikis-Quest" target="
 ### [711ccd2 - 9/26/22](https://github.com/keymaster777/Nikis-Quest/commit/711ccd2b1a7042ba114c30ce6aa0a1b54696beea)
 - Adds two fonts to game and replaces Arial text
 - Adds game start overlay with the games title, overlay fades out.
+
+### [b84e3aa - 9/23/22](https://github.com/keymaster777/Nikis-Quest/commit/b84e3aa696b1d7a44df58dfd09e7c114a6f6cc56)
+- Adds darkness overlay, used when a room does not have any torches or the last torch was broken
