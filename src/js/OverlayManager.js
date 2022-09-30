@@ -31,7 +31,7 @@ class OverlayManager {
   }
 
   addLevelCompleteOverlay() {
-    if(this.activeOverlayElements.find(overlay => overlay.name == "Level Complete Overlay")) return
+    if(this.activeOverlayElements.find(overlay => overlay.name === "Level Complete Overlay")) return
     this.activeOverlayElements.push(new LevelCompleteOverlay())
   }
 
@@ -40,17 +40,17 @@ class OverlayManager {
   }
 
   addExitInstructionsOverlay() {
-    if(activeRoom.x != 0 || activeRoom.y != 0) return
+    if(activeRoom.x !== 0 || activeRoom.y !== 0) return
     this.activeOverlayElements.push(new ExitInstructionsOverlay())
   }
 
   addYouDiedOverlay() {
-    if(this.activeOverlayElements.find(overlay => overlay.name == "You Died Overlay")) return
+    if(this.activeOverlayElements.find(overlay => overlay.name === "You Died Overlay")) return
     this.activeOverlayElements.push(new YouDiedOverlay())
   }
 
   addDarkRoomOverlay() {
-    if(this.activeOverlayElements.find(overlay => overlay.name == "Dark Room Overlay")) return
+    if(this.activeOverlayElements.find(overlay => overlay.name === "Dark Room Overlay")) return
     this.activeOverlayElements.push(new DarkRoomOverlay())
   }
 
@@ -59,7 +59,7 @@ class OverlayManager {
   }
 
   addBossBarOverlay() {
-    if(this.activeOverlayElements.find(overlay => overlay.name == "Boss Bar Overlay")) return
+    if(this.activeOverlayElements.find(overlay => overlay.name === "Boss Bar Overlay")) return
     this.activeOverlayElements.push(new BossBarOverlay())
   }
 }

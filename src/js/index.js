@@ -1,26 +1,26 @@
-import Level from './Level'
-import {CANVAS_HEIGHT, CANVAS_WIDTH} from "./constants"
-import { handleInput } from "./helpers";
-import { setUpImages } from './images';
+import Level from "./Level"
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants"
+import { handleInput } from "./helpers"
+import { setUpImages } from "./images"
 import Player from "./entities/Player"
 import Room from "./Room"
-import OverlayManager from './OverlayManager';
-import BitPotion from '../fonts/BitPotion.ttf'
-import AntiquityPrint from '../fonts/antiquity-print.ttf'
+import OverlayManager from "./OverlayManager"
+import BitPotion from "../fonts/BitPotion.ttf"
+import AntiquityPrint from "../fonts/antiquity-print.ttf"
 
-let canvas = document.createElement("canvas");
-let bitPotionFont = new FontFace('bitPotionFont', `url(${BitPotion})`)
-let antiquityPrintFont = new FontFace('antiquityFont', `url(${AntiquityPrint})`)
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
+let canvas = document.createElement("canvas")
+let bitPotionFont = new FontFace("bitPotionFont", `url(${BitPotion})`)
+let antiquityPrintFont = new FontFace("antiquityFont", `url(${AntiquityPrint})`)
+canvas.width = CANVAS_WIDTH
+canvas.height = CANVAS_HEIGHT
 
-global.ctx = canvas.getContext("2d");
+global.ctx = canvas.getContext("2d")
 ctx.imageSmoothingEnabled = false;
 
 
 ( async () => {
-  await document.fonts.add(bitPotionFont)
-  await document.fonts.add(antiquityPrintFont)
+  document.fonts.add(bitPotionFont)
+  document.fonts.add(antiquityPrintFont)
   await setUpImages()
   startGame()
 })()
@@ -46,64 +46,64 @@ const startGame = () => {
 document.body.appendChild(canvas);
 
 (function() {
-    var pressedKeys = {};
-    function setKey(event, status) {
-        var code = event.keyCode;
-        var key;
+  var pressedKeys = {}
+  function setKey(event, status) {
+    var code = event.keyCode
+    var key
 
-        switch(code) {
-        case 32:
-            key = 'SPACE'; break;
-        case 37:
-            key = 'LEFT'; break;
-        case 38:
-            key = 'UP'; break;
-        case 39:
-            key = 'RIGHT'; break;
-        case 40:
-            key = 'DOWN'; break;
-            case 67:
-            key = 'C'; break;
-        default:
-            // Convert ASCII codes to letters
-            key = String.fromCharCode(code);
-        }
-
-        pressedKeys[key] = status;
+    switch(code) {
+    case 32:
+      key = "SPACE"; break
+    case 37:
+      key = "LEFT"; break
+    case 38:
+      key = "UP"; break
+    case 39:
+      key = "RIGHT"; break
+    case 40:
+      key = "DOWN"; break
+    case 67:
+      key = "C"; break
+    default:
+      // Convert ASCII codes to letters
+      key = String.fromCharCode(code)
     }
 
-    document.addEventListener('keydown', function(e) {
-        setKey(e, true);
-    });
+    pressedKeys[key] = status
+  }
 
-    document.addEventListener('keyup', function(e) {
-        setKey(e, false);
-    });
+  document.addEventListener("keydown", function(e) {
+    setKey(e, true)
+  })
 
-    window.addEventListener('blur', function() {
-        pressedKeys = {};
-    });
+  document.addEventListener("keyup", function(e) {
+    setKey(e, false)
+  })
 
-    window.input = {
-        isDown: function(key) {
-            return pressedKeys[key.toUpperCase()];
-        }
-    };
-})();
+  window.addEventListener("blur", function() {
+    pressedKeys = {}
+  })
+
+  window.input = {
+    isDown: function(key) {
+      return pressedKeys[key.toUpperCase()]
+    }
+  }
+})()
 
 
 function main() {
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#1a1a1a"
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    // Regen Components
-    if (player.stamina < 100) player.stamina += 0.35;
+  // Regen Components
+  if (player.stamina < 100) player.stamina += 0.35
 
-    handleInput();
+  handleInput()
 
-    activeRoom.drawRoom() 
-    overlayManager.renderOverlays()
-    if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
+  activeRoom.drawRoom()
+  overlayManager.renderOverlays()
+  if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
 
-    requestAnimationFrame(main);
-};
+  requestAnimationFrame(main)
+}

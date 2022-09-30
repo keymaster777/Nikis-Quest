@@ -1,6 +1,6 @@
-import { TS } from '../constants'
-import {distance, point} from '../helpers'
-import BoundingRegion from './BoundingRegion'
+import { TS } from "../constants"
+import { distance, point } from "../helpers"
+import BoundingRegion from "./BoundingRegion"
 
 class BoundingElliptic extends BoundingRegion{
   constructor(options) {
@@ -16,9 +16,9 @@ class BoundingElliptic extends BoundingRegion{
   }
 
   angleInRadiansToTargetPoint(x, y) {
-    let dy = y - this.y;
-    let dx = x - this.x;
-    let theta = Math.atan2(dy, dx); // range (-PI, PI]
+    let dy = y - this.y
+    let dx = x - this.x
+    let theta = Math.atan2(dy, dx) // range (-PI, PI]
     return theta
   }
 
@@ -32,13 +32,13 @@ class BoundingElliptic extends BoundingRegion{
     this.updateBoundaryCoords()
 
     ctx.save
-    ctx.strokeStyle = fillColor;
+    ctx.strokeStyle = fillColor
     ctx.beginPath()
     ctx.ellipse(this.x, this.y, this.xSemiAxis, this.ySemiAxis, 0, 0, 2*Math.PI)
     ctx.stroke()
 
-    ctx.fillStyle = fillColor;
-    ctx.fillRect(this.x-2,this.y-2,5,5); // Creates visual reference for boundaries center mark
+    ctx.fillStyle = fillColor
+    ctx.fillRect(this.x-2,this.y-2,5,5) // Creates visual reference for boundaries center mark
     ctx.restore
   }
 

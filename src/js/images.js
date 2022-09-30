@@ -1,16 +1,16 @@
 // UI Image Imports
-import HeartImage from '../img/UIelements/Sprite_heart.png'
-import LeftArrowImg from '../img/UIelements/ARROWLEFT.png'
-import RightArrowImg from '../img/UIelements/ARROWRIGHT.png'
-import UpArrowImg from '../img/UIelements/ARROWUP.png'
-import DownArrowImg from '../img/UIelements/ARROWDOWN.png'
-import LetterAImg from '../img/UIelements/A.png'
-import LetterWImg from '../img/UIelements/W.png'
-import LetterSImg from '../img/UIelements/S.png'
-import LetterDImg from '../img/UIelements/D.png'
-import SpaceBarImg from '../img/UIelements/SPACE.png'
-import CheckboxImg from '../img/UIelements/checkbox.png'
-import CheckboxCheckImg from '../img/UIelements/checkbox_check.png'
+import HeartImage from "../img/UIelements/Sprite_heart.png"
+import LeftArrowImg from "../img/UIelements/ARROWLEFT.png"
+import RightArrowImg from "../img/UIelements/ARROWRIGHT.png"
+import UpArrowImg from "../img/UIelements/ARROWUP.png"
+import DownArrowImg from "../img/UIelements/ARROWDOWN.png"
+import LetterAImg from "../img/UIelements/A.png"
+import LetterWImg from "../img/UIelements/W.png"
+import LetterSImg from "../img/UIelements/S.png"
+import LetterDImg from "../img/UIelements/D.png"
+import SpaceBarImg from "../img/UIelements/SPACE.png"
+import CheckboxImg from "../img/UIelements/checkbox.png"
+import CheckboxCheckImg from "../img/UIelements/checkbox_check.png"
 
 // Player Image Imports
 import RunRightSprite from "../img/player/run-right.png"
@@ -23,10 +23,10 @@ import IdleDownImg from "../img/player/idle-down.png"
 import IdleUpImg from "../img/player/idle-up.png"
 
 // Monster Image Imports
-import GnollShamanWalkLeftSprite from '../img/Mobs/GnollShaman_Walk_Left.png'
-import GnollShamanWalkRightSprite from '../img/Mobs/GnollShaman_Walk_Right.png'
-import ChortIdleLeft from '../img/Mobs/chort_idle_left.png'
-import ChortIdleRight from '../img/Mobs/chort_idle_right.png'
+import GnollShamanWalkLeftSprite from "../img/Mobs/GnollShaman_Walk_Left.png"
+import GnollShamanWalkRightSprite from "../img/Mobs/GnollShaman_Walk_Right.png"
+import ChortIdleLeft from "../img/Mobs/chort_idle_left.png"
+import ChortIdleRight from "../img/Mobs/chort_idle_right.png"
 
 // Weapon Image Imports
 import KatanaImg from "../img/sprites/weapon_katana.png"
@@ -35,7 +35,7 @@ import WoodSword from "../img/player/wood_sword.png"
 
 // Tile Image Imports
 import ChestImg from "../img/2D Pixel Dungeon Asset Pack/items and trap_animation/box_2/box_2_1.png"
-import PotionImg from '../img/2D Pixel Dungeon Asset Pack/items and trap_animation/flasks/flasks_1_1.png'
+import PotionImg from "../img/2D Pixel Dungeon Asset Pack/items and trap_animation/flasks/flasks_1_1.png"
 
 import Floor1Img from "../img/sprites/floor_1.png"
 import Floor2Img from "../img/sprites/floor_2.png"
@@ -51,28 +51,28 @@ import WallSideFrontRightImg from "../img/sprites/wall_side_front_right.png"
 import WallSideTopLeftImg from "../img/sprites/wall_side_top_left.png"
 import WallSideTopRightImg from "../img/sprites/wall_side_top_right.png"
 import WallSideMidRightImg from "../img/sprites/wall_side_mid_right.png"
-import WallMidImg from '../img/sprites/wall_mid.png'
-import WallMidTopImg from '../img/sprites/wall_top_mid.png'
-import WallSideMidLeftImg from '../img/sprites/wall_side_mid_left.png';       
-import WallTopLeftImg from "../img/sprites/wall_top_left.png" 
-import WallTopRightImg from "../img/sprites/wall_top_right.png" 
+import WallMidImg from "../img/sprites/wall_mid.png"
+import WallMidTopImg from "../img/sprites/wall_top_mid.png"
+import WallSideMidLeftImg from "../img/sprites/wall_side_mid_left.png"
+import WallTopLeftImg from "../img/sprites/wall_top_left.png"
+import WallTopRightImg from "../img/sprites/wall_top_right.png"
 import WallLeftImg from "../img/sprites/wall_left.png"
 import WallRightImg from "../img/sprites/wall_right.png"
-import WallInnerCornerTopLeftImg from '../img/sprites/wall_inner_corner_l_top_left.png'
-import WallInnerCornerTopRightImg from '../img/sprites/wall_inner_corner_l_top_rigth.png'
-import WallHole1Img from '../img/sprites/wall_hole_1.png'
-import WallBannerRedImg from '../img/sprites/wall_banner_red.png'
-import WallHole2Img from '../img/sprites/wall_hole_2.png'
-import WallBannerYellowImg from '../img/sprites/wall_banner_yellow.png'
-import WallGooImg from '../img/sprites/wall_goo.png'
+import WallInnerCornerTopLeftImg from "../img/sprites/wall_inner_corner_l_top_left.png"
+import WallInnerCornerTopRightImg from "../img/sprites/wall_inner_corner_l_top_rigth.png"
+import WallHole1Img from "../img/sprites/wall_hole_1.png"
+import WallBannerRedImg from "../img/sprites/wall_banner_red.png"
+import WallHole2Img from "../img/sprites/wall_hole_2.png"
+import WallBannerYellowImg from "../img/sprites/wall_banner_yellow.png"
+import WallGooImg from "../img/sprites/wall_goo.png"
 
-import ColumnBaseImg from '../img/sprites/column_base.png'
-import ColumnMidImg from '../img/sprites/column_mid.png'
-import ColumnTopImg from '../img/sprites/column_top.png'
+import ColumnBaseImg from "../img/sprites/column_base.png"
+import ColumnMidImg from "../img/sprites/column_mid.png"
+import ColumnTopImg from "../img/sprites/column_top.png"
 
-import TorchSprite from '../img/sprites/torch.png'
-import TorchSideLeftSprite from '../img/sprites/torch-side-left.png'
-import TorchSideRightSprite from '../img/sprites/torch-side-right.png'
+import TorchSprite from "../img/sprites/torch.png"
+import TorchSideLeftSprite from "../img/sprites/torch-side-left.png"
+import TorchSideRightSprite from "../img/sprites/torch-side-right.png"
 
 function setUpImages() {
   let imgs = {}
@@ -217,4 +217,4 @@ function setUpImages() {
 
   global.imgs = imgs
 }
-export {setUpImages}
+export { setUpImages }

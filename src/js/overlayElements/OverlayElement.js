@@ -21,7 +21,7 @@ class OverlayElement {
   }
 
   elementTeardown(){
-    overlayManager.activeOverlayElements = overlayManager.activeOverlayElements.filter(overlay => overlay != this)
+    overlayManager.activeOverlayElements = overlayManager.activeOverlayElements.filter(overlay => overlay !== this)
     console.log(`Tearing down ${this.name}.`)
   }
 }

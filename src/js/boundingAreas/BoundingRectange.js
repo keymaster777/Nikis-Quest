@@ -1,6 +1,6 @@
-import { TS } from '../constants'
-import {distance, point} from '../helpers'
-import BoundingRegion from './BoundingRegion'
+import { TS } from "../constants"
+import { point } from "../helpers"
+import BoundingRegion from "./BoundingRegion"
 
 class BoundingRectangle extends BoundingRegion{
   constructor(options) {
@@ -20,12 +20,12 @@ class BoundingRectangle extends BoundingRegion{
 
   drawArea(fillColor){
     this.updateBoundaryCoords()
-    ctx.strokeStyle = fillColor;
+    ctx.strokeStyle = fillColor
     ctx.strokeRect(this.x, this.y, this.width, this.height)
   }
 
   closestPointTo(x,y){
-    let closestPoint = point(x,y) 
+    let closestPoint = point(x,y)
     if(this.x > x) closestPoint.x = this.x
     if(this.x + this.width < x) closestPoint.x = this.x+this.width
     if(this.y > y) closestPoint.y = this.y
@@ -35,7 +35,7 @@ class BoundingRectangle extends BoundingRegion{
 
   containsPoint(point){
     let xOverlap = this.x <=  point.x && this.x + this.width >= point.x
-    let yOverlap = this.y <= point.y && this.y + this.height >= point.y 
+    let yOverlap = this.y <= point.y && this.y + this.height >= point.y
     return xOverlap && yOverlap
   }
 }

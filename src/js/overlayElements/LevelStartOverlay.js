@@ -1,5 +1,5 @@
 import OverlayElement from "./OverlayElement"
-import {CANVAS_WIDTH, CANVAS_HEIGHT} from "../constants"
+import { CANVAS_WIDTH } from "../constants"
 
 class LevelStartOverlay extends OverlayElement{
   constructor(){
@@ -33,13 +33,13 @@ class LevelStartOverlay extends OverlayElement{
     ctx.translate(this.x, this.y)
 
     ctx.textAlign = "center"
-    ctx.fillStyle = "#111";
+    ctx.fillStyle = "#111"
     ctx.globalAlpha = transparency * .75
-    ctx.fillRect(0, 0, this.width, this.height); 
+    ctx.fillRect(0, 0, this.width, this.height)
     ctx.globalAlpha = transparency
 
     ctx.font = "52px antiquityFont"
-    ctx.fillStyle = "#ddd";
+    ctx.fillStyle = "#ddd"
     ctx.fillText("Quest", this.width/2+75, 130)
     ctx.fillStyle = "#c03a47"
     ctx.fillText("Niki's", this.width/2-75, 80)

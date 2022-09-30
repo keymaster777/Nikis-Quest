@@ -1,5 +1,5 @@
-import {TS, UP, DOWN, LEFT, RIGHT} from '../constants'
-import { point } from '../helpers'
+import { TS, UP, DOWN, LEFT, RIGHT } from "../constants"
+import { point } from "../helpers"
 
 class Movable{
   constructor(options){
@@ -18,8 +18,8 @@ class Movable{
 
     // Dash attributes
     this.dashedLast = Date.now()
-    this.maxDashFrames = 12;
-    this.currentDashFrame = 0;
+    this.maxDashFrames = 12
+    this.currentDashFrame = 0
     this.isDashing = false
     this.dashDirection = DOWN
 
@@ -37,7 +37,7 @@ class Movable{
   }
 
   move(){
-    if(this.isFalling == true){
+    if(this.isFalling === true){
       this.sprite.yAdjust += 1.2
       this.sprite.xAdjust += .1
       this.sprite.sizescaleAdjust -= .0001
@@ -46,7 +46,7 @@ class Movable{
         this.takeDamage(10)
       }
       if (Date.now() - this.fallTimer > 500) return
-    } 
+    }
 
 
     this.lastValidLocation = point(this.x, this.y)
@@ -56,19 +56,19 @@ class Movable{
     if(this.queuedMovements.length > 0) this.facing = [...this.queuedMovements].pop()
 
     this.queuedMovements.forEach(direction => {
-      if(direction == DOWN) this.y += speed
-      if(direction == UP) this.y -= speed
-      if(direction == LEFT) this.x -= speed
-      if(direction == RIGHT) this.x += speed
+      if(direction === DOWN) this.y += speed
+      if(direction === UP) this.y -= speed
+      if(direction === LEFT) this.x -= speed
+      if(direction === RIGHT) this.x += speed
     })
 
     let boundaryCollisions = this.boundary.boundaryCollisions(this.collisionTargets())
 
     this.dashCollision()
 
-    if (this.isDashing == false && boundaryCollisions.length > 0){
+    if (this.isDashing === false && boundaryCollisions.length > 0){
       let collisionPoint = boundaryCollisions[0].collisionPoint
-      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y) 
+      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y)
 
       this.x=this.lastValidLocation.x
       this.y=this.lastValidLocation.y
@@ -84,20 +84,20 @@ class Movable{
     }
 
     if(this.isDashing) this.handleDash()
-    if(this.correctingPosition && this.outOfBounds() == false) this.correctingPosition = false
+    if(this.correctingPosition && this.outOfBounds() === false) this.correctingPosition = false
 
-    if(this.isFalling && this.outOfBounds() == false){
+    if(this.isFalling && this.outOfBounds() === false){
       this.isFalling = false
       this.sprite.yAdjust = 0
       this.sprite.xAdjust = 0
       this.sprite.sizescaleAdjust = 0
-    } 
+    }
 
-    if(this.isDashing == false && this.correctingPosition == false){
+    if(this.isDashing === false && this.correctingPosition === false){
       if(this.outOfBounds()) this.x = this.lastValidLocation.x
       if(this.outOfBounds()) this.y = this.lastValidLocation.y
-    } 
-    
+    }
+
     this.effectCollisions()
 
     this.queuedMovements = []
@@ -110,26 +110,26 @@ class Movable{
   }
 
   dash(afterDashStart = null){
-    if(this.isFalling && Date.now() - this.fallTimer > 800) return
+    if(this.isDashing || this.isFalling && Date.now() - this.fallTimer > 800) return
     if(Date.now() - this.dashedLast > 100){
-      this.dashedLast = Date.now();
-      this.currentDashFrame = 0;
-      this.isDashing = true;
+      this.dashedLast = Date.now()
+      this.currentDashFrame = 0
+      this.isDashing = true
       this.dashDirection = this.facing
 
-      if(afterDashStart != null) afterDashStart()
-    } 
+      if(afterDashStart !== null) afterDashStart()
+    }
   }
 
   handleDash(){
-    if(this.currentDashFrame == this.maxDashFrames){
+    if(this.currentDashFrame === this.maxDashFrames){
       this.handleDashEnd()
     }else{
-      this.currentDashFrame++;
-      if(this.dashDirection == UP) this.y -= this.dashSpeed
-      if(this.dashDirection == DOWN) this.y += this.dashSpeed
-      if(this.dashDirection == LEFT) this.x -= this.dashSpeed
-      if(this.dashDirection == RIGHT) this.x += this.dashSpeed
+      this.currentDashFrame++
+      if(this.dashDirection === UP) this.y -= this.dashSpeed
+      if(this.dashDirection === DOWN) this.y += this.dashSpeed
+      if(this.dashDirection === LEFT) this.x -= this.dashSpeed
+      if(this.dashDirection === RIGHT) this.x += this.dashSpeed
 
       this.dashCollision()
     }
@@ -147,13 +147,13 @@ class Movable{
   }
 
   handleDashEnd(){
-    this.isDashing = false;
+    this.isDashing = false
     // TODO clean up boolean logic here
     if(this.outOfBounds() && this.canBeCorrected()) this.correctingPosition = true
-    if(this.outOfBounds() && this.canBeCorrected() == false){
+    if(this.outOfBounds() && this.canBeCorrected() === false){
       this.isFalling = true
       this.fallTimer = Date.now()
-    } 
+    }
   }
 
   canBeCorrected(){

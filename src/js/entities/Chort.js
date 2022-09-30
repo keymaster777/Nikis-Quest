@@ -1,28 +1,29 @@
-import {TS, UP, DOWN, LEFT, RIGHT, NAMES} from "../constants"
-import BoundingElliptic from "../boundingAreas/BoundingElliptic";
-import { distance } from "../helpers";
-import Sprite from "../Sprite";
-import Killable from "../entityTraits/Killable";
-import Fightable from "../entityTraits/Fightable";
-import Movable from "../entityTraits/Movable";
+import { TS, UP, DOWN, LEFT, RIGHT, NAMES } from "../constants"
+import BoundingElliptic from "../boundingAreas/BoundingElliptic"
+import { distance } from "../helpers"
+import Sprite from "../Sprite"
+import Killable from "../entityTraits/Killable"
+import Fightable from "../entityTraits/Fightable"
+import Movable from "../entityTraits/Movable"
+import Potion from "./Potion"
 
 class Chort{
   constructor(tileSizeX, tileSizeY){
-    this.x=(tileSizeX*TS)+.5*TS;
-    this.y=(tileSizeY*TS)+.5*TS;
+    this.x=(tileSizeX*TS)+.5*TS
+    this.y=(tileSizeY*TS)+.5*TS
 
 
-    this.spriteCoords = () => ({x: this.x, y: this.y+(.2*TS)})
+    this.spriteCoords = () => ({ x: this.x, y: this.y+(.2*TS) })
     this.sprite = new Sprite({
-        coords: this.spriteCoords.bind(this),
-        width: 64,
-        height: 24,
-        image: imgs.chortIdleLeft,
-        numberOfFrames: 4,
-        sizescale: .045,
-    });
+      coords: this.spriteCoords.bind(this),
+      width: 64,
+      height: 24,
+      image: imgs.chortIdleLeft,
+      numberOfFrames: 4,
+      sizescale: .045,
+    })
 
-    this.boundaryCoords = () => ({x: this.x, y: this.y})
+    this.boundaryCoords = () => ({ x: this.x, y: this.y })
     this.boundary = new BoundingElliptic({
       coords: this.boundaryCoords.bind(this),
       xSemiAxis: .2*TS,
@@ -30,7 +31,7 @@ class Chort{
       isMovingBoundary: true,
     })
 
-    this.hitBoxCoords = () => ({x: this.x, y: this.y-(.25*TS)})
+    this.hitBoxCoords = () => ({ x: this.x, y: this.y-(.25*TS) })
     this.hitBox = new BoundingElliptic({
       coords: this.hitBoxCoords.bind(this),
       xSemiAxis: .25*TS,
@@ -41,7 +42,7 @@ class Chort{
     let killable = new Killable({
       maxHitPoints: 10,
       maxDamageFrames: 18,
-      onDeath: this.killChort 
+      onDeath: this.killChort
     })
 
     let fightable = new Fightable({
@@ -53,7 +54,7 @@ class Chort{
     let movable = new Movable({
       speed: 3.5+level.levelNum*0.3,
       dashSpeedMultiplier: 1.5,
-      speedDebuff: (() => this.hitPoints != this.maxHitPoints)
+      speedDebuff: (() => this.hitPoints !== this.maxHitPoints)
     })
 
     this.potionsConsumed = 0
@@ -83,11 +84,11 @@ class Chort{
   }
 
   powerUp(){
-    if(this.potionsConsumed == 0){
+    if(this.potionsConsumed === 0){
       this.name = NAMES.sort(() => 0.5 - Math.random())[0]
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*4
-      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash == true))
+      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
     } else {
       this.maxHitPoints = Math.round(this.maxHitPoints*1.1)
     }
@@ -95,13 +96,13 @@ class Chort{
 
   fullName(){
     let title = ""
-    if(this.potionsConsumed == 1) title = "Super Chort"
+    if(this.potionsConsumed === 1) title = "Super Chort"
     if(this.potionsConsumed > 1) title = "Super Mega Chort"
     return `${title} ${this.name}`
   }
 
   killChort(){
-    activeRoom.monsters = activeRoom.monsters.filter(monster => monster != this)
+    activeRoom.monsters = activeRoom.monsters.filter(monster => monster !== this)
     player.enemiesFelled += 1
 
     if(this.potionsConsumed > 0) {
@@ -115,21 +116,21 @@ class Chort{
 
   setupMovements(){
     if ( this.isAgitated()){
-        if (player.y < this.y) this.queuedMovements.push(UP)
-        if (player.y > this.y) this.queuedMovements.push(DOWN)
-        if (player.x < this.x-5) this.queuedMovements.push(LEFT)
-        if (player.x > this.x+5) this.queuedMovements.push(RIGHT)
+      if (player.y < this.y) this.queuedMovements.push(UP)
+      if (player.y > this.y) this.queuedMovements.push(DOWN)
+      if (player.x < this.x-5) this.queuedMovements.push(LEFT)
+      if (player.x > this.x+5) this.queuedMovements.push(RIGHT)
     }
   }
 
   setSpriteImage(){
     if(this.queuedMovements.includes(LEFT)){
-        this.sprite.image = imgs.chortIdleLeft
-        this.sprite.frameIndex = 0
-    } 
+      this.sprite.image = imgs.chortIdleLeft
+      this.sprite.frameIndex = 0
+    }
     if(this.queuedMovements.includes(RIGHT)){
-        this.sprite.image = imgs.chortIdleRight
-        this.sprite.frameIndex = 3
+      this.sprite.image = imgs.chortIdleRight
+      this.sprite.frameIndex = 3
     }
   }
 
@@ -138,13 +139,13 @@ class Chort{
     this.setupMovements()
     this.setSpriteImage()
 
-    if (this.queuedMovements.length == 0) this.sprite.update();
+    if (this.queuedMovements.length === 0) this.sprite.update()
 
-    this.move();
-    this.tryToAttackTargets();
-    this.sprite.render();
+    this.move()
+    this.tryToAttackTargets()
+    this.sprite.render()
 
-    if(this.takingDamage) this.damagedAnimation();
+    if(this.takingDamage) this.damagedAnimation()
   }
 }
 
