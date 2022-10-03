@@ -54,6 +54,8 @@ class Chort{
     let movable = new Movable({
       speed: 3.5+level.levelNum*0.3,
       dashSpeedMultiplier: 1.5,
+      maxKnockBackFrames: 8,
+      knockBackInitialDistance: 16,
       speedDebuff: (() => this.hitPoints !== this.maxHitPoints)
     })
 
@@ -63,6 +65,10 @@ class Chort{
 
     // compose killable and fightable into chort
     Object.assign(this, killable, fightable, movable)
+  }
+
+  bodyCenter(){
+    return { x: this.x, y: this.y-(.25*TS) }
   }
 
   fightableTargets(){
@@ -89,6 +95,8 @@ class Chort{
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*4
       this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
+      this.maxKnockBackFrames = 5
+      this.knockBackInitialDistance = 8
     } else {
       this.maxHitPoints = Math.round(this.maxHitPoints*1.1)
     }

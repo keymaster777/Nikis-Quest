@@ -24,6 +24,14 @@ class BoundingRectangle extends BoundingRegion{
     ctx.strokeRect(this.x, this.y, this.width, this.height)
   }
 
+  angleInRadiansToTargetPoint(x, y) {
+    let closestPoint = this.closestPointTo(x,y)
+    let dy = y - closestPoint.y
+    let dx = x - closestPoint.x
+    let theta = Math.atan2(dy, dx) // range (-PI, PI]
+    return theta
+  }
+
   closestPointTo(x,y){
     let closestPoint = point(x,y)
     if(this.x > x) closestPoint.x = this.x

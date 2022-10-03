@@ -50,6 +50,8 @@ class Goblin{
     })
 
     let movable = new Movable({
+      maxKnockBackFrames: 10,
+      knockBackInitialDistance: 16,
       speed: Math.random() + .75,
       dashSpeedMultiplier: 1.5,
     })
@@ -61,6 +63,10 @@ class Goblin{
     // compose killable, fightable, movable into Goblin
     Object.assign(this, killable, fightable, movable)
     if(spawnEmpowered || Math.random() < level.levelNum*.01) this.drinkPotion()
+  }
+
+  bodyCenter(){
+    return { x: this.x, y: this.y-(.25*TS) }
   }
 
   drinkPotion(){
@@ -78,6 +84,8 @@ class Goblin{
       this.speed += .5
       this.attackDamage += 4
       this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
+      this.maxKnockBackFrames = 5
+      this.knockBackInitialDistance = 10
     } else {
       this.speed += .25
       this.attackDamage += 2

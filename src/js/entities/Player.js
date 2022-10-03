@@ -53,8 +53,10 @@ class Player{
     let movable = new Movable({
       speed: 2.5,
       dashSpeed: 7.5,
+      canBeKnockedBack: false,
       speedDebuff: (() => activeRoom.torches.length === 0)
     })
+
 
     this.idleImg = imgs.idleDown
     this.maxStamina = 100
@@ -66,13 +68,12 @@ class Player{
 
     // compose killable and fightable into player
     Object.assign(this, killable, fightable, movable)
+
+    console.log("hmmm", this.canBeKnockedBack)
   }
 
-  multiplySize(multiplier){
-    this.sprite.sizescale *= multiplier
-    this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
-    this.boundary.multiplySize(multiplier)
-    this.hitBox.multiplySize(multiplier)
+  bodyCenter(){
+    return { x: this.x, y: this.y-(.2*TS) }
   }
 
   drinkPotion(){
@@ -82,7 +83,7 @@ class Player{
 
   attemptToDash(){
     let dashCost = 30
-    if(this.stamina >= dashCost) this.dash(() => {this.stamina -= dashCost})
+    if(this.stamina >= dashCost) this.startDashing(() => {this.stamina -= dashCost})
   }
 
   setLocation(coord){

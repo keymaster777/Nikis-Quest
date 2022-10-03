@@ -8,7 +8,8 @@ class BossBarOverlay extends OverlayElement{
   }
 
   tearDownConditions(){
-    return activeRoom.monsters.find(monster => monster.potionsConsumed > 0) === undefined
+    let potentialBossMobs = [...activeRoom.monsters, ...activeRoom.chests]
+    return potentialBossMobs.find(monster => monster.potionsConsumed > 0) === undefined
   }
 
   render(){

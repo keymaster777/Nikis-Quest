@@ -33,6 +33,7 @@ class Fightable{
     this.swingWeapon = this.swingWeapon
     this.attackSwingStartingPoint = this.attackSwingStartingPoint
     this.tryToAttackTargets = this.tryToAttackTargets
+    this.knockBack = this.knockBack
   }
 
   fightableTargets(){
@@ -48,7 +49,15 @@ class Fightable{
 
   attack(entity){
     this.attackedLast = Date.now()
+    if(entity.canBeKnockedBack === true && entity.takingDamage === false) this.knockBack(entity)
     entity.takeDamage(this.attackDamage)
+  }
+
+  knockBack(entity){
+    let dy = entity.bodyCenter().y - this.bodyCenter().y
+    let dx = entity.bodyCenter().x - this.bodyCenter().x
+    let angleRadians = Math.atan2(dy, dx) // range (-PI, PI)
+    entity.startKnockBack(angleRadians)
   }
 
   tryToAttackTargets(){
