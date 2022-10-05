@@ -14,7 +14,6 @@ class Fightable{
     // Attributes for fightable with weapon
     this.isAttacking = false
     this.weapon = options.weapon || null
-    this.attackDirection = RIGHT
     this.maxAttackFrame = options.maxAttackFrame || 100
     this.attackFrame = 0
     if(this.weapon) {
@@ -49,7 +48,7 @@ class Fightable{
 
   attack(entity){
     this.attackedLast = Date.now()
-    if(entity.canBeKnockedBack === true && entity.takingDamage === false) this.knockBack(entity)
+    if(entity?.movementBehavior?.canBeKnockedBack === true && entity.takingDamage === false) this.knockBack(entity)
     entity.takeDamage(this.attackDamage)
   }
 
@@ -57,7 +56,10 @@ class Fightable{
     let dy = entity.bodyCenter().y - this.bodyCenter().y
     let dx = entity.bodyCenter().x - this.bodyCenter().x
     let angleRadians = Math.atan2(dy, dx) // range (-PI, PI)
-    entity.startKnockBack(angleRadians)
+
+    if(entity.movementBehavior !== undefined){
+      entity.movementBehavior.startKnockBack(angleRadians)
+    }
   }
 
   tryToAttackTargets(){
@@ -67,7 +69,7 @@ class Fightable{
   }
 
   attackSwingStartingPoint(){
-    switch(this.attackDirection){
+    switch(this.facing){
     case UP:
       return -50
     case RIGHT:

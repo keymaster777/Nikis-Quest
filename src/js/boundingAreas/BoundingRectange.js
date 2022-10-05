@@ -1,4 +1,4 @@
-import { TS } from "../constants"
+import { TS, LEFT, RIGHT, UP, DOWN } from "../constants"
 import { point } from "../helpers"
 import BoundingRegion from "./BoundingRegion"
 
@@ -45,6 +45,17 @@ class BoundingRectangle extends BoundingRegion{
     let xOverlap = this.x <=  point.x && this.x + this.width >= point.x
     let yOverlap = this.y <= point.y && this.y + this.height >= point.y
     return xOverlap && yOverlap
+  }
+
+  probePoints(){
+    let probePoints = {}
+
+    probePoints[LEFT] = { x: this.x, y: this.y+(.5*this.height) }
+    probePoints[RIGHT] = { x: this.x+this.width, y: this.y+(.5*this.height) }
+    probePoints[UP] = { x: this.x+(.5*this.width), y: this.y }
+    probePoints[DOWN] = { x: this.x+(.5*this.width), y: this.y+this.height }
+
+    return probePoints
   }
 }
 

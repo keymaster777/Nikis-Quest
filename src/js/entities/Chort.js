@@ -4,7 +4,7 @@ import { distance } from "../helpers"
 import Sprite from "../Sprite"
 import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
-import Movable from "../entityTraits/Movable"
+import MovementBehavior from "../entityBehaviors/MovementBehavior"
 import Potion from "./Potion"
 
 class Chort{
@@ -16,7 +16,7 @@ class Chort{
     this.spriteCoords = () => ({ x: this.x, y: this.y+(.2*TS) })
     this.sprite = new Sprite({
       coords: this.spriteCoords.bind(this),
-      width: 64,
+      width: 16,
       height: 24,
       image: imgs.chortIdleLeft,
       numberOfFrames: 4,
@@ -51,20 +51,21 @@ class Chort{
       targets: (() => [player, ...activeRoom.chests])
     })
 
-    let movable = new Movable({
+    this.walksRecklessly = true
+    let movementOptions = {
       speed: 3.5+level.levelNum*0.3,
-      dashSpeedMultiplier: 1.5,
       maxKnockBackFrames: 8,
       knockBackInitialDistance: 16,
-      speedDebuff: (() => this.hitPoints !== this.maxHitPoints)
-    })
+      dashSpeed: 6,
+    }
+    this.movementBehavior = new MovementBehavior(this, movementOptions)
 
     this.potionsConsumed = 0
     this.hasWings = false
     this.name = "Kyle" // All average Chorts are named Kyle, this is common knowledge
 
     // compose killable and fightable into chort
-    Object.assign(this, killable, fightable, movable)
+    Object.assign(this, killable, fightable)
   }
 
   bodyCenter(){
@@ -95,7 +96,7 @@ class Chort{
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*4
       this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
-      this.maxKnockBackFrames = 5
+      this.maxKnockBackFrames = 4
       this.knockBackInitialDistance = 8
     } else {
       this.maxHitPoints = Math.round(this.maxHitPoints*1.1)
@@ -132,25 +133,45 @@ class Chort{
   }
 
   setSpriteImage(){
-    if(this.queuedMovements.includes(LEFT)){
-      this.sprite.image = imgs.chortIdleLeft
-      this.sprite.frameIndex = 0
-    }
-    if(this.queuedMovements.includes(RIGHT)){
-      this.sprite.image = imgs.chortIdleRight
-      this.sprite.frameIndex = 3
+    if(this.movementBehavior.isMoving()){
+      if(this.facing === LEFT){
+        this.sprite.image = imgs.chortIdleLeft
+        this.sprite.frameIndex = 0
+      }
+      if(this.facing === RIGHT){
+        this.sprite.image = imgs.chortIdleRight
+        this.sprite.frameIndex = 3
+      }
     }
   }
 
+  emote(){
+    ctx.fillStyle = "red"
+    ctx.textAlign = "center"
+
+    if( this.isFalling){
+      ctx.font = "36px antiquityFont"
+      ctx.fillText("!", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(this.isAgitated()){
+      ctx.font = "15px antiquityFont"
+      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight())
+    }
+  }
+
+  move(){
+    this.walksRecklessly = this.hitPoints < this.maxHitPoints
+    if(this.isAgitated()) this.movementBehavior.setupProximityMovements(player)
+    this.setSpriteImage()
+    this.movementBehavior.move()
+  }
 
   draw(){
-    this.setupMovements()
-    this.setSpriteImage()
-
-    if (this.queuedMovements.length === 0) this.sprite.update()
+    if (this.movementBehavior.queuedMovements.length === 0) this.sprite.update()
+    if(this.potionsConsumed > 0 && this.isFalling && Date.now() - this.fallTimer > 400) this.attemptToDash()
 
     this.move()
     this.tryToAttackTargets()
+    this.emote()
     this.sprite.render()
 
     if(this.takingDamage) this.damagedAnimation()

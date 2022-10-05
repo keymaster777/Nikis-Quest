@@ -3,7 +3,7 @@ import Sprite from "../Sprite"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic"
 import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
-import Movable from "../entityTraits/Movable"
+import MovementBehavior from "../entityBehaviors/MovementBehavior"
 
 class Player{
   constructor(){
@@ -11,10 +11,9 @@ class Player{
     this.y=0
 
     this.spriteCoords = () => ({ x: this.x, y: this.y+(.3*TS) })
-
     this.sprite = new Sprite({
       coords: this.spriteCoords.bind(this),
-      width: 256,
+      width: 32,
       height: 32,
       image: imgs.runLeft,
       numberOfFrames: 8,
@@ -24,8 +23,8 @@ class Player{
     this.boundaryCoords = () => ({ x: this.x, y: this.y })
     this.boundary = new BoundingElliptic({
       coords: this.boundaryCoords.bind(this),
-      xSemiAxis: .25*TS,
-      ySemiAxis: .125*TS,
+      xSemiAxis: .3*TS,
+      ySemiAxis: .15*TS,
       isMovingBoundary: true,
     })
 
@@ -50,13 +49,15 @@ class Player{
       weapon: imgs.woodSword,
     })
 
-    let movable = new Movable({
+    // this.walksRecklessly = true
+    this.walksSlowInDark = true
+
+    let movementOptions = {
       speed: 2.5,
       dashSpeed: 7.5,
       canBeKnockedBack: false,
-      speedDebuff: (() => activeRoom.torches.length === 0)
-    })
-
+    }
+    this.movementBehavior = new MovementBehavior(this, movementOptions)
 
     this.idleImg = imgs.idleDown
     this.maxStamina = 100
@@ -67,9 +68,7 @@ class Player{
     this.roomsExplored = 1
 
     // compose killable and fightable into player
-    Object.assign(this, killable, fightable, movable)
-
-    console.log("hmmm", this.canBeKnockedBack)
+    Object.assign(this, killable, fightable)
   }
 
   bodyCenter(){
@@ -83,7 +82,10 @@ class Player{
 
   attemptToDash(){
     let dashCost = 30
-    if(this.stamina >= dashCost) this.startDashing(() => {this.stamina -= dashCost})
+    if( this.isDashing === false && this.stamina >= dashCost){
+      this.stamina -= dashCost
+      this.movementBehavior.startDashing(this.facing)
+    }
   }
 
   setLocation(coord){
@@ -91,68 +93,57 @@ class Player{
     this.y=coord.y
   }
 
-  setupMovements(){
-    this.queuedMovements = []
-    if(input.isDown("s")) this.queuedMovements.push(DOWN)
-    if(input.isDown("w")) this.queuedMovements.push(UP)
-    if(input.isDown("a")) this.queuedMovements.push(LEFT)
-    if(input.isDown("d")) this.queuedMovements.push(RIGHT)
+  setSpriteImage(){
+    if(this.movementBehavior.isMoving()){
+      this.sprite.numberOfFrames = 8
+      if(this.facing === RIGHT) this.sprite.image = imgs.runRight
+      if(this.facing === LEFT) this.sprite.image = imgs.runLeft
+      if(this.facing === UP) this.sprite.image = imgs.runUp
+      if(this.facing === DOWN) this.sprite.image = imgs.runDown
+    } else {
+      this.sprite.numberOfFrames = 1
+      if(this.facing === RIGHT) this.sprite.image = imgs.idleRight
+      if(this.facing === LEFT) this.sprite.image = imgs.idleLeft
+      if(this.facing === UP) this.sprite.image = imgs.idleUp
+      if(this.facing === DOWN) this.sprite.image = imgs.idleDown
+    }
   }
 
-  setSpriteImage(){
-    if(this.queuedMovements.includes(UP)){
-      this.sprite.image = imgs.runUp
-      this.idleImg = imgs.idleUp
-    }
-    if(this.queuedMovements.includes(DOWN)){
-      this.sprite.image = imgs.runDown
-      this.idleImg = imgs.idleDown
-    }
-    if(this.queuedMovements.includes(LEFT)){
-      this.sprite.image = imgs.runLeft
-      this.idleImg = imgs.idleLeft
-    }
-    if(this.queuedMovements.includes(RIGHT)){
-      this.sprite.image = imgs.runRight
-      this.idleImg = imgs.idleRight
-    }
+  isAgitated(){
+    return this.hitPoints < this.maxHitPoints && Date.now() - this.damagedLast < 1500
+  }
 
-    if(this.isAttacking){
-      if(this.attackDirection === UP){
-        this.sprite.image = imgs.runUp
-        this.idleImg = imgs.idleUp
-      }
-      if(this.attackDirection === DOWN){
-        this.sprite.image = imgs.runDown
-        this.idleImg = imgs.idleDown
-      }
-      if(this.attackDirection === LEFT){
-        this.sprite.image = imgs.runLeft
-        this.idleImg = imgs.idleLeft
-      }
-      if(this.attackDirection === RIGHT){
-        this.sprite.image = imgs.runRight
-        this.idleImg = imgs.idleRight
-      }
+  emote(){
+    ctx.save()
+    ctx.globalAlpha = 1
+    ctx.fillStyle = "red"
+    ctx.textAlign = "center"
+    if( this.isFalling){
+      ctx.font = "36px antiquityFont"
+      ctx.fillText("!", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(this.isAgitated()){
+      ctx.font = "15px antiquityFont"
+      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     }
+    ctx.restore()
+  }
+
+  move(){
+    this.movementBehavior.setupInputMovements()
+    this.setSpriteImage()
+    this.movementBehavior.move()
   }
 
   draw(){
-    this.setupMovements()
-    this.setSpriteImage()
-
     if(input.isDown("SPACE")) this.attemptToDash()
 
     if(this.hitPoints > 0 && this.isAttacking && this.attackDirection !== DOWN) this.swingWeapon()
 
     if(this.hitPoints === 0) ctx.globalAlpha = 0
 
-    if(this.isMoving()){
-      this.move()
-      this.sprite.draw()
-    } else {
-      ctx.drawImage(this.idleImg, this.x-.65*TS, this.y-1*TS, TS*32*.04, TS*32*.04)
-    }
+    this.move()
+    this.emote()
+    this.sprite.draw()
 
     ctx.globalAlpha = 1
 

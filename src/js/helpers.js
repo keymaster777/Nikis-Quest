@@ -13,28 +13,28 @@ function handleInput() {
   if(input.isDown("UP")) {
     if(!player.isAttacking) {
       player.isAttacking = true
-      player.attackDirection = UP
+      player.facing = UP
     }
   }
 
   if(input.isDown("RIGHT")) {
     if(!player.isAttacking) {
       player.isAttacking = true
-      player.attackDirection = RIGHT
+      player.facing = RIGHT
     }
   }
 
   if(input.isDown("DOWN")) {
     if(!player.isAttacking) {
       player.isAttacking = true
-      player.attackDirection = DOWN
+      player.facing = DOWN
     }
   }
 
   if(input.isDown("LEFT")) {
     if(!player.isAttacking) {
       player.isAttacking = true
-      player.attackDirection = LEFT
+      player.facing = LEFT
     }
   }
 }

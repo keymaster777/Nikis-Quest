@@ -1,4 +1,4 @@
-import { TS } from "../constants"
+import { TS, LEFT, UP, DOWN, RIGHT } from "../constants"
 import { distance, point } from "../helpers"
 import BoundingRegion from "./BoundingRegion"
 
@@ -8,6 +8,17 @@ class BoundingElliptic extends BoundingRegion{
 
     this.xSemiAxis = options.xSemiAxis || TS
     this.ySemiAxis = options.ySemiAxis || TS
+  }
+
+  probePoints(){
+    let probePoints = {}
+
+    probePoints[LEFT] = { x: this.x-this.xSemiAxis, y: this.y }
+    probePoints[RIGHT] = { x: this.x+this.xSemiAxis, y: this.y }
+    probePoints[UP] = { x: this.x, y: this.y-this.ySemiAxis }
+    probePoints[DOWN] = { x: this.x, y: this.y+this.ySemiAxis }
+
+    return probePoints
   }
 
   multiplySize(multiplier){

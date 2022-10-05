@@ -40,12 +40,12 @@ class Sprite{
       this.y = coords.y
     }
 
-    const { image, frameIndex, width, height, numberOfFrames, xAdjust, yAdjust, x, y } = this
+    const { image, frameIndex, width, height, xAdjust, yAdjust, x, y } = this
 
     ctx.drawImage(
       image,                                   // Sprite Image
-      frameIndex * width / numberOfFrames, 0,  // X and Y starting point for portion of sprite map to show
-      width / numberOfFrames, height,          // Width and height of visible portion of sprite map
+      frameIndex * width, 0,  // X and Y starting point for portion of sprite map to show
+      width, height,          // Width and height of visible portion of sprite map
       x+xAdjust-this.calculatedWidth()/2,      // X start of sprite render
       y+yAdjust-this.calculatedHeight(),
       this.calculatedWidth(),
@@ -54,7 +54,7 @@ class Sprite{
   }
 
   calculatedWidth() {
-    return TS*(this.sizescale+this.sizescaleAdjust)*this.width / this.numberOfFrames
+    return TS*(this.sizescale+this.sizescaleAdjust)*this.width
   }
 
   calculatedHeight(){

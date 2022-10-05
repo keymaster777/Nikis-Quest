@@ -6,6 +6,7 @@ class Killable{
 
     this.hitPoints = this.maxHitPoints
     this.takingDamage = false
+    this.damagedLast = Date.now()
     this.damagedAnimation = this.damagedAnimation
     this.takeDamage = this.takeDamage
   }
@@ -26,6 +27,7 @@ class Killable{
 
   takeDamage(damage){
     if(this.takingDamage || this.isDashing) return
+    this.damagedLast = Date.now()
     this.takingDamage = true
     this.currentDamageFrame = 0
     this.hitPoints = Math.max(0, this.hitPoints-damage)

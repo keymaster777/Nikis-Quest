@@ -1,17 +1,27 @@
 import { TS } from "../constants"
 import Killable from "../entityTraits/Killable"
-import Movable from "../entityTraits/Movable"
 import BoundingRectangle from "../boundingAreas/BoundingRectange"
 import Goblin from "./Goblin"
 import Chort from "./Chort"
 import Potion from "./Potion"
+import Sprite from "../Sprite"
+import MovementBehavior from "../entityBehaviors/MovementBehavior"
 
 class Chest{
   constructor(tileSizeX, tileSizeY){
     this.x = tileSizeX*TS+(Math.random()*10)-5
     this.y = tileSizeY*TS+(Math.random()*10)-5
-    this.depthBreakpoint = this.y+40
     this.sizeMultiplier = 1
+
+    this.spriteCoords = () => ({ x: this.x+(.5*TS), y: this.y+(TS) })
+    this.sprite = new Sprite({
+      coords: this.spriteCoords.bind(this),
+      width: 16,
+      height: 16,
+      image: imgs.chest,
+      numberOfFrames: 1,
+      sizescale: .07,
+    })
 
     let killable = new Killable({
       maxHitPoints: 15,
@@ -19,12 +29,13 @@ class Chest{
       onDeath: this.destroyChest
     })
 
-    let movable = new Movable({
+    let movementOptions = {
       speed: 0,
       maxKnockBackFrames: 4,
       knockBackInitialDistance: 3,
-      stuckToFloor: true,
-    })
+      stuckToFloor: true
+    }
+    this.movementBehavior = new MovementBehavior(this, movementOptions)
 
     this.boundaryCoords = () => ({ x: this.x+.15*TS, y: this.y+.45*TS })
     this.boundary = new BoundingRectangle({
@@ -32,6 +43,7 @@ class Chest{
       width: TS*0.7,
       height: TS*0.3,
       cancelsDash: true,
+      isMovingBoundary: true,
     })
 
     this.hitBoxCoords = () => ({ x: this.x+.15*TS, y: this.y+.25*TS })
@@ -42,32 +54,25 @@ class Chest{
     })
 
     this.potionsConsumed = 0
-    this.name = ""
+    this.name = "Chesterson the third"
 
     // compose killable into chest
-    Object.assign(this, killable, movable)
+    Object.assign(this, killable)
   }
 
+  get depthBreakpoint(){ return this.y + 40}
+
   drinkPotion(){
-    overlayManager.addBossBarOverlay()
     this.powerUp()
     this.hitPoints = this.maxHitPoints
     this.potionsConsumed += 1
+    overlayManager.addBossBarOverlay()
   }
 
   powerUp(){
     if(this.potionsConsumed === 0){
-      this.name = "Chesterson the third"
-      this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*3
-      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
     }
-  }
-
-  multiplySize(multiplier){
-    this.boundary.multiplySize(multiplier)
-    this.hitBox.multiplySize(multiplier)
-    this.sizeMultiplier *= multiplier
   }
 
   fullName(){
@@ -75,7 +80,6 @@ class Chest{
   }
 
   destroyChest(){
-    console.log(activeRoom.chests)
 
     activeRoom.chests = activeRoom.chests.filter(chest => chest !== this)
     player.chestsOpened += 1
@@ -89,7 +93,6 @@ class Chest{
         ))
       })
     } else {
-      console.log("getting in here")
       let random = Math.random()
       if(random >= .95){
         activeRoom.monsters.push(new Goblin(this.x/TS, this.y/TS, true))
@@ -108,14 +111,8 @@ class Chest{
   }
 
   draw(){
-    this.move()
-    ctx.drawImage(
-      imgs.chest,
-      this.x-(.05*TS*(this.sizeMultiplier-1)),
-      this.y-(.5*TS*(this.sizeMultiplier-1)),
-      TS*this.sizeMultiplier,
-      TS*this.sizeMultiplier
-    )
+    this.movementBehavior.move()
+    this.sprite.draw()
     if(this.takingDamage) this.damagedAnimation()
   }
 }

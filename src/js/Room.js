@@ -270,7 +270,6 @@ class Room{
     // this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
     // this.hitBoxEntities().forEach(entity => entity.hitBox.drawArea("green"))
 
-
     // this.doors.forEach(door => door.effectBox.drawArea('yellow'))
     // this.potions.forEach(potion => potion.effectBox.drawArea('yellow'))
 

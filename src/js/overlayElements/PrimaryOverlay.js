@@ -7,7 +7,7 @@ class PrimaryOverlay extends OverlayElement{
     super(10, 10, "Primary Overlay", 1)
 
     this.mapPlayerSprite = new Sprite({
-      width: 256,
+      width: 32,
       height: 32,
       image: imgs.runDown,
       numberOfFrames: 8,
@@ -15,7 +15,7 @@ class PrimaryOverlay extends OverlayElement{
     })
 
     this.mapMonsterSprite = new Sprite({
-      width: 64,
+      width: 16,
       height: 21,
       image: imgs.gnollShamanWalkRight,
       numberOfFrames: 4,

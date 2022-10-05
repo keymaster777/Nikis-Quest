@@ -1,9 +1,10 @@
 import { TS, UP, DOWN, LEFT, RIGHT, NAMES } from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic"
+import BoundingRegion from "../boundingAreas/BoundingRegion"
 import Sprite from "../Sprite"
 import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
-import Movable from "../entityTraits/Movable"
+import MovementBehavior from "../entityBehaviors/MovementBehavior"
 import Potion from "./Potion"
 
 class Goblin{
@@ -14,7 +15,7 @@ class Goblin{
     this.spriteCoords = () => ({ x: this.x, y: this.y+(.2*TS) })
     this.sprite = new Sprite({
       coords: this.spriteCoords.bind(this),
-      width: 64,
+      width: 16,
       height: 21,
       image: imgs.gnollShamanWalkRight,
       numberOfFrames: 4,
@@ -49,19 +50,19 @@ class Goblin{
       targets: (() => [player, ...activeRoom.chests])
     })
 
-    let movable = new Movable({
+    let movementOptions = {
+      speed: Math.random() + .75,
       maxKnockBackFrames: 10,
       knockBackInitialDistance: 16,
-      speed: Math.random() + .75,
-      dashSpeedMultiplier: 1.5,
-    })
+      dashSpeed: 6,
+    }
+    this.movementBehavior = new MovementBehavior(this, movementOptions)
 
     this.potionsConsumed = 0
     this.hasWings = false
     this.name = "Tony" // All average goblins are named Tony, this is common knowledge
 
-    // compose killable, fightable, movable into Goblin
-    Object.assign(this, killable, fightable, movable)
+    Object.assign(this, killable, fightable)
     if(spawnEmpowered || Math.random() < level.levelNum*.01) this.drinkPotion()
   }
 
@@ -77,17 +78,17 @@ class Goblin{
   }
 
   powerUp(){
+    let movement = this.movementBehavior
     if(this.potionsConsumed === 0){
       this.name = NAMES.sort(() => 0.5 - Math.random())[0]
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*5
-      this.speed += .5
+      movement.speed += .5
       this.attackDamage += 4
-      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
-      this.maxKnockBackFrames = 5
-      this.knockBackInitialDistance = 10
+      movement.maxKnockBackFrames = 4
+      movement.knockBackInitialDistance = 6
     } else {
-      this.speed += .25
+      movement.speed += .25
       this.attackDamage += 2
       this.maxHitPoints = Math.round(this.maxHitPoints*1.25)
     }
@@ -115,24 +116,57 @@ class Goblin{
     }
   }
 
-  setupMovements(){
-    if (player.y < this.y) this.queuedMovements.push(UP)
-    if (player.y > this.y) this.queuedMovements.push(DOWN)
-    if (player.x < this.x-5) this.queuedMovements.push(LEFT)
-    if (player.x > this.x+5) this.queuedMovements.push(RIGHT)
+  attemptToDash(){
+    if(this.isDashing === false){
+      let dy = player.bodyCenter().y - this.bodyCenter().y
+      let dx = player.bodyCenter().x - this.bodyCenter().x
+      let angleRadians = Math.atan2(dy, dx) // range (-PI, PI)
+      let degrees = (angleRadians + Math.PI) * 180/Math.PI
+      if(degrees >= 45 && degrees < 135) this.movementBehavior.startDashing(UP)
+      if(degrees >= 135 && degrees < 225) this.movementBehavior.startCorrecting(RIGHT)
+      if(degrees >= 225 && degrees < 315) this.movementBehavior.startCorrecting(DOWN)
+      if(degrees < 45 || degrees >= 315) this.movementBehavior.startCorrecting(LEFT)
+      this.movementBehavior.startDashing(this.facing)
+    }
   }
 
   setSpriteImage(){
-    if(this.queuedMovements.includes(LEFT)) this.sprite.image = imgs.gnollShamanWalkLeft
-    if(this.queuedMovements.includes(RIGHT)) this.sprite.image = imgs.gnollShamanWalkRight
+    if(this.facing === LEFT) this.sprite.image = imgs.gnollShamanWalkLeft
+    if(this.facing === RIGHT) this.sprite.image = imgs.gnollShamanWalkRight
+  }
+
+  isAgitated(){
+    if (this.boundary.boundaryCollisions(BoundingRegion.canBeFallenInto()).length > 0) return true
+    return (this.potionsConsumed > 0 &&  Date.now() - this.damagedLast < 2000)
+  }
+
+  emote(){
+    ctx.fillStyle = "red"
+    ctx.textAlign = "center"
+    if( this.isFalling){
+      ctx.font = "36px antiquityFont"
+      ctx.fillText("!", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(this.isAgitated()){
+      ctx.font = "26px antiquityFont"
+      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight())
+    }
+  }
+
+  move(){
+    this.walksRecklessly = this.isAgitated()
+    this.movementBehavior.setupProximityMovements(player)
+    this.setSpriteImage()
+    this.movementBehavior.move()
   }
 
   draw(){
-    this.setupMovements()
-    this.setSpriteImage()
+
+    if(this.potionsConsumed > 0 && this.isFalling && Date.now() - this.fallTimer > 400) this.attemptToDash()
+
     this.move()
     this.tryToAttackTargets()
 
+    this.emote()
     this.sprite.draw()
     if(this.takingDamage) this.damagedAnimation()
   }

@@ -14,6 +14,28 @@ class BoundingRegion{
     this.y = options.coords().y
   }
 
+  static pointCollisions(point, boundaries) {
+    let collidingBoundaries = []
+    boundaries.forEach( boundary => {
+      boundary.updateBoundaryCoords()
+      if(boundary.containsPoint(point)) collidingBoundaries.push(boundary)
+    })
+
+    return collidingBoundaries.length > 0
+  }
+
+  static dashCancelling(boundaries) {
+    return boundaries.filter(bound => bound.cancelsDash === true)
+  }
+
+  static canBeFallenInto(boundaries = activeRoom.boundaries()) {
+    return boundaries.filter(bound => bound.canBeFallenInto === true)
+  }
+
+  static canNotBeFallenInto(boundaries) {
+    return boundaries.filter(bound => bound.canBeFallenInto !== true)
+  }
+
   updateBoundaryCoords(){
     if(this.coordsAreVolatile) return
     let updatedCoords = this.coords()
@@ -37,7 +59,11 @@ class BoundingRegion{
       let closestBoundPoint = boundary.closestPointTo(this.x,this.y)
 
       if(this.containsPoint(closestBoundPoint)){
-        boundary.collisionPoint = closestBoundPoint
+        if(boundary.width !== undefined){
+          boundary.collisionPoint = closestBoundPoint
+        } else {
+          boundary.collisionPoint = boundary.coords()
+        }
         collidingBoundaries.push(boundary)
       }
     })

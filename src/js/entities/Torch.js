@@ -12,7 +12,7 @@ class Torch{
     let torchSprite = new Sprite({
       x: this.x+.5*TS,
       y: this.y+(.7*TS),
-      width: 64,
+      width: 16,
       height: 16,
       image: imgs.torch,
       numberOfFrames: 4,

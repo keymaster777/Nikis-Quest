@@ -13,7 +13,8 @@ class BossBarOverlay extends OverlayElement{
   }
 
   render(){
-    this.bosses = activeRoom.monsters.filter(monster => monster.potionsConsumed > 0)
+    let potentialBossMobs = [...activeRoom.monsters, ...activeRoom.chests]
+    this.bosses = potentialBossMobs.filter(monster => monster.potionsConsumed > 0)
     this.barHeight = 34
     this.height = this.bosses.length*this.barHeight
 
