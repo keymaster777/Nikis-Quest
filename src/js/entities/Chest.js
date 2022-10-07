@@ -92,8 +92,9 @@ class Chest{
     activeRoom.chests = activeRoom.chests.filter(chest => chest !== this)
     player.chestsOpened += 1
 
+    if(this.isFalling) return
+
     if(this.potionsConsumed > 0){
-      if(this.isFalling) return
       [...Array(5)].forEach(() => {
         activeRoom.potions.push(new Potion(
           this.x+(Math.random()*30)-15,
