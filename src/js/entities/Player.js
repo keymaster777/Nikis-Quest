@@ -66,6 +66,7 @@ class Player{
     this.chestsOpened = 0
     this.potionsConsumed = 0
     this.roomsExplored = 1
+    this.coins = 0
 
     // compose killable and fightable into player
     Object.assign(this, killable, fightable)
@@ -78,6 +79,7 @@ class Player{
   drinkPotion(){
     this.potionsConsumed += 1
     this.hitPoints = Math.min(this.hitPoints + 20, this.maxHitPoints)
+    this.lastDrankPotion = Date.now()
   }
 
   attemptToDash(){
@@ -115,7 +117,7 @@ class Player{
 
   emote(){
     ctx.save()
-    ctx.globalAlpha = 1
+
     ctx.fillStyle = "red"
     ctx.textAlign = "center"
     if( this.isFalling){
@@ -124,7 +126,11 @@ class Player{
     } else if(this.isAgitated()){
       ctx.font = "15px antiquityFont"
       ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(this.potionsConsumed > 0 && Date.now() - this.lastDrankPotion < 1500){
+      ctx.font = "20px arial"
+      ctx.fillText("ヽ(^o^)ノ", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     }
+
     ctx.restore()
   }
 
@@ -140,6 +146,7 @@ class Player{
     if(this.hitPoints > 0 && this.isAttacking && this.attackDirection !== DOWN) this.swingWeapon()
 
     if(this.hitPoints === 0) ctx.globalAlpha = 0
+    if (this.stamina < 100) this.stamina += 0.35
 
     this.move()
     this.emote()

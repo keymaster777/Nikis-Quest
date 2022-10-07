@@ -1,4 +1,4 @@
-import { TS, UP, DOWN, LEFT, RIGHT, NAMES } from "../constants"
+import { TS, LEFT, RIGHT, NAMES } from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic"
 import { distance } from "../helpers"
 import Sprite from "../Sprite"
@@ -6,6 +6,7 @@ import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
 import MovementBehavior from "../entityBehaviors/MovementBehavior"
 import Potion from "./Potion"
+import Coin from "./Coin"
 
 class Chort{
   constructor(tileSizeX, tileSizeY){
@@ -81,6 +82,7 @@ class Chort{
     this.powerUp()
     this.hitPoints = this.maxHitPoints
     this.potionsConsumed += 1
+    this.lastDrankPotion = Date.now()
   }
 
   multiplySize(multiplier){
@@ -112,24 +114,33 @@ class Chort{
 
   killChort(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster !== this)
-    player.enemiesFelled += 1
+    player.enemiesFelled += 1;
 
-    if(this.potionsConsumed > 0) {
-      activeRoom.potions.push(new Potion(this.x-.5*TS, this.y-.2*TS, false))
+    [...Array(5)].forEach(() => {
+      let coin = new Coin(this.x, this.y)
+      if(this.isFalling === false) player.knockBack(coin)
+      activeRoom.coins.push(coin)
+    })
+
+    if(this.potionsConsumed > 0){
+      [...Array(2)].forEach(() => {
+        let coin = new Coin(this.x, this.y, { value: 10 })
+        if(this.isFalling === false) player.knockBack(coin)
+        activeRoom.coins.push(coin)
+      });
+
+      [...Array(this.potionsConsumed)].forEach(() => {
+        activeRoom.potions.push(new Potion(
+          this.x-.5*TS+(Math.random()*30)-15,
+          this.y-.2*TS+(Math.random()*30)-15,
+          false
+        ))
+      })
     }
   }
 
   isAgitated(){
     return this.takingDamage || distance(this.x, this.y, player.x, player.y) < 2*TS
-  }
-
-  setupMovements(){
-    if ( this.isAgitated()){
-      if (player.y < this.y) this.queuedMovements.push(UP)
-      if (player.y > this.y) this.queuedMovements.push(DOWN)
-      if (player.x < this.x-5) this.queuedMovements.push(LEFT)
-      if (player.x > this.x+5) this.queuedMovements.push(RIGHT)
-    }
   }
 
   setSpriteImage(){
@@ -154,7 +165,10 @@ class Chort{
       ctx.fillText("!", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     } else if(this.isAgitated()){
       ctx.font = "15px antiquityFont"
-      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight())
+      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(Date.now() - this.lastDrankPotion < 1500){
+      ctx.font = "20px arial"
+      ctx.fillText("ヽ(^o^)ノ", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     }
   }
 

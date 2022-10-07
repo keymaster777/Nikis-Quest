@@ -8,7 +8,12 @@ class BoundingElliptic extends BoundingRegion{
 
     this.xSemiAxis = options.xSemiAxis || TS
     this.ySemiAxis = options.ySemiAxis || TS
+
+    this.canBeCorrectedAgainstRectangle = true
+    this.type = "ellipse"
   }
+
+  get centerPoint(){ return { x: this.x, y: this.y }}
 
   probePoints(){
     let probePoints = {}
@@ -60,6 +65,34 @@ class BoundingElliptic extends BoundingRegion{
       return point(this.x+radiusFromPoint*Math.cos(angle), this.y+radiusFromPoint*Math.sin(angle))
     }
     return point(x,y)
+  }
+
+  closestPointToPoint(x,y){
+    let radiusFromPoint = this.radiusFromPoint(x, y)
+    if (radiusFromPoint < distance(this.x, this.y, x, y)){
+      let angle = this.angleInRadiansToTargetPoint(x, y, 0, 0)
+      return point(this.x+radiusFromPoint*Math.cos(angle), this.y+radiusFromPoint*Math.sin(angle))
+    }
+    return point(x,y)
+  }
+
+  closestPointToBound(boundary) {
+    if(boundary instanceof BoundingElliptic) {
+      return this.closestPointToPoint(boundary.x, boundary.y)
+    } else {
+      let otherBoundClosest = boundary.closestPointToPoint(this.x, this.y)
+      return this.closestPointToPoint(otherBoundClosest.x, otherBoundClosest.y)
+    }
+  }
+
+  collisionAngleToBound(boundary) {
+    let selfReferencePoint = this.coords()
+    let angleReferencePoint = this.closestPointToBound(boundary)
+
+    let dy = angleReferencePoint.y - selfReferencePoint.y
+    let dx = angleReferencePoint.x - selfReferencePoint.x
+    let theta = Math.atan2(dy, dx) // range (-PI, PI]
+    return theta
   }
 
   containsPoint(point){

@@ -6,6 +6,7 @@ import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
 import MovementBehavior from "../entityBehaviors/MovementBehavior"
 import Potion from "./Potion"
+import Coin from "./Coin"
 
 class Goblin{
   constructor(tileSizeX, tileSizeY, spawnEmpowered = false){
@@ -75,6 +76,7 @@ class Goblin{
     this.powerUp()
     this.hitPoints = this.maxHitPoints
     this.potionsConsumed += 1
+    this.lastDrankPotion = Date.now()
   }
 
   powerUp(){
@@ -110,9 +112,29 @@ class Goblin{
 
   killGoblin(){
     activeRoom.monsters = activeRoom.monsters.filter(monster => monster !== this)
-    player.enemiesFelled += 1
-    if(this.potionsConsumed > 0) {
-      activeRoom.potions.push(new Potion(this.x-.5*TS, this.y-.2*TS, false))
+    player.enemiesFelled += 1;
+
+    [...Array(3)].forEach(() => {
+      let coin = new Coin(this.x, this.y)
+      if(this.isFalling === false) player.knockBack(coin)
+      activeRoom.coins.push(coin)
+    })
+
+
+    if(this.potionsConsumed > 0){
+      [...Array(2)].forEach(() => {
+        let coin = new Coin(this.x, this.y, { value: 10 })
+        if(this.isFalling === false) player.knockBack(coin)
+        activeRoom.coins.push(coin)
+      });
+
+      [...Array(this.potionsConsumed)].forEach(() => {
+        activeRoom.potions.push(new Potion(
+          this.x-.5*TS+(Math.random()*30)-15,
+          this.y-.2*TS+(Math.random()*30)-15,
+          false
+        ))
+      })
     }
   }
 
@@ -148,7 +170,10 @@ class Goblin{
       ctx.fillText("!", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     } else if(this.isAgitated()){
       ctx.font = "26px antiquityFont"
-      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight())
+      ctx.fillText(">:(", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
+    } else if(Date.now() - this.lastDrankPotion < 1500){
+      ctx.font = "20px arial"
+      ctx.fillText("ヽ(^o^)ノ", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     }
   }
 

@@ -6,6 +6,7 @@ import Chort from "./Chort"
 import Potion from "./Potion"
 import Sprite from "../Sprite"
 import MovementBehavior from "../entityBehaviors/MovementBehavior"
+import Coin from "./Coin"
 
 class Chest{
   constructor(tileSizeX, tileSizeY){
@@ -24,16 +25,16 @@ class Chest{
     })
 
     let killable = new Killable({
-      maxHitPoints: 15,
+      maxHitPoints: 24,
       maxDamageFrames: 18,
       onDeath: this.destroyChest
     })
 
+    this.walksRecklessly = true
     let movementOptions = {
       speed: 0,
       maxKnockBackFrames: 4,
-      knockBackInitialDistance: 3,
-      stuckToFloor: true
+      knockBackInitialDistance: 4
     }
     this.movementBehavior = new MovementBehavior(this, movementOptions)
 
@@ -71,8 +72,16 @@ class Chest{
 
   powerUp(){
     if(this.potionsConsumed === 0){
+      this.multiplySize(1.5)
       this.maxHitPoints = this.maxHitPoints*3
     }
+  }
+
+  multiplySize(multiplier){
+    this.sprite.sizescale *= multiplier
+    this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
+    this.boundary.multiplySize(multiplier)
+    this.hitBox.multiplySize(multiplier)
   }
 
   fullName(){
@@ -80,29 +89,36 @@ class Chest{
   }
 
   destroyChest(){
-
     activeRoom.chests = activeRoom.chests.filter(chest => chest !== this)
     player.chestsOpened += 1
 
     if(this.potionsConsumed > 0){
-      [...Array(4)].forEach(() => {
+      if(this.isFalling) return
+      [...Array(5)].forEach(() => {
         activeRoom.potions.push(new Potion(
           this.x+(Math.random()*30)-15,
           this.y+(Math.random()*30)-15,
           false
         ))
+      });
+
+      [...Array(5)].forEach(() => {
+        let coin = new Coin(this.bodyCenter().x, this.y+(TS*.6), { spread: 30 })
+        activeRoom.coins.push(coin)
       })
+      activeRoom.coins.push(new Coin(this.bodyCenter().x, this.y, { value: 15 }))
     } else {
       let random = Math.random()
-      if(random >= .95){
-        activeRoom.monsters.push(new Goblin(this.x/TS, this.y/TS, true))
-      }
-      if(random >= .9){
-        activeRoom.monsters.push(new Chort(this.x/TS, this.y/TS))
-      }
+      if(random >= .95) activeRoom.monsters.push(new Goblin(this.x/TS, this.y/TS, true))
+      if(random >= .9) activeRoom.monsters.push(new Chort(this.x/TS, this.y/TS))
       if(random < .9){
-        activeRoom.potions.push(new Potion(this.x, this.y, false))
+        activeRoom.potions.push(new Potion(this.x, this.y, false));
+        [...Array(5)].forEach(() => {
+          let coin = new Coin(this.bodyCenter().x, this.y+(TS*.6), { spread: 30 })
+          activeRoom.coins.push(coin)
+        })
       }
+      if(random < .05) activeRoom.coins.push(new Coin(this.bodyCenter().x, this.y, { value: 15 }))
     }
   }
 

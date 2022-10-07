@@ -93,17 +93,14 @@ document.body.appendChild(canvas);
 
 
 function main() {
+  handleInput()
+
   ctx.fillStyle = "#1a1a1a"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  // Regen Components
-  if (player.stamina < 100) player.stamina += 0.35
-
-  handleInput()
-
   activeRoom.drawRoom()
   overlayManager.renderOverlays()
-  if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
 
+  if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
   requestAnimationFrame(main)
 }

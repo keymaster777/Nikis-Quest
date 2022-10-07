@@ -11,11 +11,10 @@ class MovementBehavior{
     this.entity.isBeingKnockedBack = false
     this.entity.facing = DOWN
 
-    this.speed = options.speed || 2.5
+    this.speed = options.speed === undefined ? 2.5 : options.speed
     this.dashSpeed = options.dashSpeed || 0
     this.collisionTargets = options.collisionTargets || (() => activeRoom.boundaries())
     this.effectTargets = options.effectTargets || (() => activeRoom.effectEntities())
-    this.stuckToFloor = options.stuckToFloor === undefined ? false : options.stuckToFloor
     this.queuedMovements = []
     this.lastValidLocation = point(0,0)
     this.correctingPosition = false
@@ -84,8 +83,6 @@ class MovementBehavior{
   }
 
   shouldStayValid(){
-    if(this.stuckToFloor === true) return true
-
     if(this.entity.isDashing) return false
     if(this.entity.isBeingKnockedBack) return false
     if(this.entity.isFalling) return false
@@ -150,11 +147,11 @@ class MovementBehavior{
   }
 
   shouldBeFalling(){
-    if(this.entity.isDashing || this.isCorrecting) return false
+    if(this.entity.isDashing || this.isCorrecting || this.entity.canFloat === true) return false
     let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
     if (collisions.length === 0) return false
 
-    let pitFall = collisions.find(bound => bound.containsPoint(point(this.x, this.y)) && bound.canBeFallenInto)
+    let pitFall = collisions.find(bound => bound.containsPoint(this.boundary.centerPoint) && bound.canBeFallenInto)
     return pitFall !== undefined
   }
 
@@ -201,29 +198,27 @@ class MovementBehavior{
   }
 
   continueCorrecting(){
-    let boundaryCollisions = this.entity.boundary.boundaryCollisions(this.newCollisionTargets())
+    let boundary = this.entity.boundary.boundaryCollisions(this.newCollisionTargets())[0]
     let speed = this.currentSpeed()
+    if(boundary === undefined) return
 
-    if (boundaryCollisions.length > 0){
-      let collisionPoint = boundaryCollisions[0].collisionPoint
-      let collisionAngleRadians = this.boundary.angleInRadiansToTargetPoint(collisionPoint.x, collisionPoint.y)
-      let angle = (collisionAngleRadians + Math.PI) * (180/Math.PI)
+    let collisionAngleRadians = this.boundary.collisionAngleToBound(boundary)
+    let degrees = (collisionAngleRadians + Math.PI) * (180/Math.PI)
 
-      if(angle === 90 && this.queuedMovements.includes(UP)) this.y = this.lastValidLocation.y
-      if(angle === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastValidLocation.y
-      if(angle === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
-      if(angle === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
+    if(degrees === 90 && this.queuedMovements.includes(UP)) this.y = this.lastValidLocation.y
+    if(degrees === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastValidLocation.y
+    if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
+    if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
 
-      if(this.outOfBounds()){
-        this.x=this.lastValidLocation.x
-        this.y=this.lastValidLocation.y
+    if(this.outOfBounds()){
+      this.x=this.lastValidLocation.x
+      this.y=this.lastValidLocation.y
 
-        let newX = (Math.cos(collisionAngleRadians+Math.PI) * (speed*.5) + this.x)
-        let newY = (Math.sin(collisionAngleRadians+Math.PI) * (speed*.5) + this.y)
+      let newX = (Math.cos(collisionAngleRadians+Math.PI) * (speed*.5) + this.x)
+      let newY = (Math.sin(collisionAngleRadians+Math.PI) * (speed*.5) + this.y)
 
-        this.x = newX
-        this.y = newY
-      }
+      this.x = newX
+      this.y = newY
     }
 
     if(!this.outOfBounds()) this.stopCorrecting()
@@ -264,7 +259,7 @@ class MovementBehavior{
 
     this.knockBackCurrentDistance *= 0.75
 
-    let collisions = this.boundary.boundaryCollisions(this.collisionTargets())
+    let collisions = this.boundary.boundaryCollisions(this.newCollisionTargets())
     if(collisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap()){
       this.x = this.lastValidLocation.x
       this.y = this.lastValidLocation.y
@@ -282,9 +277,8 @@ class MovementBehavior{
 
   newCollisionTargets(){
     let collisionTargets = activeRoom.boundaries()
-    if(this.entity.isDashing) collisionTargets = BoundingRegion.dashCancelling(collisionTargets)
-    if(this.entity.walksRecklessly) collisionTargets = BoundingRegion.canNotBeFallenInto(collisionTargets)
-
+    if(this.entity.isDashing || this.entity.canBeWalkedThrough) collisionTargets = BoundingRegion.dashCancelling(collisionTargets)
+    if(this.entity.walksRecklessly || this.entity.canFloat === true) collisionTargets = BoundingRegion.canNotBeFallenInto(collisionTargets)
     return collisionTargets
   }
 
@@ -313,6 +307,7 @@ class MovementBehavior{
   }
 
   setupProximityMovements(target){
+    if(target.hitPoints <= 0) return
     if (target.y < this.y) this.queuedMovements.push(UP)
     if (target.y > this.y) this.queuedMovements.push(DOWN)
     if (target.x < this.x-5) this.queuedMovements.push(LEFT)

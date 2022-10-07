@@ -11,6 +11,7 @@ import LetterDImg from "../img/UIelements/D.png"
 import SpaceBarImg from "../img/UIelements/SPACE.png"
 import CheckboxImg from "../img/UIelements/checkbox.png"
 import CheckboxCheckImg from "../img/UIelements/checkbox_check.png"
+import CoinSprite from "../img/UIelements/floating_coin.png"
 
 // Player Image Imports
 import RunRightSprite from "../img/player/run-right.png"
@@ -102,6 +103,8 @@ function setUpImages() {
   imgs.checkbox.src = CheckboxImg
   imgs.checkboxCheck = new Image()
   imgs.checkboxCheck.src = CheckboxCheckImg
+  imgs.coin = new Image()
+  imgs.coin.src = CoinSprite
 
   // Player Images and Sprites
   imgs.runRight = new Image()

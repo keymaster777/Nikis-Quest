@@ -24,6 +24,8 @@ class Door extends Structure{
       triggerEvent: ((entity) => this.stepInDoor(entity, this))
     })
 
+    this.occupyingSpaces = [[this.x,this.y]]
+
     this.build()
   }
 
@@ -58,8 +60,12 @@ class Door extends Structure{
   }
 
   build(){
-    this.selfArray.push(new FloorTile(this.x, this.y))
-    this.occupyingSpaces = [[this.x,this.y]]
+    if(this.direction === UP) this.occupyingSpaces.push([this.x, this.y+1])
+    if(this.direction === DOWN) this.occupyingSpaces.push([this.x, this.y-1])
+
+    this.occupyingSpaces.forEach(spot => {
+      this.selfArray.push(new FloorTile(...spot))
+    })
 
     if([UP, DOWN].includes(this.direction)) this.effectBox.height = .1*TS
     if([LEFT, RIGHT].includes(this.direction)) this.effectBox.width = .1*TS

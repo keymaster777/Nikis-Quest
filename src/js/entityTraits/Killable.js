@@ -7,6 +7,7 @@ class Killable{
     this.hitPoints = this.maxHitPoints
     this.takingDamage = false
     this.damagedLast = Date.now()
+    this.lastDrankPotion = Date.now()
     this.damagedAnimation = this.damagedAnimation
     this.takeDamage = this.takeDamage
   }

@@ -26,6 +26,7 @@ class Room{
     this.torches = []
     this.potions = []
     this.chests = []
+    this.coins = []
     // Room entities end
 
     this.built = false
@@ -209,12 +210,13 @@ class Room{
       ...this.chests,
       ...this.monsters,
       ...this.doors,
+      ...this.coins,
       player
     ]
   }
 
   boundaryEntities(){
-    return this.allEntities().filter(entity => entity.boundary !== undefined)
+    return this.allEntities().filter(entity => entity.boundary !== undefined && entity.canBeWalkedThrough !== true)
   }
 
   hitBoxEntities(){
@@ -243,12 +245,12 @@ class Room{
     layer1.forEach(ele => ele.draw())
     layer2.forEach(ele => ele.draw())
 
-    var objectsWithLayerVariety = [...layerVaries, ...this.chests, ...this.potions, ...this.monsters, ...this.torches, player]
+    var objectsWithLayerVariety = [...layerVaries, ...this.chests, ...this.potions, ...this.monsters, ...this.torches, ...this.coins, player]
 
     objectsWithLayerVariety = objectsWithLayerVariety.sort((a,b) => {
       var elements = [a,b].map(ele => {
-        if (ele.depthBreakpoint !== undefined) return ele.depthBreakpoint
         if (ele.isFalling === true) return ele.y - TS
+        if (ele.depthBreakpoint !== undefined) return ele.depthBreakpoint
         return ele.y
       })
 
@@ -272,6 +274,9 @@ class Room{
 
     // this.doors.forEach(door => door.effectBox.drawArea('yellow'))
     // this.potions.forEach(potion => potion.effectBox.drawArea('yellow'))
+
+
+    // player.boundary.drawBounds()
 
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }

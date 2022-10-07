@@ -1,5 +1,3 @@
-import { distance } from "../helpers"
-
 class BoundingRegion{
   constructor(options) {
     // If boundary moves use coords function to get parent objects x and y
@@ -47,23 +45,15 @@ class BoundingRegion{
     return this.boundaryCollisions([boundary]).length === 1
   }
 
-  boundaryCollisions(boundaries){
+  boundaryCollisions(boundaries = activeRoom.boundaries()){
     this.updateBoundaryCoords()
     let collidingBoundaries = []
 
     boundaries.forEach( boundary => {
       if(boundary === this) return // Dont reference self boundary
-
       boundary.updateBoundaryCoords()
 
-      let closestBoundPoint = boundary.closestPointTo(this.x,this.y)
-
-      if(this.containsPoint(closestBoundPoint)){
-        if(boundary.width !== undefined){
-          boundary.collisionPoint = closestBoundPoint
-        } else {
-          boundary.collisionPoint = boundary.coords()
-        }
+      if(boundary.containsPoint(this.closestPointToBound(boundary))){
         collidingBoundaries.push(boundary)
       }
     })
@@ -71,8 +61,7 @@ class BoundingRegion{
     return collidingBoundaries
   }
 
-
-  drawBounds(boundaries){
+  drawBounds(boundaries = activeRoom.boundaries()){
     // TODO clean up this method
     let collidingBoundaries = []
 
@@ -80,21 +69,18 @@ class BoundingRegion{
       if(boundary === this) return // Dont reference self boundary
       boundary.updateBoundaryCoords()
 
-      let closestBoundPoint = boundary.closestPointTo(this.x,this.y)
-
+      let closestPointToBound = this.closestPointToBound(boundary)
       ctx.fillStyle = "blue"
-      ctx.fillRect(closestBoundPoint.x-2,closestBoundPoint.y-2,5,5) // Creates visual reference for boundaries center mark
-
-      let selfClosest = this.closestPointTo(closestBoundPoint.x, closestBoundPoint.y)
-      if( distance(closestBoundPoint.x, closestBoundPoint.y, selfClosest.x, selfClosest.y) < 50){
-        ctx.fillRect(selfClosest.x-2, selfClosest.y-2,5,5)
-      }
+      ctx.fillRect(closestPointToBound.x-2,closestPointToBound.y-2,5,5) // Creates visual reference for boundaries center mark
 
     })
 
     return collidingBoundaries
   }
 
+  canBeCorrectedRelativeTo(boundary) {
+    return !(this.canBeCorrectedAgainstRectangle === false && boundary.canBeCorrectedAgainstRectangle === false)
+  }
 
 }
 
