@@ -8,6 +8,7 @@ class BoundingRegion{
     this.canBeFallenInto = options.canBeFallenInto || false
     this.collisionReferencePoint = { x: 0, y: 0 }
     this.triggerEvent = options.triggerEvent || null
+    this.entityBound = options.entityBound !== undefined ? options.entityBound : false
     this.x = options.coords().x
     this.y = options.coords().y
   }

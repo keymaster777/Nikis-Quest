@@ -1,4 +1,8 @@
 import { UP, DOWN, LEFT, RIGHT } from "./constants"
+import Room from "./Room"
+import Level from "./Level"
+import Player from "./entities/Player"
+import OverlayManager from "./OverlayManager"
 
 function randomIntFromInterval(min,max){
   return Math.floor(Math.random()*(max-min+1)+min)
@@ -6,6 +10,29 @@ function randomIntFromInterval(min,max){
 
 function distance(x1, y1, x2, y2){
   return Math.sqrt((x2-x1)**2 + (y2-y1)**2)
+}
+
+function getMousePosition(canvas, event) {
+  let rect = canvas.getBoundingClientRect()
+  let x = event.clientX - rect.left
+  let y = event.clientY - rect.top
+  console.log("Coordinate x: " + x, "Coordinate y: " + y)
+  return { x: x, y: y }
+}
+
+function setGame(){
+  global.activeRoom = new Room(0,0)
+  global.player = new Player()
+  global.level = new Level(1)
+  global.overlayManager = new OverlayManager()
+
+  level.buildOutRooms()
+  player.setLocation(activeRoom.spawnLocation)
+
+  overlayManager.addPrimaryOverlay()
+  overlayManager.addControlsInfoOverlay()
+  overlayManager.addLevelStartOverlay()
+  if(activeRoom.torches.length === 0) overlayManager.addDarkRoomOverlay()
 }
 
 function handleInput() {
@@ -44,4 +71,4 @@ function point(x,y) {
 }
 
 
-export { randomIntFromInterval, handleInput, distance, point }
+export { setGame, randomIntFromInterval, handleInput, distance, point, getMousePosition }

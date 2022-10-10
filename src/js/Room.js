@@ -8,7 +8,7 @@ import Chort from "./entities/Chort"
 import Pit from "./structures/Pit"
 
 import { randomIntFromInterval } from "./helpers"
-import { TS, CANVAS_WIDTH } from "./constants"
+import { TS, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants"
 
 class Room{
   constructor( x, y){
@@ -216,7 +216,7 @@ class Room{
   }
 
   boundaryEntities(){
-    return this.allEntities().filter(entity => entity.boundary !== undefined && entity.canBeWalkedThrough !== true)
+    return this.allEntities().filter(entity => entity.boundary !== undefined)
   }
 
   hitBoxEntities(){
@@ -233,7 +233,12 @@ class Room{
   }
 
   drawRoom(){
-    ctx.translate(activeRoom.lpad, 0)
+    if(freeCam){
+      ctx.translate(CANVAS_WIDTH/2 - player.x, CANVAS_HEIGHT/2 - player.y)
+    } else {
+      ctx.translate(activeRoom.lpad, 0)
+    }
+
     var layerVaries = this.tileArray.filter(tile => tile.layer === "*")
     var layer0 = this.tileArray.filter(tile => tile.layer === 0)
     var layer1 = this.tileArray.filter(tile => tile.layer === 1)
@@ -278,6 +283,7 @@ class Room{
 
     // player.boundary.drawBounds()
 
+    ctx.restore()
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }

@@ -13,6 +13,12 @@ class OverlayManager {
     this.activeOverlayElements = []
   }
 
+  get buttonBoxes() {
+    let boxes = []
+    this.activeOverlayElements.forEach(overlay => {boxes = [...boxes, ...overlay.buttonBoxes] })
+    return boxes
+  }
+
   renderOverlays(){
     let elements = this.activeOverlayElements.sort((b,a) => a.renderPriority - b.renderPriority)
     elements.forEach(overlay => {

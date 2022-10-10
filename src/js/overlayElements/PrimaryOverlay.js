@@ -79,16 +79,18 @@ class PrimaryOverlay extends OverlayElement{
     ctx.fillText("LEVEL COMPLETION: ", 10, 345)
 
     ctx.drawImage(level.haveAllMonstersBeenKilled() ? imgs.checkboxCheck : imgs.checkbox, 10, 350, 40, 40)
-    ctx.fillText("Clear all rooms", 45, 376)
+    ctx.fillText("Clear all rooms", 47, 376)
 
     ctx.drawImage(level.isComplete() ? imgs.checkboxCheck : imgs.checkbox, 10, 380, 40, 40)
-    ctx.fillText("Return to start" , 45, 406)
+    ctx.fillText("Return to start" , 47, 406)
 
     ctx.textAlign = "center"
     ctx.font = "24px bitPotionFont"
-    ctx.fillText(`Potions Devoured: ${player.potionsConsumed}`,100, CANVAS_HEIGHT-100)
-    ctx.fillText(`Chests Opened: ${player.chestsOpened}`,100, CANVAS_HEIGHT-80)
-    ctx.fillText(`Enemies Felled: ${player.enemiesFelled}`,100, CANVAS_HEIGHT-60)
+    ctx.fillText(`Potions Devoured: ${player.potionsConsumed}`,100, CANVAS_HEIGHT-120)
+    ctx.fillText(`Chests Opened: ${player.chestsOpened}`,100, CANVAS_HEIGHT-100)
+    ctx.fillText(`Enemies Felled: ${player.enemiesFelled}`,100, CANVAS_HEIGHT-80)
+    ctx.fillText(`Death Count: ${deathCount}`,100, CANVAS_HEIGHT-60)
+
     ctx.fillText(`Dungeon Level: ${level.levelNum}`,100, CANVAS_HEIGHT-30)
 
     super.render()

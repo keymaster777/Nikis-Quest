@@ -18,7 +18,9 @@ module.exports = {
     "player": true,
     "level": true,
     "overlayManager": true,
-    "activeRoom": true
+    "activeRoom": true,
+    "freeCam": true,
+    "deathCount": true,
   },
   "ignorePatterns": [
     "/dist/*.js",

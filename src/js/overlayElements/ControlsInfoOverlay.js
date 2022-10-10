@@ -1,12 +1,25 @@
 import OverlayElement from "./OverlayElement"
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../constants"
+import BoundingRectangle from "../boundingAreas/BoundingRectange"
 
 class ControlsInfoOverlay extends OverlayElement{
   constructor(){
     super(CANVAS_WIDTH-210, 10, "Controls Info Overlay", 1)
+    this.width = 200
+    this.height = CANVAS_HEIGHT-20
+
+    let freeCamBox = new BoundingRectangle({
+      coords: (() => ({ x: this.x+20, y: this.y+this.height-30 })),
+      width: 20,
+      height: 20,
+      triggerEvent: (() => freeCam = !freeCam)
+    })
+
+    this.buttonBoxes.push(freeCamBox)
   }
 
   render(){
+
     ctx.translate(this.x, this.y)
 
     ctx.fillStyle = "#555"
@@ -36,7 +49,16 @@ class ControlsInfoOverlay extends OverlayElement{
 
     ctx.fillText("To dash", 100, 440)
 
+    ctx.fillStyle = "#b8b5b9"
+    ctx.font = "28px bitPotionFont"
+    ctx.textAlign = "left"
+    ctx.drawImage(freeCam ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-40, 40, 40)
+    ctx.fillText("Lock Camera", 47, this.height-14)
+
     super.render()
+
+    // ctx.restore()
+    // this.buttonBoxes[0].drawArea("yellow")
   }
 }
 

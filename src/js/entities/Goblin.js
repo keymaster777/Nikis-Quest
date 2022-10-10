@@ -1,6 +1,5 @@
-import { TS, UP, DOWN, LEFT, RIGHT, NAMES } from "../constants"
+import { TS, LEFT, RIGHT, NAMES } from "../constants"
 import BoundingElliptic from "../boundingAreas/BoundingElliptic"
-import BoundingRegion from "../boundingAreas/BoundingRegion"
 import Sprite from "../Sprite"
 import Killable from "../entityTraits/Killable"
 import Fightable from "../entityTraits/Fightable"
@@ -29,6 +28,7 @@ class Goblin{
       xSemiAxis: .25*TS,
       ySemiAxis: .125*TS,
       isMovingBoundary: true,
+      entityBound: true,
     })
 
     this.hitBoxCoords = () => ({ x: this.x, y: this.y-(.25*TS) })
@@ -55,7 +55,7 @@ class Goblin{
       speed: Math.random() + .75,
       maxKnockBackFrames: 10,
       knockBackInitialDistance: 16,
-      dashSpeed: 6,
+      dashSpeed: 8,
     }
     this.movementBehavior = new MovementBehavior(this, movementOptions)
 
@@ -139,17 +139,7 @@ class Goblin{
   }
 
   attemptToDash(){
-    if(this.isDashing === false){
-      let dy = player.bodyCenter().y - this.bodyCenter().y
-      let dx = player.bodyCenter().x - this.bodyCenter().x
-      let angleRadians = Math.atan2(dy, dx) // range (-PI, PI)
-      let degrees = (angleRadians + Math.PI) * 180/Math.PI
-      if(degrees >= 45 && degrees < 135) this.movementBehavior.startDashing(UP)
-      if(degrees >= 135 && degrees < 225) this.movementBehavior.startCorrecting(RIGHT)
-      if(degrees >= 225 && degrees < 315) this.movementBehavior.startCorrecting(DOWN)
-      if(degrees < 45 || degrees >= 315) this.movementBehavior.startCorrecting(LEFT)
-      this.movementBehavior.startDashing(this.facing)
-    }
+    if(this.isDashing === false) this.movementBehavior.startDashing()
   }
 
   setSpriteImage(){
@@ -158,8 +148,9 @@ class Goblin{
   }
 
   isAgitated(){
-    if (this.boundary.boundaryCollisions(BoundingRegion.canBeFallenInto()).length > 0) return true
-    return (this.potionsConsumed > 0 &&  Date.now() - this.damagedLast < 2000)
+    let isSuper = this.potionsConsumed > 0
+    let damagedRecently = Date.now() - this.damagedLast < 2000
+    return isSuper && (damagedRecently || this.isFalling)
   }
 
   emote(){

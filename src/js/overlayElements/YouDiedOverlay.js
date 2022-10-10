@@ -1,5 +1,6 @@
 import OverlayElement from "./OverlayElement"
 import { CANVAS_WIDTH } from "../constants"
+import { setGame } from "../helpers"
 
 class YouDiedOverlay extends OverlayElement{
   constructor(){
@@ -19,7 +20,8 @@ class YouDiedOverlay extends OverlayElement{
   }
 
   elementTeardown(){
-    window.location.reload(false)
+    deathCount += 1
+    setGame()
     super.elementTeardown()
   }
 

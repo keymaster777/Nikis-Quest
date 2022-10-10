@@ -10,6 +10,7 @@ class Killable{
     this.lastDrankPotion = Date.now()
     this.damagedAnimation = this.damagedAnimation
     this.takeDamage = this.takeDamage
+    this.takeTrueDamage = this.takeTrueDamage
   }
 
   damagedAnimation(){
@@ -27,7 +28,11 @@ class Killable{
   }
 
   takeDamage(damage){
-    if(this.takingDamage || this.isDashing) return
+    if(this.takingDamage || this?.movementBehavior?.isDashing === true) return
+    this.takeTrueDamage(damage)
+  }
+
+  takeTrueDamage(damage){
     this.damagedLast = Date.now()
     this.takingDamage = true
     this.currentDamageFrame = 0

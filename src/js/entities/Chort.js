@@ -30,6 +30,7 @@ class Chort{
       xSemiAxis: .2*TS,
       ySemiAxis: .1*TS,
       isMovingBoundary: true,
+      entityBound: true,
     })
 
     this.hitBoxCoords = () => ({ x: this.x, y: this.y-(.25*TS) })
@@ -57,7 +58,7 @@ class Chort{
       speed: 3.5+level.levelNum*0.3,
       maxKnockBackFrames: 8,
       knockBackInitialDistance: 16,
-      dashSpeed: 6,
+      dashSpeed: 10,
     }
     this.movementBehavior = new MovementBehavior(this, movementOptions)
 
@@ -97,7 +98,6 @@ class Chort{
       this.name = NAMES.sort(() => 0.5 - Math.random())[0]
       this.multiplySize(2)
       this.maxHitPoints = this.maxHitPoints*4
-      this.collisionTargets = (() => activeRoom.boundaries().filter(bound => bound.cancelsDash === true))
       this.maxKnockBackFrames = 4
       this.knockBackInitialDistance = 8
     } else {
@@ -170,6 +170,10 @@ class Chort{
       ctx.font = "20px arial"
       ctx.fillText("ヽ(^o^)ノ", this.sprite.x, this.sprite.y - this.sprite.calculatedHeight()+10)
     }
+  }
+
+  attemptToDash(){
+    if(this.isDashing === false) this.movementBehavior.startDashing()
   }
 
   move(){

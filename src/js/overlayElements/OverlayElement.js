@@ -4,6 +4,7 @@ class OverlayElement {
     this.y = y
     this.name = name
     this.renderPriority = renderPriority
+    this.buttonBoxes = []
 
     this.beforeElementSetup()
   }

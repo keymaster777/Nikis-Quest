@@ -13,7 +13,6 @@ class MovementBehavior{
 
     this.speed = options.speed === undefined ? 2.5 : options.speed
     this.dashSpeed = options.dashSpeed || 0
-    this.collisionTargets = options.collisionTargets || (() => activeRoom.boundaries())
     this.effectTargets = options.effectTargets || (() => activeRoom.effectEntities())
     this.queuedMovements = []
     this.lastValidLocation = point(0,0)
@@ -39,13 +38,15 @@ class MovementBehavior{
   get y(){ return this.entity.y }
   set x(x){ this.entity.x = x}
   set y(y){ this.entity.y = y}
-  get boundary(){ return this.entity.boundary }
   get sprite(){ return this.entity.sprite }
 
   move(){
     this.lastValidLocation = point(this.x, this.y)
-    if(this.shouldBeCorrected() && !this.isCorrecting) this.startCorrecting()
+    if(this.queuedMovements.length === 0 && this.entity.isDashing) this.queuedMovements.push(this.entity.facing)
+
+
     if(this.shouldBeFalling() && !this.entity.isFalling) this.startFalling()
+    if(this.shouldBeCorrected() && !this.isCorrecting) this.startCorrecting()
 
     if(this.canMove()){
       if(this.queuedMovements.length > 0) this.processQueuedMovements()
@@ -69,8 +70,9 @@ class MovementBehavior{
   }
 
   effectCollisions(){
+    if(this.entity.boundary === undefined) return
     this.effectTargets().forEach(entity => {
-      if(this.boundary.collidesWith(entity.effectBox)) entity.effectBox.triggerEvent(this.entity)
+      if(this.entity.boundary.collidesWith(entity.effectBox)) entity.effectBox.triggerEvent(this.entity)
     })
   }
 
@@ -112,6 +114,7 @@ class MovementBehavior{
   startFalling(){
     this.entity.isFalling = true
     this.entity.fallTimer = Date.now()
+    this.isCorrecting = false
   }
 
   continueFalling(){
@@ -120,7 +123,7 @@ class MovementBehavior{
     this.sprite.sizescaleAdjust -= .0001
 
     let msFalling = Date.now() - this.entity.fallTimer
-    if (msFalling > 2000) this.entity.takeDamage(10)
+    if (msFalling > 2000) this.entity.takeTrueDamage(2)
     if (msFalling > 500 && !this.disabledMovement){
       this.disabledMovement = true
       this.entity.isDashing = false
@@ -137,8 +140,8 @@ class MovementBehavior{
   }
 
   suckIntoPit(){
-    let pitCollisions = this.collisionTargets().filter(bound => bound.canBeFallenInto)
-    let probePoints = this.boundary.probePoints()
+    let pitCollisions = this.activeCollisions().filter(bound => bound.canBeFallenInto)
+    let probePoints = this.entity.boundary.probePoints()
 
     if(!BoundingRegion.pointCollisions(probePoints[UP], pitCollisions)) this.y += 3
     if(!BoundingRegion.pointCollisions(probePoints[DOWN], pitCollisions)) this.y -= 3
@@ -147,38 +150,31 @@ class MovementBehavior{
   }
 
   shouldBeFalling(){
-    if(this.entity.isDashing || this.isCorrecting || this.entity.canFloat === true) return false
-    let collisions = this.boundary.boundaryCollisions(activeRoom.boundaries())
+    if(this.entity.isDashing || this.entity.boundary === undefined ) return false
+    let collisions = this.entity.boundary.boundaryCollisions() // Intentionally bypassing activeCollissions
     if (collisions.length === 0) return false
 
-    let pitFall = collisions.find(bound => bound.containsPoint(this.boundary.centerPoint) && bound.canBeFallenInto)
+    let pitFall = collisions.find(bound => bound.containsPoint(this.entity.boundary.centerPoint) && bound.canBeFallenInto)
     return pitFall !== undefined
   }
 
   // ---------------------------
 
-  startDashing(direction){
-    if(this.entity.isDashing || this.disabledMovement) return
-    this.dashStartSpot = { x: this.x, y: this.y }
+  startDashing(){
+    if(this.entity.isDashing || this.disabledMovement) return false
     if(Date.now() - this.dashedLast > 100){
       if(this.entity.isFalling) this.stopFalling()
-      this.dashedLast = Date.now()
       this.currentDashFrame = 0
       this.entity.isDashing = true
-      this.dashDirection = direction
+      return true
     }
+    return false
   }
 
   continueDashing(){
     this.currentDashFrame++
-    if(this.disabledMovement === false){
-      if(this.dashDirection === UP) this.y -= this.dashSpeed
-      if(this.dashDirection === DOWN) this.y += this.dashSpeed
-      if(this.dashDirection === LEFT) this.x -= this.dashSpeed
-      if(this.dashDirection === RIGHT) this.x += this.dashSpeed
-    }
 
-    let collisions = this.boundary.boundaryCollisions(this.collisionTargets())
+    let collisions = this.activeCollisions()
     if(collisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap()){
       this.x = this.lastValidLocation.x
       this.y = this.lastValidLocation.y
@@ -188,6 +184,7 @@ class MovementBehavior{
   }
 
   stopDashing(){
+    this.dashedLast = Date.now()
     this.entity.isDashing = false
   }
 
@@ -198,28 +195,36 @@ class MovementBehavior{
   }
 
   continueCorrecting(){
-    let boundary = this.entity.boundary.boundaryCollisions(this.newCollisionTargets())[0]
+    let boundaries = this.activeCollisions()
     let speed = this.currentSpeed()
-    if(boundary === undefined) return
+    if(boundaries.length === 0) return
 
-    let collisionAngleRadians = this.boundary.collisionAngleToBound(boundary)
-    let degrees = (collisionAngleRadians + Math.PI) * (180/Math.PI)
+    boundaries.forEach(boundary => {
+      if(this.entity.cantBeShoved && boundary.entityBound) {
+        this.x=this.lastValidLocation.x
+        this.y=this.lastValidLocation.y
+        return
+      }
 
-    if(degrees === 90 && this.queuedMovements.includes(UP)) this.y = this.lastValidLocation.y
-    if(degrees === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastValidLocation.y
-    if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
-    if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
+      let collisionAngleRadians = this.entity.boundary.collisionAngleToBound(boundary)
+      let degrees = (collisionAngleRadians + Math.PI) * (180/Math.PI)
 
-    if(this.outOfBounds()){
-      this.x=this.lastValidLocation.x
-      this.y=this.lastValidLocation.y
+      if(degrees === 90 && this.queuedMovements.includes(UP)) this.y = this.lastValidLocation.y
+      if(degrees === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastValidLocation.y
+      if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
+      if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
 
-      let newX = (Math.cos(collisionAngleRadians+Math.PI) * (speed*.5) + this.x)
-      let newY = (Math.sin(collisionAngleRadians+Math.PI) * (speed*.5) + this.y)
+      if(this.outOfBounds()){
+        this.x=this.lastValidLocation.x
+        this.y=this.lastValidLocation.y
 
-      this.x = newX
-      this.y = newY
-    }
+        let newX = (Math.cos(collisionAngleRadians+Math.PI) * (speed*.5) + this.x)
+        let newY = (Math.sin(collisionAngleRadians+Math.PI) * (speed*.5) + this.y)
+
+        this.x = newX
+        this.y = newY
+      }
+    })
 
     if(!this.outOfBounds()) this.stopCorrecting()
   }
@@ -259,7 +264,7 @@ class MovementBehavior{
 
     this.knockBackCurrentDistance *= 0.75
 
-    let collisions = this.boundary.boundaryCollisions(this.newCollisionTargets())
+    let collisions = this.activeCollisions()
     if(collisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap()){
       this.x = this.lastValidLocation.x
       this.y = this.lastValidLocation.y
@@ -275,11 +280,20 @@ class MovementBehavior{
 
   // ---------------------------
 
-  newCollisionTargets(){
+  activeCollisions(){
+    if(this.entity.boundary === undefined) return []
+
     let collisionTargets = activeRoom.boundaries()
-    if(this.entity.isDashing || this.entity.canBeWalkedThrough) collisionTargets = BoundingRegion.dashCancelling(collisionTargets)
-    if(this.entity.walksRecklessly || this.entity.canFloat === true) collisionTargets = BoundingRegion.canNotBeFallenInto(collisionTargets)
-    return collisionTargets
+
+    if(this.entity.isDashing){
+      collisionTargets = BoundingRegion.dashCancelling(collisionTargets)
+    }
+
+    if(this.entity.walksRecklessly){
+      collisionTargets = BoundingRegion.canNotBeFallenInto(collisionTargets)
+    }
+
+    return this.entity.boundary.boundaryCollisions(collisionTargets)
   }
 
   outOfMap(){
@@ -289,7 +303,7 @@ class MovementBehavior{
   }
 
   outOfBounds(){
-    let collisions = this.boundary.boundaryCollisions(this.newCollisionTargets())
+    let collisions = this.activeCollisions()
     if (collisions.length > 0) return true
     return this.outOfMap()
   }

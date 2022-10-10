@@ -45,6 +45,7 @@ class Chest{
       height: TS*0.3,
       cancelsDash: true,
       isMovingBoundary: true,
+      entityBound: true,
     })
 
     this.hitBoxCoords = () => ({ x: this.x+.15*TS, y: this.y+.25*TS })

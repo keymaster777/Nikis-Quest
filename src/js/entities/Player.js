@@ -39,7 +39,7 @@ class Player{
     let killable = new Killable({
       maxHitPoints: 100,
       maxDamageFrames: 12,
-      onDeath: () => overlayManager.addYouDiedOverlay()
+      onDeath: this.killPlayer
     })
 
     let fightable = new Fightable({
@@ -49,12 +49,12 @@ class Player{
       weapon: imgs.woodSword,
     })
 
-    // this.walksRecklessly = true
     this.walksSlowInDark = true
+    this.cantBeShoved = true
 
     let movementOptions = {
       speed: 2.5,
-      dashSpeed: 7.5,
+      dashSpeed: 11,
       canBeKnockedBack: false,
     }
     this.movementBehavior = new MovementBehavior(this, movementOptions)
@@ -72,6 +72,11 @@ class Player{
     Object.assign(this, killable, fightable)
   }
 
+  killPlayer(){
+    this.movementBehavior.disabledMovement = true
+    overlayManager.addYouDiedOverlay()
+  }
+
   bodyCenter(){
     return { x: this.x, y: this.y-(.2*TS) }
   }
@@ -84,10 +89,7 @@ class Player{
 
   attemptToDash(){
     let dashCost = 30
-    if( this.isDashing === false && this.stamina >= dashCost){
-      this.stamina -= dashCost
-      this.movementBehavior.startDashing(this.facing)
-    }
+    if( this.stamina >= dashCost && this.movementBehavior.startDashing()) this.stamina -= dashCost
   }
 
   setLocation(coord){

@@ -12,14 +12,6 @@ class Coin{
     this.x = x+(Math.random()*spread*2)-spread
     this.y = y+(Math.random()*spread*2)-spread
 
-    this.boundaryCoords = () => ({ x: this.x, y: this.y })
-    this.boundary = new BoundingElliptic({
-      coords: this.boundaryCoords.bind(this),
-      xSemiAxis: .1*TS,
-      ySemiAxis: .05*TS,
-      isMovingBoundary: true,
-    })
-
     this.effectBoxCoords = () => ({ x: this.x, y: this.y-5 })
     this.effectBox = new BoundingElliptic({
       coords: this.effectBoxCoords.bind(this),
@@ -37,9 +29,6 @@ class Coin{
       numberOfFrames: 4,
       sizescale: .03,
     })
-
-    this.canFloat = true
-    this.canBeWalkedThrough = true
 
     let movementOptions = {
       speed: 0,
@@ -62,7 +51,6 @@ class Coin{
   multiplySize(multiplier){
     this.sprite.sizescale *= multiplier
     this.sprite.yAdjust += (.2*TS)*multiplier-.2*TS
-    this.boundary.multiplySize(multiplier)
     this.effectBox.multiplySize(multiplier)
   }
 
@@ -71,8 +59,8 @@ class Coin{
   }
 
   move(){
-    if(!this.isBeingKnockedBack && distance(this.x, this.y, player.x, player.y) < TS*1.3){
-      this.movementBehavior.speed += .15
+    if(!this.isBeingKnockedBack && distance(this.x, this.y, player.x, player.y) < TS*1.75){
+      this.movementBehavior.speed += .18
     }
     this.movementBehavior.setupProximityMovements(player)
     this.movementBehavior.move()

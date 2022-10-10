@@ -1,20 +1,20 @@
 import Level from "./Level"
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants"
-import { handleInput } from "./helpers"
+import { handleInput, getMousePosition, setGame } from "./helpers"
 import { setUpImages } from "./images"
-import Player from "./entities/Player"
-import Room from "./Room"
-import OverlayManager from "./OverlayManager"
 import BitPotion from "../fonts/BitPotion.ttf"
 import AntiquityPrint from "../fonts/antiquity-print.ttf"
 
 let canvas = document.createElement("canvas")
+
 let bitPotionFont = new FontFace("bitPotionFont", `url(${BitPotion})`)
 let antiquityPrintFont = new FontFace("antiquityFont", `url(${AntiquityPrint})`)
 canvas.width = CANVAS_WIDTH
 canvas.height = CANVAS_HEIGHT
 
 global.ctx = canvas.getContext("2d")
+global.freeCam = false
+global.deathCount = 0
 ctx.imageSmoothingEnabled = false;
 
 
@@ -26,24 +26,14 @@ ctx.imageSmoothingEnabled = false;
 })()
 
 const startGame = () => {
-  // TODO: Move these into Level class as instance variables
-  global.activeRoom = new Room(0,0)
-  global.player = new Player()
-  global.level = new Level(1)
-  global.overlayManager = new OverlayManager()
-
-  level.buildOutRooms()
-  player.setLocation(activeRoom.spawnLocation)
-
-  overlayManager.addPrimaryOverlay()
-  overlayManager.addControlsInfoOverlay()
-  overlayManager.addLevelStartOverlay()
-  if(activeRoom.torches.length === 0) overlayManager.addDarkRoomOverlay()
-
+  setGame()
   main()
 }
 
-document.body.appendChild(canvas);
+document.body.appendChild(canvas)
+let img = document.createElement("img")
+img.setAttribute("id", "canvasimg")
+document.body.appendChild(img);
 
 (function() {
   var pressedKeys = {}
@@ -91,6 +81,17 @@ document.body.appendChild(canvas);
   }
 })()
 
+let canvasElem = document.querySelector("canvas")
+
+canvasElem.addEventListener("mousedown", (e) => {
+  let mousePosition = getMousePosition(canvasElem, e)
+  overlayManager.buttonBoxes.forEach(button => {
+    console.log(button.coords())
+    if(button.containsPoint(mousePosition)){
+      button.triggerEvent()
+    }
+  })
+})
 
 function main() {
   handleInput()
