@@ -12,10 +12,11 @@ canvas.width = CANVAS_WIDTH
 canvas.height = CANVAS_HEIGHT
 
 global.ctx = canvas.getContext("2d")
-global.freeCam = false
-global.showFps = false
-global.deathCount = 0
 ctx.imageSmoothingEnabled = false
+
+if(localStorage.getItem("deathCount") === null) localStorage.setItem("deathCount", 0)
+if(localStorage.getItem("freeCam") === null) localStorage.setItem("freeCam", 0)
+if(localStorage.getItem("showFps") === null) localStorage.setItem("showFps", 0)
 
 // For Fps tracking
 let fpsLastCalled = performance.now()
@@ -145,5 +146,5 @@ function main() {
     timeThen = timeNow - (delta % interval)
   }
 
-  if(showFps) showAvgFps()
+  if(localStorage.getItem("showFps") === "1") showAvgFps()
 }

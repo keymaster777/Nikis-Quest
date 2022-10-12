@@ -233,7 +233,7 @@ class Room{
   }
 
   drawRoom(){
-    if(freeCam){
+    if(localStorage.getItem("freeCam") === "1"){
       ctx.translate(CANVAS_WIDTH/2 - player.x, CANVAS_HEIGHT/2 - player.y)
     } else {
       ctx.translate(activeRoom.lpad, 0)

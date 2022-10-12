@@ -89,7 +89,7 @@ class PrimaryOverlay extends OverlayElement{
     ctx.fillText(`Potions Devoured: ${player.potionsConsumed}`,100, CANVAS_HEIGHT-120)
     ctx.fillText(`Chests Opened: ${player.chestsOpened}`,100, CANVAS_HEIGHT-100)
     ctx.fillText(`Enemies Felled: ${player.enemiesFelled}`,100, CANVAS_HEIGHT-80)
-    ctx.fillText(`Death Count: ${deathCount}`,100, CANVAS_HEIGHT-60)
+    ctx.fillText(`Death Count: ${localStorage.getItem("deathCount")}`,100, CANVAS_HEIGHT-60)
 
     ctx.fillText(`Dungeon Level: ${level.levelNum}`,100, CANVAS_HEIGHT-30)
 

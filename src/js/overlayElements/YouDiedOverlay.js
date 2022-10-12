@@ -20,7 +20,8 @@ class YouDiedOverlay extends OverlayElement{
   }
 
   elementTeardown(){
-    deathCount += 1
+    let currentDeathCount = localStorage.getItem("deathCount")
+    localStorage.setItem("deathCount", parseInt(currentDeathCount) + 1)
     setGame()
     super.elementTeardown()
   }

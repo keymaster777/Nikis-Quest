@@ -12,7 +12,7 @@ class ControlsInfoOverlay extends OverlayElement{
       coords: (() => ({ x: this.x+20, y: this.y+this.height-30 })),
       width: 20,
       height: 20,
-      triggerEvent: (() => freeCam = !freeCam)
+      triggerEvent: this.toggleFreeCam
     })
     this.buttonBoxes.push(freeCamBox)
 
@@ -20,9 +20,19 @@ class ControlsInfoOverlay extends OverlayElement{
       coords: (() => ({ x: this.x+20, y: this.y+this.height-60 })),
       width: 20,
       height: 20,
-      triggerEvent: (() => showFps = !showFps)
+      triggerEvent: this.toggleShowFps
     })
     this.buttonBoxes.push(showFpsBox)
+  }
+
+  toggleFreeCam(){
+    let currentSetting = localStorage.getItem("freeCam")
+    localStorage.setItem("freeCam", currentSetting === "1" ? "0" : "1")
+  }
+
+  toggleShowFps(){
+    let currentSetting = localStorage.getItem("showFps")
+    localStorage.setItem("showFps", currentSetting === "1" ? "0" : "1")
   }
 
   render(){
@@ -60,10 +70,10 @@ class ControlsInfoOverlay extends OverlayElement{
     ctx.font = "28px bitPotionFont"
     ctx.textAlign = "left"
 
-    ctx.drawImage(showFps ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-70, 40, 40)
+    ctx.drawImage(localStorage.getItem("showFps") === "1" ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-70, 40, 40)
     ctx.fillText("Show Fps Avg", 47, this.height-44)
 
-    ctx.drawImage(freeCam ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-40, 40, 40)
+    ctx.drawImage(localStorage.getItem("freeCam") === "1" ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-40, 40, 40)
     ctx.fillText("Lock Camera", 47, this.height-14)
 
     super.render()

@@ -19,9 +19,6 @@ module.exports = {
     "level": true,
     "overlayManager": true,
     "activeRoom": true,
-    "freeCam": true,
-    "deathCount": true,
-    "showFps": true,
   },
   "ignorePatterns": [
     "/dist/*.js",
