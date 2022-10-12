@@ -55,7 +55,7 @@ class Chort{
 
     this.walksRecklessly = true
     let movementOptions = {
-      speed: 3.5+level.levelNum*0.3,
+      speed: 3.75+level.levelNum*0.3,
       maxKnockBackFrames: 8,
       knockBackInitialDistance: 16,
       dashSpeed: 10,

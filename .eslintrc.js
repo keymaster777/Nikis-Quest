@@ -21,6 +21,7 @@ module.exports = {
     "activeRoom": true,
     "freeCam": true,
     "deathCount": true,
+    "showFps": true,
   },
   "ignorePatterns": [
     "/dist/*.js",

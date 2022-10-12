@@ -53,8 +53,8 @@ class Player{
     this.cantBeShoved = true
 
     let movementOptions = {
-      speed: 2.5,
-      dashSpeed: 11,
+      speed: 2.65,
+      dashSpeed: 12,
       canBeKnockedBack: false,
     }
     this.movementBehavior = new MovementBehavior(this, movementOptions)

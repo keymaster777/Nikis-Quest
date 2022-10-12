@@ -1,4 +1,3 @@
-import Level from "./Level"
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants"
 import { handleInput, getMousePosition, setGame } from "./helpers"
 import { setUpImages } from "./images"
@@ -6,16 +5,30 @@ import BitPotion from "../fonts/BitPotion.ttf"
 import AntiquityPrint from "../fonts/antiquity-print.ttf"
 
 let canvas = document.createElement("canvas")
-
 let bitPotionFont = new FontFace("bitPotionFont", `url(${BitPotion})`)
 let antiquityPrintFont = new FontFace("antiquityFont", `url(${AntiquityPrint})`)
+
 canvas.width = CANVAS_WIDTH
 canvas.height = CANVAS_HEIGHT
 
 global.ctx = canvas.getContext("2d")
 global.freeCam = false
+global.showFps = false
 global.deathCount = 0
-ctx.imageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false
+
+// For Fps tracking
+let fpsLastCalled = performance.now()
+let fpsLastShown = performance.now()
+let avgFps = 0
+let fpsBuffer = []
+
+// For Fps locking
+let fpsTarget = 60
+let interval = (1000 / fpsTarget)
+let timeThen = performance.now()
+let timeNow
+let delta
 
 
 ( async () => {
@@ -93,15 +106,44 @@ canvasElem.addEventListener("mousedown", (e) => {
   })
 })
 
+function showAvgFps() {
+  let now = performance.now()
+  let delta = (now - fpsLastCalled)/1000
+  fpsLastCalled = now
+  fpsBuffer.push(1/delta)
+
+  if(now - fpsLastShown > 1000){
+    fpsLastShown = now
+    avgFps = fpsBuffer.reduce((a, b) => a + b, 0)/fpsBuffer.length
+    fpsBuffer = []
+  }
+  ctx.textAlign = "left"
+
+  ctx.fillStyle = "white"
+  if(avgFps < fpsTarget*.9) ctx.fillStyle = "red"
+
+  ctx.font = "24px bitPotionFont"
+  ctx.fillText(`fps: ${Math.min(~~avgFps, fpsTarget)}`, CANVAS_WIDTH - 262, CANVAS_HEIGHT-10)
+}
+
 function main() {
-  handleInput()
-
-  ctx.fillStyle = "#1a1a1a"
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-  activeRoom.drawRoom()
-  overlayManager.renderOverlays()
-
-  if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
   requestAnimationFrame(main)
+
+  timeNow = performance.now()
+  delta = timeNow - timeThen
+
+  if(delta > interval) {
+    handleInput()
+    ctx.fillStyle = "#1a1a1a"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    activeRoom.drawRoom()
+    overlayManager.renderOverlays()
+
+    if (level.isComplete()) overlayManager.addLevelCompleteOverlay()
+
+    timeThen = timeNow - (delta % interval)
+  }
+
+  if(showFps) showAvgFps()
 }

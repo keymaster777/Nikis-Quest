@@ -14,8 +14,15 @@ class ControlsInfoOverlay extends OverlayElement{
       height: 20,
       triggerEvent: (() => freeCam = !freeCam)
     })
-
     this.buttonBoxes.push(freeCamBox)
+
+    let showFpsBox = new BoundingRectangle({
+      coords: (() => ({ x: this.x+20, y: this.y+this.height-60 })),
+      width: 20,
+      height: 20,
+      triggerEvent: (() => showFps = !showFps)
+    })
+    this.buttonBoxes.push(showFpsBox)
   }
 
   render(){
@@ -52,6 +59,10 @@ class ControlsInfoOverlay extends OverlayElement{
     ctx.fillStyle = "#b8b5b9"
     ctx.font = "28px bitPotionFont"
     ctx.textAlign = "left"
+
+    ctx.drawImage(showFps ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-70, 40, 40)
+    ctx.fillText("Show Fps Avg", 47, this.height-44)
+
     ctx.drawImage(freeCam ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-40, 40, 40)
     ctx.fillText("Lock Camera", 47, this.height-14)
 
@@ -59,6 +70,7 @@ class ControlsInfoOverlay extends OverlayElement{
 
     // ctx.restore()
     // this.buttonBoxes[0].drawArea("yellow")
+    // this.buttonBoxes[1].drawArea("yellow")
   }
 }
 

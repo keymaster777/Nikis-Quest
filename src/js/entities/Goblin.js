@@ -52,7 +52,7 @@ class Goblin{
     })
 
     let movementOptions = {
-      speed: Math.random() + .75,
+      speed: Math.random() + .9,
       maxKnockBackFrames: 10,
       knockBackInitialDistance: 16,
       dashSpeed: 8,
