@@ -15,7 +15,7 @@ class MovementBehavior{
     this.dashSpeed = options.dashSpeed || 0
     this.effectTargets = options.effectTargets || (() => activeRoom.effectEntities())
     this.queuedMovements = []
-    this.lastValidLocation = point(0,0)
+    this.lastLocation = point(0,0)
     this.correctingPosition = false
     this.disabledMovement = false
     this.slowedForNFrames = 0
@@ -42,7 +42,7 @@ class MovementBehavior{
   get sprite(){ return this.entity.sprite }
 
   move(){
-    this.lastValidLocation = point(this.x, this.y)
+    this.lastLocation = point(this.x, this.y)
     this.startedInBounds = !this.outOfBounds()
     if(this.queuedMovements.length === 0 && this.entity.isDashing) this.queuedMovements.push(this.entity.facing)
 
@@ -63,8 +63,8 @@ class MovementBehavior{
     }
 
     if(this.shouldStayValid()){
-      if(this.outOfBounds()) this.x = this.lastValidLocation.x
-      if(this.outOfBounds()) this.y = this.lastValidLocation.y
+      if(this.outOfBounds()) this.x = this.lastLocation.x
+      if(this.outOfBounds()) this.y = this.lastLocation.y
     }
 
     this.effectCollisions()
@@ -188,8 +188,8 @@ class MovementBehavior{
 
     let collisions = this.activeCollisions()
     if(collisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap()){
-      this.x = this.lastValidLocation.x
-      this.y = this.lastValidLocation.y
+      this.x = this.lastLocation.x
+      this.y = this.lastLocation.y
       this.currentDashFrame = this.maxDashFrames
     }
     if(this.currentDashFrame === this.maxDashFrames) this.stopDashing()
@@ -213,30 +213,28 @@ class MovementBehavior{
 
     boundaries.forEach(boundary => {
       if(this.entity.cantBeShoved && boundary.entityBound) {
-        this.x=this.lastValidLocation.x
-        this.y=this.lastValidLocation.y
+        this.x=this.lastLocation.x
+        this.y=this.lastLocation.y
         return
       }
 
       let collisionAngleRadians = this.entity.boundary.collisionAngleToBound(boundary)
       let degrees = (collisionAngleRadians + Math.PI) * (180/Math.PI)
 
-      if(degrees === 90 && this.queuedMovements.includes(UP)) this.y = this.lastValidLocation.y
-      if(degrees === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastValidLocation.y
-      if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
-      if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
+      if(degrees === 90 && this.queuedMovements.includes(UP)) this.y = this.lastLocation.y
+      if(degrees === 270 && this.queuedMovements.includes(DOWN)) this.y = this.lastLocation.y
+      if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastLocation.x
+      if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastLocation.x
 
       if(this.outOfBounds()) {
         for(let i = 0; this.outOfBounds() && i <= Math.ceil(speed); i++){
-          let newX = (Math.cos(collisionAngleRadians+Math.PI) * (1) + this.x)
-          let newY = (Math.sin(collisionAngleRadians+Math.PI) * (1) + this.y)
-          this.x = newX
-          this.y = newY
+          this.x = Math.cos(collisionAngleRadians+Math.PI) * (1) + this.x
+          this.y = Math.sin(collisionAngleRadians+Math.PI) * (1) + this.y
         }
 
         if(this.outOfBounds() && this.startedInBounds){
-          this.x = this.lastValidLocation.x
-          this.y = this.lastValidLocation.y
+          this.x = this.lastLocation.x
+          this.y = this.lastLocation.y
         }
       }
     })
@@ -270,8 +268,8 @@ class MovementBehavior{
     let kbDistance = this.knockBackCurrentDistance
 
     if(this.disabledMovement === false){
-      this.x=this.lastValidLocation.x
-      this.y=this.lastValidLocation.y
+      this.x=this.lastLocation.x
+      this.y=this.lastLocation.y
 
       this.x = (Math.cos(this.knockBackAngle+Math.PI) * (-kbDistance) + this.x)
       this.y = (Math.sin(this.knockBackAngle+Math.PI) * (-kbDistance) + this.y)
@@ -281,8 +279,8 @@ class MovementBehavior{
 
     let collisions = this.activeCollisions()
     if(collisions.filter(boundary => boundary.cancelsDash).length > 0 || this.outOfMap()){
-      this.x = this.lastValidLocation.x
-      this.y = this.lastValidLocation.y
+      this.x = this.lastLocation.x
+      this.y = this.lastLocation.y
       this.currentKnockBackFrame = this.maxKnockBackFrames
     }
 
