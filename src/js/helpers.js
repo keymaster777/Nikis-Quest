@@ -32,6 +32,7 @@ function setGame(){
   overlayManager.addPrimaryOverlay()
   overlayManager.addControlsInfoOverlay()
   overlayManager.addLevelStartOverlay()
+  if(localStorage.getItem("showDebug") === "1") overlayManager.addDebugInfoOverlay()
   if(activeRoom.torches.length === 0) overlayManager.addDarkRoomOverlay()
 }
 

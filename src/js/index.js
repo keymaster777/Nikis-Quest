@@ -16,13 +16,7 @@ ctx.imageSmoothingEnabled = false
 
 if(localStorage.getItem("deathCount") === null) localStorage.setItem("deathCount", 0)
 if(localStorage.getItem("freeCam") === null) localStorage.setItem("freeCam", 0)
-if(localStorage.getItem("showFps") === null) localStorage.setItem("showFps", 0)
-
-// For Fps tracking
-let fpsLastCalled = performance.now()
-let fpsLastShown = performance.now()
-let avgFps = 0
-let fpsBuffer = []
+if(localStorage.getItem("showDebug") === null) localStorage.setItem("showDebug", 0)
 
 // For Fps locking
 let fpsTarget = 60
@@ -107,25 +101,6 @@ canvasElem.addEventListener("mousedown", (e) => {
   })
 })
 
-function showAvgFps() {
-  let now = performance.now()
-  let delta = (now - fpsLastCalled)/1000
-  fpsLastCalled = now
-  fpsBuffer.push(1/delta)
-
-  if(now - fpsLastShown > 1000){
-    fpsLastShown = now
-    avgFps = fpsBuffer.reduce((a, b) => a + b, 0)/fpsBuffer.length
-    fpsBuffer = []
-  }
-  ctx.textAlign = "left"
-
-  ctx.fillStyle = "white"
-  if(avgFps < fpsTarget*.9) ctx.fillStyle = "red"
-
-  ctx.font = "24px bitPotionFont"
-  ctx.fillText(`fps: ${Math.min(~~avgFps, fpsTarget)}`, CANVAS_WIDTH - 262, CANVAS_HEIGHT-10)
-}
 
 function main() {
   requestAnimationFrame(main)
@@ -135,6 +110,7 @@ function main() {
 
   if(delta > interval) {
     handleInput()
+
     ctx.fillStyle = "#1a1a1a"
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -145,6 +121,4 @@ function main() {
 
     timeThen = timeNow - (delta % interval)
   }
-
-  if(localStorage.getItem("showFps") === "1") showAvgFps()
 }

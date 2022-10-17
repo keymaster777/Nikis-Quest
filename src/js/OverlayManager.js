@@ -7,6 +7,7 @@ import DarkRoomOverlay from "./overlayElements/DarkRoomOverlay"
 import ExitInstructionsOverlay from "./overlayElements/ExitInstructionsOverlay"
 import RoomMessageOverlay from "./overlayElements/RoomMessageOverlay"
 import BossBarOverlay from "./overlayElements/BossBarOverlay"
+import DebugInfoOverlay from "./overlayElements/DebugInfoOverlay"
 
 class OverlayManager {
   constructor(){
@@ -67,6 +68,11 @@ class OverlayManager {
   addBossBarOverlay() {
     if(this.activeOverlayElements.find(overlay => overlay.name === "Boss Bar Overlay")) return
     this.activeOverlayElements.push(new BossBarOverlay())
+  }
+
+  addDebugInfoOverlay() {
+    if (this.activeOverlayElements.find(overlay => overlay.name === "Debug Info Overlay")) return
+    this.activeOverlayElements.push(new DebugInfoOverlay())
   }
 }
 

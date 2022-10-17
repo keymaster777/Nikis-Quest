@@ -16,13 +16,13 @@ class ControlsInfoOverlay extends OverlayElement{
     })
     this.buttonBoxes.push(freeCamBox)
 
-    let showFpsBox = new BoundingRectangle({
+    let showDebugBox = new BoundingRectangle({
       coords: (() => ({ x: this.x+20, y: this.y+this.height-60 })),
       width: 20,
       height: 20,
-      triggerEvent: this.toggleShowFps
+      triggerEvent: this.toggleShowDebug
     })
-    this.buttonBoxes.push(showFpsBox)
+    this.buttonBoxes.push(showDebugBox)
   }
 
   toggleFreeCam(){
@@ -30,9 +30,10 @@ class ControlsInfoOverlay extends OverlayElement{
     localStorage.setItem("freeCam", currentSetting === "1" ? "0" : "1")
   }
 
-  toggleShowFps(){
-    let currentSetting = localStorage.getItem("showFps")
-    localStorage.setItem("showFps", currentSetting === "1" ? "0" : "1")
+  toggleShowDebug(){
+    let currentSetting = localStorage.getItem("showDebug")
+    localStorage.setItem("showDebug", currentSetting === "1" ? "0" : "1")
+    if (localStorage.getItem("showDebug") === "1") overlayManager.addDebugInfoOverlay()
   }
 
   render(){
@@ -70,8 +71,8 @@ class ControlsInfoOverlay extends OverlayElement{
     ctx.font = "28px bitPotionFont"
     ctx.textAlign = "left"
 
-    ctx.drawImage(localStorage.getItem("showFps") === "1" ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-70, 40, 40)
-    ctx.fillText("Show Fps Avg", 47, this.height-44)
+    ctx.drawImage(localStorage.getItem("showDebug") === "1" ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-70, 40, 40)
+    ctx.fillText("Debugger Info", 47, this.height-44)
 
     ctx.drawImage(localStorage.getItem("freeCam") === "1" ? imgs.checkboxCheck : imgs.checkbox, 10, this.height-40, 40, 40)
     ctx.fillText("Lock Camera", 47, this.height-14)

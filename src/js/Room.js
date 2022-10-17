@@ -232,7 +232,16 @@ class Room{
     return [ ...this.staticBoundaries, ...dynamicBoundaries]
   }
 
+  drawBoundingRegions(){
+    this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
+    this.hitBoxEntities().forEach(entity => entity.hitBox.drawArea("green"))
+    this.effectEntities().forEach(entity => entity.effectBox.drawArea("yellow"))
+    player.boundary.drawBounds()
+  }
+
   drawRoom(){
+    ctx.save()
+
     if(localStorage.getItem("freeCam") === "1"){
       ctx.translate(CANVAS_WIDTH/2 - player.x, CANVAS_HEIGHT/2 - player.y)
     } else {
@@ -274,17 +283,9 @@ class Room{
 
     layer3.forEach(ele => ele.draw())
 
-    // this.boundaries().forEach(boundary => boundary.drawArea("red", this.boundaries()))
-    // this.hitBoxEntities().forEach(entity => entity.hitBox.drawArea("green"))
-
-    // this.doors.forEach(door => door.effectBox.drawArea('yellow'))
-    // this.potions.forEach(potion => potion.effectBox.drawArea('yellow'))
-
-
-    // player.boundary.drawBounds()
+    if(localStorage.getItem("showDebug") === "1") this.drawBoundingRegions()
 
     ctx.restore()
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }
 

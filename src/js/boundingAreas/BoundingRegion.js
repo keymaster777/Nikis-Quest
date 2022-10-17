@@ -1,3 +1,5 @@
+import { distance } from "../helpers"
+
 class BoundingRegion{
   constructor(options) {
     // If boundary moves use coords function to get parent objects x and y
@@ -71,9 +73,13 @@ class BoundingRegion{
       boundary.updateBoundaryCoords()
 
       let closestPointToBound = this.closestPointToBound(boundary)
-      ctx.fillStyle = "blue"
-      ctx.fillRect(closestPointToBound.x-2,closestPointToBound.y-2,5,5) // Creates visual reference for boundaries center mark
+      let foreignClosestPoint = boundary.closestPointToBound(this)
 
+      if(distance(closestPointToBound.x, closestPointToBound.y, foreignClosestPoint.x, foreignClosestPoint.y) < 100){
+        ctx.fillStyle = "blue"
+        ctx.fillRect(closestPointToBound.x - 2, closestPointToBound.y - 2, 5, 5) // Creates visual reference for boundaries center mark
+
+      }
     })
 
     return collidingBoundaries

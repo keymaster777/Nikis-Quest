@@ -18,6 +18,7 @@ class MovementBehavior{
     this.lastValidLocation = point(0,0)
     this.correctingPosition = false
     this.disabledMovement = false
+    this.slowedForNFrames = 0
 
     // Knockback attributes
     this.canBeKnockedBack = options.canBeKnockedBack === undefined ? true : options.canBeKnockedBack
@@ -42,6 +43,7 @@ class MovementBehavior{
 
   move(){
     this.lastValidLocation = point(this.x, this.y)
+    this.startedInBounds = !this.outOfBounds()
     if(this.queuedMovements.length === 0 && this.entity.isDashing) this.queuedMovements.push(this.entity.facing)
 
 
@@ -81,6 +83,8 @@ class MovementBehavior{
     if (this.entity.walksSlowInDark && activeRoom.torches.length === 0) speed = speed * .85
     if (this.entity.walksSlowWhenMaimed && this.entity.hitPoints < this.entity.maxHitPoints) speed = speed * .75
     if (this.entity.isFalling) speed = 0
+    if (this.slowedForNFrames !== 0) speed = speed * 0.5
+
     return speed
   }
 
@@ -107,6 +111,14 @@ class MovementBehavior{
       if(direction === LEFT) this.x -= speed
       if(direction === RIGHT) this.x += speed
     })
+
+    if(this.entity.slowCollisionMovement){
+      if(this.startedInBounds && this.activeCollisions().find(bound => bound.entityBound === false)){
+        this.slowedForNFrames = 3
+      } else {
+        this.slowedForNFrames = Math.max(this.slowedForNFrames-1, 0)
+      }
+    }
   }
 
   // ---------------------------
@@ -214,15 +226,18 @@ class MovementBehavior{
       if(degrees === 360 && this.queuedMovements.includes(LEFT)) this.x = this.lastValidLocation.x
       if(degrees === 180 && this.queuedMovements.includes(RIGHT)) this.x = this.lastValidLocation.x
 
-      if(this.outOfBounds()){
-        this.x=this.lastValidLocation.x
-        this.y=this.lastValidLocation.y
+      if(this.outOfBounds()) {
+        for(let i = 0; this.outOfBounds() && i <= Math.ceil(speed); i++){
+          let newX = (Math.cos(collisionAngleRadians+Math.PI) * (1) + this.x)
+          let newY = (Math.sin(collisionAngleRadians+Math.PI) * (1) + this.y)
+          this.x = newX
+          this.y = newY
+        }
 
-        let newX = (Math.cos(collisionAngleRadians+Math.PI) * (speed*.5) + this.x)
-        let newY = (Math.sin(collisionAngleRadians+Math.PI) * (speed*.5) + this.y)
-
-        this.x = newX
-        this.y = newY
+        if(this.outOfBounds() && this.startedInBounds){
+          this.x = this.lastValidLocation.x
+          this.y = this.lastValidLocation.y
+        }
       }
     })
 

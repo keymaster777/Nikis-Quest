@@ -51,6 +51,7 @@ class Player{
 
     this.walksSlowInDark = true
     this.cantBeShoved = true
+    this.slowCollisionMovement = true
 
     let movementOptions = {
       speed: 2.65,

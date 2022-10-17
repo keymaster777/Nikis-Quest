@@ -13,15 +13,15 @@ class YouDiedOverlay extends OverlayElement{
     player.speed = 0
     player.dashSpeed = 0
     this.timer = Date.now()
+    let currentDeathCount = localStorage.getItem("deathCount")
+    localStorage.setItem("deathCount", parseInt(currentDeathCount) + 1)
   }
 
   tearDownConditions(){
     return Date.now() - this.timer > 6*1000
   }
 
-  elementTeardown(){
-    let currentDeathCount = localStorage.getItem("deathCount")
-    localStorage.setItem("deathCount", parseInt(currentDeathCount) + 1)
+  elementTeardown() {
     setGame()
     super.elementTeardown()
   }
